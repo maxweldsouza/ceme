@@ -1,11 +1,22 @@
 import os
 import tornado.ioloop
 import tornado.web
+import json
+
+config = json.load(open('/etc/scantuary.json'))
 
 settings = {
     'debug' : True,
     'cookie_secret' : 'asdfn034uih4usygfp89dghu23780tghdsfgbshx'
 }
+
+def restricted(f):
+    def wrapper(*args, **kwargs):
+        if args[0].get_secure_cookie('fidmsig'):
+            return f(*args, **kwargs)
+        else:
+            return args[0].redirect('/')
+    return wrapper
 
 def authenticate(email, password):
     if email == 'maxellusionist@gmail.com' and password == 'm4a1ak47':
@@ -30,6 +41,12 @@ class LogoutHandler(tornado.web.RequestHandler):
         self.clear_cookie('fidmsig')
         self.redirect('/logged-out')
 
+class LogHandler(tornado.web.RequestHandler):
+    @restricted
+    def get(self, path):
+        file = open(config["loglocation"] + 'serverErrors.log', 'r')
+        self.write(file.read())
+
 class CodeHandler(tornado.web.RequestHandler):
     def get(self, path):
         fullpath = './assets/code/' + path
@@ -43,6 +60,7 @@ class CodeHandler(tornado.web.RequestHandler):
 application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
+    (r"/logs/(.*)", LogHandler),
     (r"/assets/code/(.*)", CodeHandler),
     (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),
     (r"/(.*)", MainHandler),
