@@ -96,3 +96,45 @@ div
                             'text-align:center;'
                     h1
                         8
+        div
+            attrib
+                class
+                    'col-md-4'
+            div
+                attrib
+                    class
+                        'panel panel-default'
+                div
+                    attrib
+                        class
+                            'panel-heading'
+                    'Web Server'
+                div
+                    attrib
+                        class
+                            'panel-body'
+                        style
+                            'text-align:center;'
+                    h1
+                        attrib
+                            id
+                                'uptime-status'
+                        '''
+                        <script>
+                        function jsonUptimeRobotApi(data) {
+                            var statuses = {
+                                "0": "Paused",
+                                "1": "Not Checked",
+                                "2": "Up",
+                                "8": "Seems Down",
+                                "9": "Down",
+                            }
+                            $("#uptime-status").html(statuses[data.monitors.monitor[0].status]);
+                        }
+                        $.ajax({
+                            url: "https://api.uptimerobot.com/getMonitors?apiKey=m776543979-97c43119873e5593e3a22bbc&format=json",
+                            type: "GET",
+                            dataType: "jsonp",
+                        });
+                        </script>
+                        '''
