@@ -1,13 +1,16 @@
 import os
 import tornado.ioloop
 import tornado.web
+from tornado.httpserver import HTTPServer
 import json
+
 
 config = json.load(open('/etc/scantuary.json'))
 
 settings = {
     'debug' : True,
-    'cookie_secret' : 'asdfn034uih4usygfp89dghu23780tghdsfgbshx'
+    'cookie_secret' : 'asdfn034uih4usygfp89dghu23780tghdsfgbshx',
+    'xsrf_cookies': True
 }
 
 def restricted(f):
@@ -24,6 +27,7 @@ def authenticate(email, password):
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
+        self.xsrf_token
         self.render("index.html")
 
 class LoginHandler(tornado.web.RequestHandler):
@@ -67,5 +71,9 @@ application = tornado.web.Application([
     ], **settings)
 
 if __name__ == "__main__":
-    application.listen(8001)
+    server = HTTPServer(application, ssl_options = {
+        'certfile': os.path.join('certs/localhost.crt'),
+        'keyfile': os.path.join('certs/localhost.key'),
+        })
+    server.listen(8001)
     tornado.ioloop.IOLoop.instance().start()

@@ -714,6 +714,10 @@ var cemeEnv = function() {
             },
             'ProductWithDashes': function (a) {
                 return a.replace(/\s/g, '-');
+            },
+            'GetCookie': function(name) {
+                var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+                return r ? r[1] : undefined;
             }
     }
 }();
