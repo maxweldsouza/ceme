@@ -7,12 +7,6 @@ import json
 
 config = json.load(open('/etc/scantuary.json'))
 
-settings = {
-    'debug' : True,
-    'cookie_secret' : 'asdfn034uih4usygfp89dghu23780tghdsfgbshx',
-    'xsrf_cookies': True
-}
-
 def restricted(f):
     def wrapper(*args, **kwargs):
         if args[0].get_secure_cookie('fidmsig'):
@@ -60,6 +54,19 @@ class CodeHandler(tornado.web.RequestHandler):
         else:
             file = open('./assets/code/login.ceme', 'r')
             self.write(file.read())
+
+class ErrorHandler(tornado.web.ErrorHandler):
+    def get(self):
+        self.write('An error occurred');\
+
+settings = {
+    'default_handler_class': ErrorHandler,
+    'default_handler_args': dict(status_code=404),
+    'compress_response': True,
+    'debug' : True,
+    'cookie_secret' : 'asdfn034uih4usygfp89dghu23780tghdsfgbshx',
+    'xsrf_cookies': True
+}
 
 application = tornado.web.Application([
     (r"/login", LoginHandler),
