@@ -15,7 +15,7 @@ var onClickHandlers = function (a) {
         $('a').unbind('click');
         $('a').click( function (e) {
             var url = $(this).attr("href");
-            if (url[0] === '/') {
+            if (url && url[0] === '/') {
                 $('#page-container').empty();
                 history.pushState(null, null, url);
 
@@ -32,6 +32,10 @@ window.onpopstate = function (event) {
     Router.route(window.location.pathname);
 }
 
+var xsrfToken = function () {
+    return '&_xsrf=' + cemeEnv.GetCookie('_xsrf')
+}
+
 var Router = function () {
     var route = function (url) {
         if (url === '/') {
@@ -46,15 +50,28 @@ var Router = function () {
         }
         $('#ceme-run').click(runCode);
 
-        var text = ajaxRequest('/assets/demos/' + url + '.ceme');
-        $('#ceme-input').val(text);
-        runCode();
+    $('#ceme-save').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+                url: 'save',
+                type: 'POST',
+                data: $('#submit-form').serialize() + xsrfToken(),
+        }).done(function (response) {
+            $('#alert').html(cemeEnv.Alert(response, 'success'));
+        }).fail(function () {
+            $('#alert').html(cemeEnv.Alert('Your changes could not be saved', 'danger'));
+        });
+    });
 
-        onClickHandlers();
-    }
-    return {
-        'route': route
-    }
+    var text = ajaxRequest('/assets/demos/' + url + '.ceme');
+    $('#ceme-input').val(text);
+    runCode();
+
+    onClickHandlers();
+}
+return {
+    'route': route
+}
 }();
 
 (function (exports) {

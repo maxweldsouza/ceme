@@ -1,6 +1,19 @@
 import
     '/assets/code/css.ceme'
 define
+    Alert
+        x
+        y
+    Formatter
+        '''
+        <div class="alert alert-%s alert-dismissible" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            %s
+        </div>
+        '''
+        y
+        x
+define
     TYPOGRAPHY
     let
         lineheight
@@ -108,7 +121,8 @@ div
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#my-menu">Ceme.io</a>
+        <a class="navbar-brand" href="#my-menu"><i class="fa fa-bars"></i></a>
+        <a class="navbar-brand" href="/">Ceme.io</a>
     </div>
 
     <!-- Collect the nav links, forms, and other
@@ -141,7 +155,7 @@ div
         div
             attrib
                 class
-                    'col-md-12'
+                    'col-md-6'
             div
                 attrib
                     id
@@ -150,12 +164,26 @@ div
         div
             attrib
                 class
-                    'col-md-12'
+                    'col-md-6'
             h3
                 'Code'
-            '<textarea id="ceme-input" class="form-control" style="font-family:Courier;" rows="10"></textarea>'
             div
                 attrib
                     class
                         'panel'
-                '<div class="btn-group" role="group" aria-label=""><button class="btn btn-default" id="ceme-run">Run</button><button class="btn btn-default">Save</button></div>'
+                Formatter
+                    '''
+                    <form action="/save" method="post" id="submit-form">
+                    <textarea name="content" id="ceme-input" class="form-control" style="font-family:Courier;" rows="10"></textarea>
+                    <div class="btn-group" role="group" aria-label="">
+                    <div class="btn btn-default" id="ceme-run">Run</div>
+                    <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+                    <input type="hidden" name="name" value="%s">
+                    </div>
+                    </form>
+                    '''
+                    window.location.pathname
+                div
+                    attrib
+                        id
+                            'alert'

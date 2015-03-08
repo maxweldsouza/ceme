@@ -3,10 +3,26 @@ import tornado.ioloop
 import tornado.web
 from tornado.httpserver import HTTPServer
 import json
+import MySQLdb
 
+try:
+    db = MySQLdb.connect(host="localhost",
+            user="root",
+            passwd="dttmw5d",
+            db="cemeio")
+
+    cur = db.cursor()
+
+except Exception, e:
+    # TODO log error
+    raise
+
+xsrf_cookie = 'sodfksoihasg'
+
+# authentication
 def restricted(f):
     def wrapper(*args, **kwargs):
-        if args[0].get_secure_cookie('fidmsig'):
+        if args[0].get_secure_cookie(xsrf_cookie):
             return f(*args, **kwargs)
         else:
             return args[0].redirect('/')
@@ -18,38 +34,59 @@ def authenticate(email, password):
     elif email == 'chrisleeds18@gmail.com' and password == 'tsi0ffo5':
         return True
 
-class MainHandler(tornado.web.RequestHandler):
-    def get(self, path):
-        self.xsrf_token
-        self.render("index.html")
-
 class LoginHandler(tornado.web.RequestHandler):
     def post(self):
         email = self.get_argument('email', '')
         password = self.get_argument('password', '')
         if authenticate(email, password):
-            self.set_secure_cookie('fidmsig', 'maxwel')
+            self.set_secure_cookie(xsrf_cookie, 'maxwel')
             self.redirect('/home')
         else:
             self.redirect('/login-fail')
 
 class LogoutHandler(tornado.web.RequestHandler):
     def post(self):
-        self.clear_cookie('fidmsig')
+        self.clear_cookie(xsrf_cookie)
         self.redirect('/logged-out')
 
 # use the @restricted decorator
 
-class DemoHandler(tornado.web.RequestHandler):
+class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
-        fullpath = './assets/code/' + path
-        #if self.get_secure_cookie('fidmsig'):
-        file = open(fullpath, 'r')
-        self.write(file.read())
+        self.xsrf_token
+        self.render("index.html")
 
 class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
         self.write('An error occurred');\
+
+# ceme code
+class CreateHandler(tornado.web.ErrorHandler):
+    pass
+
+class DemoHandler(tornado.web.RequestHandler):
+    def get(self, path):
+        fullpath = './assets/code/' + path
+        #if self.get_secure_cookie(xsrf_cookie):
+        file = open(fullpath, 'r')
+        self.write(file.read())
+
+class SaveHandler(tornado.web.RequestHandler):
+    def post(self):
+        content = self.get_argument('content', '')
+        name = self.get_argument('name', '')
+        print content
+        print name
+        self.write('The page has been saved successfully')
+
+class DeleteHandler(tornado.web.RequestHandler):
+    pass
+
+class HistoryHandler(tornado.web.RequestHandler):
+    pass
+
+class DiffHandler(tornado.web.RequestHandler):
+    pass
 
 settings = {
     'default_handler_class': ErrorHandler,
@@ -63,6 +100,7 @@ settings = {
 application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
+    (r"/save", SaveHandler),
     (r"/assets/code/(.*)", DemoHandler),
     (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),
     (r"/(.*)", MainHandler),
