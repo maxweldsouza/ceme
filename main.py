@@ -4,9 +4,6 @@ import tornado.web
 from tornado.httpserver import HTTPServer
 import json
 
-
-config = json.load(open('/etc/scantuary.json'))
-
 def restricted(f):
     def wrapper(*args, **kwargs):
         if args[0].get_secure_cookie('fidmsig'):
@@ -16,7 +13,9 @@ def restricted(f):
     return wrapper
 
 def authenticate(email, password):
-    if email == 'maxellusionist@gmail.com' and password == 'm4a1ak47':
+    if email == 'maxellusionist@gmail.com' and password == 'tsi0ffo5':
+        return True
+    elif email == 'chrisleeds18@gmail.com' and password == 'tsi0ffo5':
         return True
 
 class MainHandler(tornado.web.RequestHandler):
@@ -39,21 +38,14 @@ class LogoutHandler(tornado.web.RequestHandler):
         self.clear_cookie('fidmsig')
         self.redirect('/logged-out')
 
-class LogHandler(tornado.web.RequestHandler):
-    @restricted
-    def get(self, path):
-        file = open(config["loglocation"] + 'serverErrors.log', 'r')
-        self.write(file.read())
+# use the @restricted decorator
 
-class CodeHandler(tornado.web.RequestHandler):
+class DemoHandler(tornado.web.RequestHandler):
     def get(self, path):
         fullpath = './assets/code/' + path
-        if self.get_secure_cookie('fidmsig'):
-            file = open(fullpath, 'r')
-            self.write(file.read())
-        else:
-            file = open('./assets/code/login.ceme', 'r')
-            self.write(file.read())
+        #if self.get_secure_cookie('fidmsig'):
+        file = open(fullpath, 'r')
+        self.write(file.read())
 
 class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
@@ -71,8 +63,7 @@ settings = {
 application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
-    (r"/logs/(.*)", LogHandler),
-    (r"/assets/code/(.*)", CodeHandler),
+    (r"/assets/code/(.*)", DemoHandler),
     (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),
     (r"/(.*)", MainHandler),
     ], **settings)
@@ -82,5 +73,5 @@ if __name__ == "__main__":
         'certfile': os.path.join('certs/localhost.crt'),
         'keyfile': os.path.join('certs/localhost.key'),
         })
-    server.listen(8001)
+    server.listen(8443)
     tornado.ioloop.IOLoop.instance().start()

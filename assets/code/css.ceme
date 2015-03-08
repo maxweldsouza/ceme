@@ -1,0 +1,312 @@
+#############################################
+# General
+#############################################
+define
+    Css
+        x
+    +
+        '<style type="text/css">'
+        x
+        '</style>'
+define
+    CssSelector
+        x
+        y
+    +
+        x
+        ' {\n'
+        y
+        '\n}\n'
+define
+    PixelString
+        name
+        px
+    sum
+        name
+        ':'
+        px
+        'px;'
+#############################################
+# Css
+#############################################
+define
+    Width
+    PixelString
+        'width'
+        .
+define
+    Height
+    PixelString
+        'height'
+        .
+define
+    Left
+    PixelString
+        'left'
+        .
+define
+    Dimensions
+        w
+        h
+    +
+        Width
+            w
+        Height
+            h
+define
+    SideMargin # TODO unused?
+        x
+    +
+        PixelString
+            'margin-left'
+            x
+        PixelString
+            'margin-right'
+            x
+define
+    BackgroundColor
+        x
+    sum
+        'background-color:'
+        x
+        ';'
+define
+    BorderColor
+        x
+    sum
+        'border-color:'
+        x
+        ';'
+define
+    Color # TODO unused?
+        x
+    sum
+        'color:'
+        x
+        ';'
+define
+    FontSize
+        x
+    sum
+        'font-size:'
+        x
+        'px;'
+define
+    FontSizeEm
+        x
+    sum
+        'font-size:'
+        x
+        'em;'
+define
+    MarginTopEm
+        x
+    sum
+        'margin-top:'
+        x
+        'em;'
+define
+    MarginBottomEm
+        x
+    sum
+        'margin-bottom:'
+        x
+        'em;'
+#############################################
+# Css 3
+#############################################
+define
+    MediaQuery
+        x
+        y
+    +
+        '@media '
+        x
+        ' {\n'
+        y
+        '\n}\n'
+define
+    BoxShadow
+        x
+    +
+        '-webkit-box-shadow: '
+        x
+        ';'
+        '-moz-box-shadow: '
+        x
+        ';'
+        'box-shadow: '
+        x
+        ';'
+define
+    BorderRadius
+        x
+    +
+        '-webkit-border-radius: '
+        x
+        ';'
+        '-moz-border-radius: '
+        x
+        ';'
+        'border-radius: '
+        x
+        ';'
+define
+    Transition
+        x
+    +
+        '-webkit-transition: '
+        x
+        ';'
+        '-moz-transition: '
+        x
+        ';'
+        '-o-transition: '
+        x
+        ';'
+        'transition: '
+        x
+        ';'
+define
+    Transform
+        x
+    +
+        '-webkit-transform: '
+        x
+        ';'
+        '-moz-transform: '
+        x
+        ';'
+        '-ms-transform: '
+        x
+        ';'
+        '-o-transform: '
+        x
+        ';'
+        'transform: '
+        x
+        ';'
+define
+    UserSelect
+        x
+    +
+        '-webkit-user-select: '
+        x
+        ';'
+        '-moz-user-select: '
+        x
+        ';'
+        '-ms-user-select: '
+        x
+        ';'
+        'user-select: '
+        x
+        ';'
+define
+    LinearGradient
+        x
+        y
+    Formatter
+        """
+    background: %s; /* Old browsers */
+    background: -moz-linear-gradient(top, %s 0%, %s 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,%s), color-stop(100%,%s)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, %s 0%,%s 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, %s 0%,%s 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, %s 0%,%s 100%); /* IE10+ */
+    background: linear-gradient(to bottom, %s 0%,%s 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='%s', endColorstr='%s',GradientType=0 ); /* IE6-9 */
+    """
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+define
+    RadialGradient
+        x
+        y
+    Formatter
+        """
+background: %s; /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover, %s 0%, %s 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,%s), color-stop(100%,%s)); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover, %s 0%,%s 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover, %s 0%,%s 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover, %s 0%,%s 100%); /* IE10+ */
+background: radial-gradient(ellipse at center, %s 0%,%s 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='%s', endColorstr='%s',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+        """
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+        x
+        y
+define
+    CenterH
+    'margin: 0 auto;'
+define
+    ElementSize
+        w
+        h
+    +
+        'width:'
+        w
+        'px;height:'
+        h
+        'px;'
+#############################################
+# Custom Styles
+#############################################
+define
+    FaintBorder
+        x
+    +
+        'border: solid 1px '
+        x
+        ';'
+define
+    LimitWidth
+        x
+    +
+        'width:100%;min-width:'
+        x
+        'px;'
+define
+    WhiteBackground
+    'background-color: #fff;'
+define
+    SansSerif
+    "font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;"
+define
+    Oswald
+    'font-family: "Oswald", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;'
+define
+    Pacifico
+    'font-family: Pacifico, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;'
+define
+    Signika
+    'font-family: Signika, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;'
+define
+    Roboto
+    'font-family: Roboto, "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;font-weight:100;'

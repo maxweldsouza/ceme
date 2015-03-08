@@ -1,48 +1,139 @@
+import
+    '/assets/code/css.ceme'
+define
+    TYPOGRAPHY
+    let
+        lineheight
+        1.5
+        +
+            MediaQuery
+                'screen and (min-width: 480px)'
+                CssSelector
+                    'body'
+                    FontSize
+                        15
+            MediaQuery
+                'screen and (min-width: 768px)'
+                CssSelector
+                    'body'
+                    FontSize
+                        16
+            MediaQuery
+                'screen and (min-width: 992px)'
+                CssSelector
+                    'body'
+                    FontSize
+                        17
+            CssSelector
+                'body'
+                +
+                    'color:#444;line-height:1.5em;'
+                    SansSerif
+            CssSelector
+                'h1, h2, h3, h4, h5, h6 .h1, .h2, .h3, .h4, .h5, .h6'
+                ''
+            CssSelector
+                'h1, h2, h3, .h1, .h2, .h3'
+                +
+                    MarginTopEm
+                        /
+                            lineheight
+                            2
+                    MarginBottomEm
+                        /
+                            lineheight
+                            3
+                    'font-weight:bold;'
+            CssSelector
+                'h4, h5, h6, .h4, .h5, .h6'
+                +
+                    MarginTopEm
+                        /
+                            lineheight
+                            2
+                    MarginBottomEm
+                        /
+                            lineheight
+                            2
+            CssSelector
+                'h1, .h1'
+                FontSizeEm
+                    3
+            CssSelector
+                'h2, .h2'
+                FontSizeEm
+                    1.5
+            CssSelector
+                'h3, .h3'
+                FontSizeEm
+                    1.25
+            CssSelector
+                'h4, .h4'
+                FontSizeEm
+                    1.1
+            CssSelector
+                'p'
+                'margin: 0 0 1.1em;'
+            CssSelector
+                'li'
+                'list-style-type:none;'
+            CssSelector
+                '.bulleted-list > li'
+                'margin-bottom: 0.75em;list-style-type:disc;'
+define
+    Panel
+        x
+    div
+        attrib
+            class
+                'panel panel-default'
+        div
+            attrib
+                class
+                    'panel-body'
+            x
 div
     attrib
         id
             'page-container'
-    Formatter
-        '''
-    <nav class="navbar navbar-inverse navbar-static-top">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">Scantuary</a>
-        </div>
+    '''
+<nav class="navbar navbar-static-top">
+<div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+            data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#my-menu">Ceme.io</a>
+    </div>
 
-        <!-- Collect the nav links, forms, and other
-        content for toggling -->
-        <div class="collapse navbar-collapse"
-            id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
-                <li><a href="/errors">Errors</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                <form class="navbar-form" action="/logout?_xsrf=%s" method="post">
-                <button type="submit" class="btn btn-link">Logout</button>
-                </form>
-                </li>
-            </ul>
-        </div><!--
-        /.navbar-collapse
-        -->
+    <!-- Collect the nav links, forms, and other
+    content for toggling -->
+    <div class="collapse navbar-collapse"
+        id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
+            <li><a href="/test">Documentation</a></li>
+            <li><a href="/test2">About</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+            </li>
+        </ul>
     </div><!--
-    /.container-fluid
+    /.navbar-collapse
     -->
-    </nav>
-        '''
-        GetCookie
-            '_xsrf'
+</div><!--
+/.container-fluid
+-->
+</nav>
+    '''
+    Css
+        TYPOGRAPHY
     div
         attrib
             class
@@ -51,93 +142,20 @@ div
             attrib
                 class
                     'col-md-12'
-            h1
-                'Dashboard'
+            div
+                attrib
+                    id
+                        'ceme-output'
+                ''
         div
             attrib
                 class
-                    'col-md-4'
+                    'col-md-12'
+            h3
+                'Code'
+            '<textarea id="ceme-input" class="form-control" style="font-family:Courier;" rows="10"></textarea>'
             div
                 attrib
                     class
-                        'panel panel-default'
-                div
-                    attrib
-                        class
-                            'panel-heading'
-                    a
-                        attrib
-                            href
-                                'errors'
-                        'Errors'
-                div
-                    attrib
-                        class
-                            'panel-body'
-                        style
-                            'text-align:center;'
-                    h1
-                        3
-        div
-            attrib
-                class
-                    'col-md-4'
-            div
-                attrib
-                    class
-                        'panel panel-default'
-                div
-                    attrib
-                        class
-                            'panel-heading'
-                    'New Products'
-                div
-                    attrib
-                        class
-                            'panel-body'
-                        style
-                            'text-align:center;'
-                    h1
-                        8
-        div
-            attrib
-                class
-                    'col-md-4'
-            div
-                attrib
-                    class
-                        'panel panel-default'
-                div
-                    attrib
-                        class
-                            'panel-heading'
-                    'Web Server'
-                div
-                    attrib
-                        class
-                            'panel-body'
-                        style
-                            'text-align:center;'
-                    h1
-                        attrib
-                            id
-                                'uptime-status'
-                        '''
-                        <script>
-                        function jsonUptimeRobotApi(data) {
-                            var statuses = {
-                                "0": "Paused",
-                                "1": "Not Checked",
-                                "2": "Up",
-                                "8": "Seems Down",
-                                "9": "Down",
-                            }
-                            $("#uptime-status").html(statuses[data.monitors.monitor[0].status]);
-                        }
-                        $.ajax({
-                            url: "https://api.uptimerobot.com/getMonitors?apiKey=m776543979-97c43119873e5593e3a22bbc&format=json",
-                            type: "GET",
-                            dataType: "jsonp",
-                        });
-                        </script>
-                        '''
+                        'panel'
+                '<div class="btn-group" role="group" aria-label=""><button class="btn btn-default" id="ceme-run">Run</button><button class="btn btn-default">Save</button></div>'

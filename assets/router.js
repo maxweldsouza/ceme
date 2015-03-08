@@ -37,8 +37,19 @@ var Router = function () {
         if (url === '/') {
             url = '/home';
         }
-        var temp = ceme.cemestart('/assets/code' + url + '.ceme');
+        var temp = ceme.cemestart('/assets/code/home.ceme');
         $('#page-container').replaceWith(temp);
+
+        var runCode = function () {
+            var text = $('#ceme-input').val();
+            $('#ceme-output').html(ceme.compile(text));
+        }
+        $('#ceme-run').click(runCode);
+
+        var text = ajaxRequest('/assets/demos/' + url + '.ceme');
+        $('#ceme-input').val(text);
+        runCode();
+
         onClickHandlers();
     }
     return {
