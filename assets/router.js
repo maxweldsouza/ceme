@@ -42,11 +42,11 @@ var Router = function () {
             url = '/home';
         }
         var temp = ceme.cemestart('/assets/code/home.ceme');
-        $('#page-container').replaceWith(temp);
+        $('#page-container').hide().html(temp).fadeIn(300);
 
         var runCode = function () {
             var text = $('#ceme-input').val();
-            $('#ceme-output').html(ceme.compile(text));
+            $('#ceme-output').hide().html(ceme.compile(text)).fadeIn(300);
         }
         $('#ceme-run').click(runCode);
 

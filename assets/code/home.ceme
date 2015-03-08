@@ -105,11 +105,7 @@ define
                 class
                     'panel-body'
             x
-div
-    attrib
-        id
-            'page-container'
-    '''
+'''
 <nav class="navbar navbar-static-top">
 <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -145,45 +141,45 @@ div
 /.container-fluid
 -->
 </nav>
-    '''
-    Css
-        TYPOGRAPHY
+'''
+Css
+    TYPOGRAPHY
+div
+    attrib
+        class
+            'container'
     div
         attrib
             class
-                'container'
+                'col-md-6'
+        div
+            attrib
+                id
+                    'ceme-output'
+            ''
+    div
+        attrib
+            class
+                'col-md-6'
+        h3
+            'Code'
         div
             attrib
                 class
-                    'col-md-6'
+                    'panel'
+            Formatter
+                '''
+                <form action="/save" method="post" id="submit-form">
+                <textarea name="content" id="ceme-input" class="form-control" style="font-family:Courier;" rows="10"></textarea>
+                <div class="btn-group" role="group" aria-label="">
+                <div class="btn btn-default" id="ceme-run">Run</div>
+                <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+                <input type="hidden" name="name" value="%s">
+                </div>
+                </form>
+                '''
+                window.location.pathname
             div
                 attrib
                     id
-                        'ceme-output'
-                ''
-        div
-            attrib
-                class
-                    'col-md-6'
-            h3
-                'Code'
-            div
-                attrib
-                    class
-                        'panel'
-                Formatter
-                    '''
-                    <form action="/save" method="post" id="submit-form">
-                    <textarea name="content" id="ceme-input" class="form-control" style="font-family:Courier;" rows="10"></textarea>
-                    <div class="btn-group" role="group" aria-label="">
-                    <div class="btn btn-default" id="ceme-run">Run</div>
-                    <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
-                    <input type="hidden" name="name" value="%s">
-                    </div>
-                    </form>
-                    '''
-                    window.location.pathname
-                div
-                    attrib
-                        id
-                            'alert'
+                        'alert'
