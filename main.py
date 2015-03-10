@@ -4,6 +4,7 @@ import tornado.web
 from tornado.httpserver import HTTPServer
 import json
 import database
+from custom_exceptions import *
 
 xsrf_cookie = 'sodfksoihasg'
 
@@ -49,24 +50,34 @@ class ErrorHandler(tornado.web.ErrorHandler):
         self.write('An error occurred');\
 
 # ceme code
-class CreateHandler(tornado.web.ErrorHandler):
-    pass
-
 class CodeHandler(tornado.web.RequestHandler):
     def get(self, path):
-        self.set_status(200)
         #if self.get_secure_cookie(xsrf_cookie):
         code = database.read_page(path)
         self.write(code)
 
+class CreateHandler(tornado.web.RequestHandler):
+    def post(self):
+        try:
+            content = self.get_argument('content', '')
+            name = self.get_argument('name', '')
+            database.create_page(name, content, 1, '', '')
+            self.redirect('/' + name)
+        except AlreadyExists:
+            self.redirect('/already-exits')
+
 class SaveHandler(tornado.web.RequestHandler):
     def post(self):
-        content = self.get_argument('content', '')
-        name = self.get_argument('name', '')
-        database.save_page(name, content, 1, '', '')
-        self.write('The page has been saved successfully')
+        try:
+            content = self.get_argument('content', '')
+            name = self.get_argument('name', '')
+            database.save_page(name, content, 1, '', '')
+            self.write('The page has been saved successfully')
+        except Exception, e:
+            self.write('An error occurred')
 
 class DeleteHandler(tornado.web.RequestHandler):
+    #TODO only for special users
     pass
 
 class HistoryHandler(tornado.web.RequestHandler):
@@ -87,6 +98,7 @@ settings = {
 application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
+    (r"/save-new", CreateHandler),
     (r"/save", SaveHandler),
     (r"/code/(.*)", CodeHandler),
     (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),

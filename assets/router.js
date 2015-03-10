@@ -57,7 +57,7 @@ var Router = function () {
     $('#ceme-save').click(function (e) {
         e.preventDefault();
         $.ajax({
-                url: 'save',
+                url: '/save',
                 type: 'POST',
                 data: $('#submit-form').serialize() + xsrfToken(),
         }).done(function (response) {
