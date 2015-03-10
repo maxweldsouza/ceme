@@ -10,6 +10,10 @@ if (!clientSide()) {
     var cemeEnv = lib.cemeEnv;
 }
 
+var cemeFileName = function () {
+    return window.location.pathname.substr(1);
+}
+
 var onClickHandlers = function (a) {
     if (clientSide()) {
         $('a').unbind('click');
@@ -57,13 +61,13 @@ var Router = function () {
                 type: 'POST',
                 data: $('#submit-form').serialize() + xsrfToken(),
         }).done(function (response) {
-            $('#alert').html(cemeEnv.Alert(response, 'success'));
+            $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
         }).fail(function () {
-            $('#alert').html(cemeEnv.Alert('Your changes could not be saved', 'danger'));
+            $('#alert').hide().html(cemeEnv.Alert('Your changes could not be saved', 'danger')).fadeIn(200);
         });
     });
 
-    var text = ajaxRequest('/assets/demos/' + url + '.ceme');
+    var text = ajaxRequest('/code' + url);
     $('#ceme-input').val(text);
     runCode();
 

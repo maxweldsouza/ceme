@@ -110,13 +110,6 @@ define
 <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-            data-target="#bs-example-navbar-collapse-1">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
         <a class="navbar-brand" href="#my-menu"><i class="fa fa-bars"></i></a>
         <a class="navbar-brand" href="/">Ceme.io</a>
     </div>
@@ -147,7 +140,7 @@ Css
 div
     attrib
         class
-            'container'
+            'container-fluid'
     div
         attrib
             class
@@ -171,14 +164,19 @@ div
                 '''
                 <form action="/save" method="post" id="submit-form">
                 <textarea name="content" id="ceme-input" class="form-control" style="font-family:Courier;" rows="10"></textarea>
-                <div class="btn-group" role="group" aria-label="">
+                <div class="btn-group" role="group">
                 <div class="btn btn-default" id="ceme-run">Run</div>
                 <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+
+                <button class="btn btn-default">History</button>
+                <button class="btn btn-default">Clear</button>
+
                 <input type="hidden" name="name" value="%s">
                 </div>
                 </form>
                 '''
-                window.location.pathname
+                cemeFileName
+                    ''
             div
                 attrib
                     id

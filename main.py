@@ -3,19 +3,7 @@ import tornado.ioloop
 import tornado.web
 from tornado.httpserver import HTTPServer
 import json
-import MySQLdb
-
-try:
-    db = MySQLdb.connect(host="localhost",
-            user="root",
-            passwd="dttmw5d",
-            db="cemeio")
-
-    cur = db.cursor()
-
-except Exception, e:
-    # TODO log error
-    raise
+import database
 
 xsrf_cookie = 'sodfksoihasg'
 
@@ -64,19 +52,18 @@ class ErrorHandler(tornado.web.ErrorHandler):
 class CreateHandler(tornado.web.ErrorHandler):
     pass
 
-class DemoHandler(tornado.web.RequestHandler):
+class CodeHandler(tornado.web.RequestHandler):
     def get(self, path):
-        fullpath = './assets/code/' + path
+        self.set_status(200)
         #if self.get_secure_cookie(xsrf_cookie):
-        file = open(fullpath, 'r')
-        self.write(file.read())
+        code = database.read_page(path)
+        self.write(code)
 
 class SaveHandler(tornado.web.RequestHandler):
     def post(self):
         content = self.get_argument('content', '')
         name = self.get_argument('name', '')
-        print content
-        print name
+        database.save_page(name, content, 1, '', '')
         self.write('The page has been saved successfully')
 
 class DeleteHandler(tornado.web.RequestHandler):
@@ -101,7 +88,7 @@ application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
     (r"/save", SaveHandler),
-    (r"/assets/code/(.*)", DemoHandler),
+    (r"/code/(.*)", CodeHandler),
     (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),
     (r"/(.*)", MainHandler),
     ], **settings)
