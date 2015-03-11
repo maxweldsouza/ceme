@@ -77,6 +77,12 @@ var Router = function () {
     $('#ceme-input').val(text);
     runCode();
 
+    if (document.cookie.indexOf('sodfksoihasg') > 0) {
+        $('#login-logout').html('<li><a href="/logout">Logout</a></li>');
+    } else {
+        $('#login-logout').html('<li><a href="/login">Login</a></li>');
+    }
+
     onClickHandlers();
 }
 return {

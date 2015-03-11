@@ -9,12 +9,14 @@ from custom_exceptions import *
 xsrf_cookie = 'sodfksoihasg'
 
 # TODO list
-# name not empty
+#name not empty
 #fork
+#default groups etc
+
 # history, set as current
 # diff
+# login logout
 # hidden editor
-# default groups etc
 # registration
 # admin section
 # embed
@@ -31,29 +33,31 @@ def restricted(f):
             return args[0].redirect('/')
     return wrapper
 
-def authenticate(email, password):
-    if email == 'maxellusionist@gmail.com' and password == 'tsi0ffo5':
+def authenticate(userid, password):
+    if userid == 'maxweldsouza' and password == 'u1tbf0s1tw':
         return True
-    elif email == 'chrisleeds18@gmail.com' and password == 'tsi0ffo5':
-        return True
+    else:
+        return False
 
 class LoginHandler(tornado.web.RequestHandler):
     def get(self):
-        # TODO 404
-        pass
+        self.xsrf_token
+        self.render("index.html")
+
     def post(self):
-        email = self.get_argument('email', '')
+        userid = self.get_argument('userid', '')
         password = self.get_argument('password', '')
-        if authenticate(email, password):
-            self.set_secure_cookie(xsrf_cookie, 'maxwel')
+        if authenticate(userid, password):
+            self.set_secure_cookie(xsrf_cookie, userid)
             self.redirect('/home')
         else:
             self.redirect('/login-fail')
 
 class LogoutHandler(tornado.web.RequestHandler):
     def get(self):
-        # TODO 404
-        pass
+        self.xsrf_token
+        self.render("index.html")
+
     def post(self):
         self.clear_cookie(xsrf_cookie)
         self.redirect('/logged-out')
@@ -80,7 +84,6 @@ class ErrorHandler(tornado.web.ErrorHandler):
 class CodeHandler(tornado.web.RequestHandler):
     # TODO no connection to database
     def get(self, path):
-        #if self.get_secure_cookie(xsrf_cookie):
         try:
             code = database.read_page(path)
             self.write(code)
@@ -91,9 +94,10 @@ class CodeHandler(tornado.web.RequestHandler):
 
 
 class CreateHandler(tornado.web.RequestHandler):
-    def get(self):
-        # TODO 404
-        pass
+    def get(self, path):
+        self.xsrf_token
+        self.render("index.html")
+
     def post(self):
         # this redirects after the post
         try:
@@ -111,9 +115,10 @@ class CreateHandler(tornado.web.RequestHandler):
             self.redirect('/already-exits')
 
 class SaveHandler(tornado.web.RequestHandler):
-    def get(self):
-        # TODO 404
-        pass
+    def get(self, path):
+        self.xsrf_token
+        self.render("index.html")
+
     def post(self):
         # this uses an ajax post
         try:
@@ -136,7 +141,7 @@ class HistoryHandler(tornado.web.RequestHandler):
     def get(self, path):
         name = self.get_argument("name")
         limit = self.get_argument("limit", "20")
-        database.get_history(name, limit)
+        self.write(database.get_history(name, limit))
 
 class DiffHandler(tornado.web.RequestHandler):
     def get(self, path):
