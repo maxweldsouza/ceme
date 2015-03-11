@@ -79,7 +79,8 @@ class CodeHandler(tornado.web.RequestHandler):
             self.write(code)
         except EntryNotFound:
             file = open('./assets/code/empty.ceme', 'r')
-            return file.read()
+            self.set_status(404)
+            self.write(file.read())
 
 
 class CreateHandler(tornado.web.RequestHandler):
