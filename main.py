@@ -86,6 +86,7 @@ class CodeHandler(tornado.web.RequestHandler):
     def get(self, path):
         try:
             code = database.read_page(path)
+            self.set_header("X-Robots-Tag", "noindex")
             self.write(code)
         except EntryNotFound:
             file = open('./assets/code/empty.ceme', 'r')
@@ -141,6 +142,7 @@ class HistoryHandler(tornado.web.RequestHandler):
     def get(self, path):
         name = self.get_argument("name")
         limit = self.get_argument("limit", "20")
+        self.set_header("Content-Type", "application/json")
         self.write(database.get_history(name, limit))
 
 class DiffHandler(tornado.web.RequestHandler):
@@ -148,6 +150,8 @@ class DiffHandler(tornado.web.RequestHandler):
         name = self.get_argument("name")
         first = self.get_argument("first")
         second = self.get_argument("second")
+        self.set_header("Content-Type", "application/json")
+        self.write(database.get_diff(name, first, second))
 
 settings = {
     'default_handler_class': ErrorHandler,
