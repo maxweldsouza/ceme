@@ -10,7 +10,7 @@ xsrf_cookie = 'sodfksoihasg'
 
 # TODO list
 # name not empty
-# fork
+#fork
 # history, set as current
 # diff
 # hidden editor
@@ -58,6 +58,13 @@ class LogoutHandler(tornado.web.RequestHandler):
         self.clear_cookie(xsrf_cookie)
         self.redirect('/logged-out')
 
+# user permissions
+class UserHandler(tornado.web.RequestHandler):
+    def get(self):
+        # get info
+        # change info
+        pass
+
 # use the @restricted decorator
 
 class MainHandler(tornado.web.RequestHandler):
@@ -90,10 +97,16 @@ class CreateHandler(tornado.web.RequestHandler):
     def post(self):
         # this redirects after the post
         try:
-            content = self.get_argument('content', '')
+            content = "'Your page has been created. You can now edit it.'"
             name = self.get_argument('name', '')
-            database.create_page(name, content, 1, '', '')
+            ip = self.request.remote_ip
+            group = 1
+            userid = ''
+            database.create_page(name, content, ip, group, userid)
             self.redirect('/' + name)
+        except InvalidPageName, e:
+            self.set_status(400)
+            self.redirect('/invalid-name' + name)
         except AlreadyExists:
             self.redirect('/already-exits')
 
@@ -104,22 +117,32 @@ class SaveHandler(tornado.web.RequestHandler):
     def post(self):
         # this uses an ajax post
         try:
-            content = self.get_argument('content', '')
             name = self.get_argument('name', '')
-            database.save_page(name, content, 1, '', '')
+            content = self.get_argument('content', '')
+            ip = self.request.remote_ip
+            group = 1
+            userid = ''
+            database.save_page(name, content, ip, group, userid)
             self.write('The page has been saved successfully')
-        except Exception, e:
-            self.write('An error occurred')
 
-class DeleteHandler(tornado.web.RequestHandler):
-    #TODO only for special users
-    pass
+        except InvalidPageName, e:
+            self.set_status(400)
+            self.write(str(e))
+        except:
+            self.set_status(500)
+            self.write('An internal error occurred.')
 
 class HistoryHandler(tornado.web.RequestHandler):
-    pass
+    def get(self, path):
+        name = self.get_argument("name")
+        limit = self.get_argument("limit", "20")
+        database.get_history(name, limit)
 
 class DiffHandler(tornado.web.RequestHandler):
-    pass
+    def get(self, path):
+        name = self.get_argument("name")
+        first = self.get_argument("first")
+        second = self.get_argument("second")
 
 settings = {
     'default_handler_class': ErrorHandler,
@@ -135,6 +158,8 @@ application = tornado.web.Application([
     (r"/logout", LogoutHandler),
     (r"/save-new", CreateHandler),
     (r"/save", SaveHandler),
+    (r"/history(.*)", HistoryHandler),
+    (r"/diff(.*)", DiffHandler),
     (r"/code/(.*)", CodeHandler),
     (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),
     (r"/(.*)", MainHandler),
