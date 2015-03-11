@@ -11,7 +11,12 @@ if (!clientSide()) {
 }
 
 var cemeFileName = function () {
-    return window.location.pathname.substr(1);
+    var file = window.location.pathname.substr(1);
+    if (file === '') {
+        return 'home';
+    } else {
+        return file;
+    }
 }
 
 var onClickHandlers = function (a) {
@@ -55,6 +60,7 @@ var Router = function () {
         $('#ceme-run').click(runCode);
 
     $('#ceme-save').click(function (e) {
+        runCode();
         e.preventDefault();
         $.ajax({
                 url: '/save',

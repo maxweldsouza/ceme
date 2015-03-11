@@ -8,6 +8,20 @@ from custom_exceptions import *
 
 xsrf_cookie = 'sodfksoihasg'
 
+# TODO list
+# name not empty
+# fork
+# history, set as current
+# diff
+# hidden editor
+# default groups etc
+# registration
+# admin section
+# embed
+# infinite loop protection
+# error messages
+# ip bans
+
 # authentication
 def restricted(f):
     def wrapper(*args, **kwargs):
@@ -24,6 +38,9 @@ def authenticate(email, password):
         return True
 
 class LoginHandler(tornado.web.RequestHandler):
+    def get(self):
+        # TODO 404
+        pass
     def post(self):
         email = self.get_argument('email', '')
         password = self.get_argument('password', '')
@@ -34,6 +51,9 @@ class LoginHandler(tornado.web.RequestHandler):
             self.redirect('/login-fail')
 
 class LogoutHandler(tornado.web.RequestHandler):
+    def get(self):
+        # TODO 404
+        pass
     def post(self):
         self.clear_cookie(xsrf_cookie)
         self.redirect('/logged-out')
@@ -51,13 +71,23 @@ class ErrorHandler(tornado.web.ErrorHandler):
 
 # ceme code
 class CodeHandler(tornado.web.RequestHandler):
+    # TODO no connection to database
     def get(self, path):
         #if self.get_secure_cookie(xsrf_cookie):
-        code = database.read_page(path)
-        self.write(code)
+        try:
+            code = database.read_page(path)
+            self.write(code)
+        except EntryNotFound:
+            file = open('./assets/code/empty.ceme', 'r')
+            return file.read()
+
 
 class CreateHandler(tornado.web.RequestHandler):
+    def get(self):
+        # TODO 404
+        pass
     def post(self):
+        # this redirects after the post
         try:
             content = self.get_argument('content', '')
             name = self.get_argument('name', '')
@@ -67,7 +97,11 @@ class CreateHandler(tornado.web.RequestHandler):
             self.redirect('/already-exits')
 
 class SaveHandler(tornado.web.RequestHandler):
+    def get(self):
+        # TODO 404
+        pass
     def post(self):
+        # this uses an ajax post
         try:
             content = self.get_argument('content', '')
             name = self.get_argument('name', '')
