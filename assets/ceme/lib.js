@@ -311,6 +311,9 @@ var cemeEnv = function() {
                 return lst;
             },
 
+            'Getkey': function (item, key) {
+                return item[key];
+            },
             //// Other
 
             'Length': function (a) {
@@ -718,6 +721,18 @@ var cemeEnv = function() {
             'GetCookie': function(name) {
                 var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
                 return r ? r[1] : undefined;
+            },
+            'AjaxGet': function (url) {
+                var temp;
+                $.ajax({
+                    url: '/api/history?name=create',
+                    async: false,
+                    dataType: 'json',
+                    success: function(data) {
+                        temp = data;
+                    }
+                });
+                return temp;
             }
     }
 }();
