@@ -37,6 +37,16 @@ var onClickHandlers = function (a) {
     }
 }
 
+cemeEnv.GetPageName = function () {
+    var path = window.location.pathname;
+    path = path.substr(1);
+    if (path === '/') {
+        return 'home';
+    } else {
+        return path;
+    }
+}
+
 window.onpopstate = function (event) {
     Router.route(window.location.toString());
 }
@@ -79,7 +89,7 @@ var Router = function () {
             });
         });
         $('#ceme-history').click(function (e) {
-            window.location = '/history?name=' + window.location.pathname.substr(1);
+            window.location = '/history?name=' + cemeEnv.GetPageName();
             e.preventDefault();
         });
 

@@ -1,0 +1,7 @@
+'No such page exists '
+'You can create one by clicking '
+a
+    attrib
+        href
+            '/create'
+    'here'

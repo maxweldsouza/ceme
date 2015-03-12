@@ -722,10 +722,10 @@ var cemeEnv = function() {
                 var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
                 return r ? r[1] : undefined;
             },
-            'AjaxGet': function (url) {
+            'AjaxGet': function (uri) {
                 var temp;
                 $.ajax({
-                    url: '/api/history?name=create',
+                    url: uri,
                     async: false,
                     dataType: 'json',
                     success: function(data) {
