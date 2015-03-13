@@ -159,7 +159,7 @@ div
             Formatter
                 '''
                 <form action="/save" method="post" id="submit-form">
-                <textarea name="content" id="ceme-input" class="ceme-editor" rows="30"></textarea>
+                <textarea name="content" id="ceme-input" rows="30"></textarea>
                 <div class="btn-group" role="group">
                 <div class="btn btn-default" id="ceme-run">Run</div>
                 <button id="ceme-save" class="btn btn-default" type="submit">Save</button>

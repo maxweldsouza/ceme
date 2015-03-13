@@ -70,6 +70,22 @@ function queryStringToJSON(queryString) {
 }
 
 var Router = function () {
+    var makeEditor = function (elem) {
+        var editor;
+        var myCodeMirror = CodeMirror.fromTextArea(elem, {
+            lineNumbers: true,
+            indentUnit: 4,
+            indentWithTabs: false,
+            extraKeys: {
+                Tab: function(cm) {
+                    var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                    cm.replaceSelection(spaces, "end", "+input");
+                }
+            }
+        });
+        return myCodeMirror;
+    }
+
     var route = function (url) {
         if (url.indexOf('?') > 0) {
             url = url.substr(url.indexOf('?'));
@@ -84,8 +100,10 @@ var Router = function () {
         var temp = ceme.cemestart('/assets/code/home.ceme');
         $('#page-container').hide().html(temp).fadeIn(300);
 
+        var mainarea = document.getElementById("ceme-input");
+
         var runCode = function () {
-            var text = $('#ceme-input').val();
+            var text = editor.getValue();
             try {
                 var output = ceme.compile(text);
                 $('#ceme-output').hide().html(output).fadeIn(300);
@@ -97,17 +115,7 @@ var Router = function () {
             var textareas = document.getElementsByClassName("ceme-editor");
             var i;
             for (i = 0; i < textareas.length; i++) {
-                var myCodeMirror = CodeMirror.fromTextArea(textareas[i], {
-                    lineNumbers: true,
-                    indentUnit: 4,
-                    indentWithTabs: false,
-                    extraKeys: {
-                        Tab: function(cm) {
-                            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                            cm.replaceSelection(spaces, "end", "+input");
-                        }
-                    }
-                });
+                makeEditor(textareas[i]);
             }
 
         }
@@ -133,7 +141,9 @@ var Router = function () {
         });
 
         var text = ajaxRequest('/code' + url);
-        $('#ceme-input').val(text);
+
+        var editor = makeEditor(mainarea);
+        editor.setValue(text);
         runCode();
 
         if (document.cookie.indexOf('sodfksoihasg') > 0) {
