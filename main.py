@@ -12,9 +12,12 @@ xsrf_cookie = 'sodfksoihasg'
 #name not empty
 #fork
 #default groups etc
+#history
 
-# history, set as current
 # diff
+# set as current
+# should you have "." in symbol names
+# refactor database conection
 # login logout
 # hidden editor
 # registration
@@ -93,7 +96,6 @@ class CodeHandler(tornado.web.RequestHandler):
             self.set_status(404)
             self.write(file.read())
 
-
 class CreateHandler(tornado.web.RequestHandler):
     def get(self, path):
         self.xsrf_token
@@ -134,7 +136,8 @@ class SaveHandler(tornado.web.RequestHandler):
         except InvalidPageName, e:
             self.set_status(400)
             self.write(str(e))
-        except:
+        except Exception, e:
+            print e
             self.set_status(500)
             self.write('An internal error occurred.')
 

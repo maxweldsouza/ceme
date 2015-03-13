@@ -55,11 +55,26 @@ var xsrfToken = function () {
     return '&_xsrf=' + cemeEnv.GetCookie('_xsrf')
 }
 
-var queryString = {};
+var queryObj = {};
+function queryStringToJSON(queryString) {
+    if(queryString.indexOf('?') > -1){
+        queryString = queryString.split('?')[1];
+    }
+    var pairs = queryString.split('&');
+    var result = {};
+    pairs.forEach(function(pair) {
+        pair = pair.split('=');
+        result[pair[0]] = decodeURIComponent(pair[1] || '');
+    });
+    return result;
+}
+
 var Router = function () {
     var route = function (url) {
-        url.replace(new RegExp("([^?=&]+)(=([^&]*))?", "g"),
-                        function($0, $1, $2, $3) { queryString[$1] = $3; });
+        if (url.indexOf('?') > 0) {
+            url = url.substr(url.indexOf('?'));
+            queryObj = queryStringToJSON(url);
+        }
 
         url = window.location.pathname;
         if (url === '/') {
@@ -71,8 +86,14 @@ var Router = function () {
 
         var runCode = function () {
             var text = $('#ceme-input').val();
-            $('#ceme-output').hide().html(ceme.compile(text)).fadeIn(300);
+            try {
+                var output = ceme.compile(text);
+                $('#ceme-output').hide().html(output).fadeIn(300);
+            } catch (err) {
+                $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
+            }
         }
+
         $('#ceme-run').click(runCode);
 
         $('#ceme-save').click(function (e) {
