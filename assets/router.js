@@ -125,6 +125,7 @@ var Router = function () {
         $('#ceme-save').click(function (e) {
             runCode();
             e.preventDefault();
+            editor.save();
             $.ajax({
                 url: '/save',
                 type: 'POST',

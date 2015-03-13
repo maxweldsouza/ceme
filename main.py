@@ -14,6 +14,9 @@ xsrf_cookie = 'sodfksoihasg'
 #default groups etc
 #history
 
+# no tabs allowed
+# remove is current
+# error handling
 # diff
 # set as current
 # should you have "." in symbol names
