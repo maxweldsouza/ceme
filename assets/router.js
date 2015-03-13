@@ -91,7 +91,25 @@ var Router = function () {
                 $('#ceme-output').hide().html(output).fadeIn(300);
             } catch (err) {
                 $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
+                throw err;
             }
+
+            var textareas = document.getElementsByClassName("ceme-editor");
+            var i;
+            for (i = 0; i < textareas.length; i++) {
+                var myCodeMirror = CodeMirror.fromTextArea(textareas[i], {
+                    lineNumbers: true,
+                    indentUnit: 4,
+                    indentWithTabs: false,
+                    extraKeys: {
+                        Tab: function(cm) {
+                            var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                            cm.replaceSelection(spaces, "end", "+input");
+                        }
+                    }
+                });
+            }
+
         }
 
         $('#ceme-run').click(runCode);
