@@ -20,24 +20,33 @@ class DatabaseConnection:
         self.cur.close()
 
     def get_one(self, qry, tpl):
-        cur = self.connect()
-        cur.execute(qry, tpl)
-        result = cur.fetchone()
-        self.disconnect()
-        return result
+        try:
+            cur = self.connect()
+            cur.execute(qry, tpl)
+            result = cur.fetchone()
+            self.disconnect()
+            return result
+        except Exception, e:
+            raise
 
     def get_all(self, qry, tpl):
-        cur = self.connect()
-        cur.execute(qry, tpl)
-        result = cur.fetchall()
-        self.disconnect()
-        return result
+        try:
+            cur = self.connect()
+            cur.execute(qry, tpl)
+            result = cur.fetchall()
+            self.disconnect()
+            return result
+        except Exception, e:
+            raise
 
     def put(self, qry, tpl):
-        cur = self.connect()
-        cur.execute(qry, tpl)
-        self.connection.commit()
-        self.disconnect()
+        try:
+            cur = self.connect()
+            cur.execute(qry, tpl)
+            self.connection.commit()
+            self.disconnect()
+        except Exception, e:
+            raise
 
 db = DatabaseConnection()
 
@@ -51,6 +60,8 @@ def validate_name(name):
 def validate_content(content):
     if content == '':
         raise Exception('Page is empty')
+    if '\t' in content:
+        raise Exception('Tabs are not allowed in code')
 
 def is_number(s):
     try:

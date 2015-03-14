@@ -19,6 +19,7 @@ var cemeFileName = function () {
     }
 }
 
+// TODO use jquery.on instead
 var onClickHandlers = function (a) {
     if (clientSide()) {
         $('a').unbind('click');
@@ -68,6 +69,32 @@ function queryStringToJSON(queryString) {
     });
     return result;
 }
+
+$(document).on('submit', 'form', function (e) {
+    var url = $(this).attr('action');
+    if (url.indexOf('/api/') === 0) {
+        e.preventDefault();
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: $(this).serialize() + xsrfToken(),
+            error: function (jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status == 500) {
+                    alert('Internal error: ' + jqXHR.responseText);
+                } else {
+                    alert('Unexpected error.');
+                }
+            }
+        }).done(function (response) {
+            $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
+        });
+    } else {
+        var input = $("<input>")
+                  .attr("type", "hidden")
+                  .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
+        $(this).append(input);
+    }
+});
 
 var Router = function () {
     var makeEditor = function (elem) {
@@ -122,21 +149,6 @@ var Router = function () {
 
         $('#ceme-run').click(runCode);
 
-        $('#ceme-save').click(function (e) {
-            runCode();
-            e.preventDefault();
-            editor.save();
-            $.ajax({
-                url: '/save',
-                type: 'POST',
-                data: $('#submit-form').serialize() + xsrfToken(),
-            }).done(function (response) {
-                $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
-            }).fail(function () {
-                $('#alert').hide().html(cemeEnv.Alert('Your changes could not be saved', 'danger')).fadeIn(200);
-            });
-        });
-
         $('#ceme-history').click(function (e) {
             window.location = '/history?name=' + cemeEnv.GetPageName();
             e.preventDefault();
@@ -149,12 +161,13 @@ var Router = function () {
         runCode();
 
         if (document.cookie.indexOf('sodfksoihasg') > 0) {
-            $('#login-logout').html('<li><a href="/logout">Logout</a></li>');
+            $('#login-logout').html('<li><form action="/logout" method="post"><button class="btn btn-default" type="submit">Logout<button></form></li>');
         } else {
-            $('#login-logout').html('<li><a href="/login">Login</a></li>');
+            $('#login-logout').html('<li><a href="/login">Login</a></li><li><a href="/login">Sign Up</a></li>');
         }
 
         onClickHandlers();
+
     }
     return {
         'route': route

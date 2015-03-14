@@ -8,22 +8,23 @@ from custom_exceptions import *
 
 xsrf_cookie = 'sodfksoihasg'
 
+# Meta
+# error handling
+
 # TODO list
 #name not empty
 #fork
 #default groups etc
 #history
+#remove is current
+#no tabs allowed
+#refactor database conection
 
-# diff
-# error handling
-# remove is current
-# no tabs allowed
-# set as current
-# should you have "." in symbol names
-# refactor database conection
-# login logout
-# hidden editor
 # registration
+# login logout
+# diff save
+# should you have "." in symbol names
+# hidden editor
 # admin section
 # embed
 # infinite loop protection
@@ -66,7 +67,7 @@ class LogoutHandler(tornado.web.RequestHandler):
 
     def post(self):
         self.clear_cookie(xsrf_cookie)
-        self.redirect('/logged-out')
+        self.redirect('/home')
 
 # user permissions
 class UserHandler(tornado.web.RequestHandler):
@@ -86,21 +87,23 @@ class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
         self.write('An error occurred');\
 
+def ceme_file(self, path):
+    try:
+        code = database.read_page(path)
+        self.set_header("X-Robots-Tag", "noindex")
+        self.write(code)
+    except EntryNotFound:
+        file = open('./assets/code/empty.ceme', 'r')
+        self.set_status(404)
+        self.write(file.read())
+
 # ceme code
 class CodeHandler(tornado.web.RequestHandler):
-    # TODO no connection to database
     def get(self, path):
-        try:
-            code = database.read_page(path)
-            self.set_header("X-Robots-Tag", "noindex")
-            self.write(code)
-        except EntryNotFound:
-            file = open('./assets/code/empty.ceme', 'r')
-            self.set_status(404)
-            self.write(file.read())
+        ceme_file(self, path)
 
 class CreateHandler(tornado.web.RequestHandler):
-    def get(self, path):
+    def get(self):
         self.xsrf_token
         self.render("index.html")
 
@@ -113,12 +116,13 @@ class CreateHandler(tornado.web.RequestHandler):
             group = 1
             userid = ''
             database.create_page(name, content, ip, group, userid)
+            self.set_status(200)
             self.redirect('/' + name)
         except InvalidPageName, e:
             self.set_status(400)
-            self.redirect('/invalid-name' + name)
+            self.redirect('/invalid-name')
         except AlreadyExists:
-            self.redirect('/already-exits')
+            self.redirect('/already-exists')
 
 class SaveHandler(tornado.web.RequestHandler):
     def get(self, path):
@@ -171,8 +175,8 @@ settings = {
 application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
-    (r"/save-new", CreateHandler), #TODO rename
-    (r"/save", SaveHandler),
+    (r"/create", CreateHandler),
+    (r"/api/save", SaveHandler),
     (r"/api/history(.*)", HistoryHandler),
     (r"/api/diff(.*)", DiffHandler),
     (r"/code/(.*)", CodeHandler),
