@@ -176,3 +176,7 @@ div
                 attrib
                     id
                         'alert'
+    '''
+    <form action="/logout" method="post" id="logout-form">
+    </form>
+    '''

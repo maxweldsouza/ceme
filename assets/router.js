@@ -96,6 +96,10 @@ $(document).on('submit', 'form', function (e) {
     }
 });
 
+$(document).on('click', '#logout', function() {
+    $('#logout-form').submit();
+});
+
 var Router = function () {
     var makeEditor = function (elem) {
         var editor;
@@ -161,7 +165,7 @@ var Router = function () {
         runCode();
 
         if (document.cookie.indexOf('sodfksoihasg') > 0) {
-            $('#login-logout').html('<li><form action="/logout" method="post"><button class="btn btn-default" type="submit">Logout<button></form></li>');
+            $('#login-logout').html('<li><a href="#" id="logout" >Log Out</a></li>');
         } else {
             $('#login-logout').html('<li><a href="/login">Login</a></li><li><a href="/login">Sign Up</a></li>');
         }
