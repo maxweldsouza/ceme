@@ -47,27 +47,32 @@ def date_handler(obj):
 def validate_name(name):
     if name == '':
         raise InvalidPageName('Page name is empty')
-def validate_content():
-    pass
+
+def validate_content(content):
+    if content == '':
+        raise Exception('Page is empty')
+
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 def create_page(name, content, ip, group, userid):
     validate_name(name)
-    if (content == ''):
-        raise Exception('Page is empty')
-    exists = db.get_one('SELECT page_iscurrent from pages where page_name = %s AND page_iscurrent = 1 limit 1', (name,))
+    validate_content(content)
+    exists = db.get_one('SELECT page_timestamp from pages where page_name = %s limit 1', (name,))
     if (exists):
         raise AlreadyExists('This page already exists')
     else:
-        db.put('INSERT INTO pages (page_name, page_content, page_group, page_userid, page_ip, page_iscurrent) VALUES (%s, %s, %s, %s, %s, 1) ', (name, content, group, userid, ip))
+        db.put('INSERT INTO pages (page_name, page_content, page_group, page_userid, page_ip) VALUES (%s, %s, %s, %s, %s) ', (name, content, group, userid, ip))
 
 def save_page(name, content, ip, group, userid):
     validate_name(name)
-    if content == '':
-        raise Exception('Page is empty')
-    exists = db.get_one('SELECT page_iscurrent from pages where page_name = %s AND page_iscurrent = 1 limit 1', (name,))
-    if (exists):
-        db.put('UPDATE pages SET page_iscurrent = 0 where page_name = %s AND page_iscurrent = 1 limit 1', (name,))
-    db.put('INSERT INTO pages (page_name, page_content, page_group, page_userid, page_ip, page_iscurrent) VALUES (%s, %s, %s, %s, %s, 1) ', (name, content, group, userid, ip))
+    validate_content(content)
+    exists = db.get_one('SELECT page_timestamp from pages where page_name = %s limit 1', (name,))
+    db.put('INSERT INTO pages (page_name, page_content, page_group, page_userid, page_ip) VALUES (%s, %s, %s, %s, %s) ', (name, content, group, userid, ip))
 
 def read_page(name):
     validate_name(name)

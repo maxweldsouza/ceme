@@ -136,6 +136,7 @@ var Router = function () {
                 $('#alert').hide().html(cemeEnv.Alert('Your changes could not be saved', 'danger')).fadeIn(200);
             });
         });
+
         $('#ceme-history').click(function (e) {
             window.location = '/history?name=' + cemeEnv.GetPageName();
             e.preventDefault();

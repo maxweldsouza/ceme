@@ -14,10 +14,10 @@ xsrf_cookie = 'sodfksoihasg'
 #default groups etc
 #history
 
-# no tabs allowed
-# remove is current
-# error handling
 # diff
+# error handling
+# remove is current
+# no tabs allowed
 # set as current
 # should you have "." in symbol names
 # refactor database conection
@@ -171,7 +171,7 @@ settings = {
 application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
-    (r"/save-new", CreateHandler),
+    (r"/save-new", CreateHandler), #TODO rename
     (r"/save", SaveHandler),
     (r"/api/history(.*)", HistoryHandler),
     (r"/api/diff(.*)", DiffHandler),
