@@ -19,17 +19,20 @@ xsrf_cookie = 'sodfksoihasg'
 #remove is current
 #no tabs allowed
 #refactor database conection
+#login logout
 
+# break query strings to multiple lines
+# password tip, passphrase
 # registration
-# login logout
 # diff save
-# should you have "." in symbol names
+
+# error messages
 # hidden editor
 # admin section
-# embed
-# infinite loop protection
-# error messages
 # ip bans
+# infinite loop protection
+# embed
+# should you have "." in symbol names
 
 # authentication
 def restricted(f):
@@ -68,6 +71,17 @@ class LogoutHandler(tornado.web.RequestHandler):
     def post(self):
         self.clear_cookie(xsrf_cookie)
         self.redirect('/home')
+
+class SignupHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.xsrf_token
+        self.render("index.html")
+
+    def post(self):
+        userid = self.get_argument('userid', '')
+        email = self.get_argument('email', '')
+        password = self.get_argument('password', '')
+        create_user(userid, email, password)
 
 # user permissions
 class UserHandler(tornado.web.RequestHandler):

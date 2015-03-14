@@ -1,6 +1,8 @@
 import MySQLdb
 import json
 from custom_exceptions import *
+import hashlib, uuid
+import re
 
 class DatabaseConnection:
     def connect(self):
@@ -53,6 +55,13 @@ db = DatabaseConnection()
 def date_handler(obj):
         return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
+def generate_salt():
+    return uuid.uuid4().hex
+
+def hash_password(password, salt):
+    return hashlib.sha512(password + salt).hexdigest()
+
+""" Validation """
 def validate_name(name):
     if name == '':
         raise InvalidPageName('Page name is empty')
@@ -63,6 +72,28 @@ def validate_content(content):
     if '\t' in content:
         raise Exception('Tabs are not allowed in code')
 
+USER_RE = re.compile('^[a-zA-Z._]+$')
+def validate_userid(userid):
+    if not len(userid) > 4:
+        raise Exception('Username should be more than 4 characters')
+    if not USER_RE.match(userid):
+        raise Exception('Username has invalid characters')
+    chars = ['.', '_']
+    # TODO map reduce StartsWith
+
+EMAIL_RE = re.compile('[^@]+@[^@]+\.[^@]+')
+def validate_email(email):
+    if not EMAIL_RE.match(email):
+        raise Exception('Invalid email')
+
+def validate_password(password):
+    if not re.search(r'/d', password):
+        raise Exception('Password should contain atleast one digit')
+    if len(password) < 10:
+        raise Exception('Password needs to be atleast 10 characters')
+    if len(password) > 128:
+        raise Exception('Password cannot be greater than 128 characters')
+
 def is_number(s):
     try:
         float(s)
@@ -70,6 +101,7 @@ def is_number(s):
     except ValueError:
         return False
 
+""" Database Handlers """
 def create_page(name, content, ip, group, userid):
     validate_name(name)
     validate_content(content)
@@ -92,6 +124,19 @@ def read_page(name):
         return page[0]
     else:
         raise EntryNotFound('this entry was not found')
+
+def create_user(userid, email, password):
+    validate_userid(userid)
+    validate_email(email)
+    validate_password(password)
+
+    userid = db.get_one('SELECT user_id FROM users'
+            ' WHERE user_id = %s', (userid,))
+
+    salt = generate_salt()
+    hash = hash_password(password, salt)
+    # add to database
+    pass
 
 def get_history(name, limit):
     validate_name(name)
