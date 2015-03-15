@@ -72,7 +72,7 @@ def validate_content(content):
     if '\t' in content:
         raise Exception('Tabs are not allowed in code')
 
-USER_RE = re.compile('^[a-zA-Z._]+$')
+USER_RE = re.compile('^[a-zA-Z]+[a-zA-Z_]+[a-zA-Z]+$')
 def validate_username(username):
     if not len(username) > 4:
         raise Exception('Username should be more than 4 characters')
@@ -125,9 +125,13 @@ def create_user(username, email, password):
 def authenticate_user(username, password):
     salt = db.get_one('SELECT user_salt FROM users'
             ' WHERE user_name = %s', (username,))
+    if not salt:
+        return false
+    salt = salt[0]
     hash = hash_password(password, salt)
-    dbhash = db.get_one('SELECT user_password FROM users'
+    dbhash = db.get_one('SELECT user_hash FROM users'
             ' WHERE user_name = %s', (username,))
+    dbhash = dbhash[0]
     return hash == dbhash
 
 """ Pages """

@@ -22,18 +22,22 @@ xsrf_cookie = 'sodfksoihasg'
 #login logout
 #break query strings to multiple lines
 #password tip, passphrase
+#registration
+#signup errors
+#invalid input
 
-# registration
 # diff save
-# change email or password
 
 # error messages
+# accessibility
+# change email or password
 # hidden editor
 # admin section
 # ip bans
 # infinite loop protection
 # embed
 # should you have "." in symbol names
+#  username already registered
 
 # authentication
 def restricted(f):
@@ -58,7 +62,7 @@ class LoginHandler(tornado.web.RequestHandler):
     def post(self):
         username = self.get_argument('username', '')
         password = self.get_argument('password', '')
-        if authenticate(username, password):
+        if database.authenticate_user(username, password):
             self.set_secure_cookie(xsrf_cookie, username)
             self.redirect('/home')
         else:
@@ -79,10 +83,13 @@ class SignupHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
     def post(self):
-        username = self.get_argument('username', '')
-        email = self.get_argument('email', '')
-        password = self.get_argument('password', '')
-        database.create_user(username, email, password)
+        try:
+            username = self.get_argument('username', '')
+            email = self.get_argument('email', '')
+            password = self.get_argument('password', '')
+            database.create_user(username, email, password)
+        except Exception, e:
+            self.redirect('signup-fail')
 
 # user permissions
 class UserHandler(tornado.web.RequestHandler):
