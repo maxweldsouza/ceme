@@ -73,20 +73,23 @@ def validate_content(content):
         raise Exception('Tabs are not allowed in code')
 
 USER_RE = re.compile('^[a-zA-Z._]+$')
-def validate_userid(userid):
-    if not len(userid) > 4:
+def validate_username(username):
+    if not len(username) > 4:
         raise Exception('Username should be more than 4 characters')
-    if not USER_RE.match(userid):
+    if not USER_RE.match(username):
         raise Exception('Username has invalid characters')
     chars = ['.', '_']
     # TODO map reduce StartsWith
 
 EMAIL_RE = re.compile('[^@]+@[^@]+\.[^@]+')
 def validate_email(email):
+    if email == '':
+        return True
     if not EMAIL_RE.match(email):
         raise Exception('Invalid email')
 
 def validate_password(password):
+    return True
     if not re.search(r'/d', password):
         raise Exception('Password should contain atleast one digit')
     if len(password) < 10:
@@ -101,8 +104,34 @@ def is_number(s):
     except ValueError:
         return False
 
-""" Database Handlers """
-def create_page(name, content, ip, group, userid):
+""" Users """
+def create_user(username, email, password):
+    validate_username(username)
+    validate_email(email)
+    validate_password(password)
+
+    exists = db.get_one('SELECT user_name FROM users'
+            ' WHERE user_name = %s', (username,))
+    if exists:
+        raise Exception('This username already exists')
+
+    salt = generate_salt()
+    hash = hash_password(password, salt)
+    group = 1
+    db.put('INSERT INTO users (user_name, user_hash, user_salt, user_email, user_group)'
+            ' VALUES (%s, %s, %s, %s, %s) '
+            , (username, hash, salt, email, group))
+
+def authenticate_user(username, password):
+    salt = db.get_one('SELECT user_salt FROM users'
+            ' WHERE user_name = %s', (username,))
+    hash = hash_password(password, salt)
+    dbhash = db.get_one('SELECT user_password FROM users'
+            ' WHERE user_name = %s', (username,))
+    return hash == dbhash
+
+""" Pages """
+def create_page(name, content, ip, group, username):
     validate_name(name)
     validate_content(content)
     exists = db.get_one('SELECT page_timestamp FROM pages'
@@ -111,17 +140,17 @@ def create_page(name, content, ip, group, userid):
         raise AlreadyExists('This page already exists')
     else:
         db.put('INSERT INTO pages '
-                '(page_name, page_content, page_group, page_userid, page_ip)'
+                '(page_name, page_content, page_group, page_username, page_ip)'
                 ' VALUES (%s, %s, %s, %s, %s) ',
-                (name, content, group, userid, ip))
+                (name, content, group, username, ip))
 
-def save_page(name, content, ip, group, userid):
+def save_page(name, content, ip, group, username):
     validate_name(name)
     validate_content(content)
     exists = db.get_one('SELECT page_timestamp from pages where page_name = %s limit 1', (name,))
-    db.put('INSERT INTO pages (page_name, page_content, page_group, page_userid, page_ip)'
+    db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
-            , (name, content, group, userid, ip))
+            , (name, content, group, username, ip))
 
 def read_page(name):
     validate_name(name)
@@ -132,22 +161,9 @@ def read_page(name):
     else:
         raise EntryNotFound('this entry was not found')
 
-def create_user(userid, email, password):
-    validate_userid(userid)
-    validate_email(email)
-    validate_password(password)
-
-    userid = db.get_one('SELECT user_id FROM users'
-            ' WHERE user_id = %s', (userid,))
-
-    salt = generate_salt()
-    hash = hash_password(password, salt)
-    # add to database
-    pass
-
 def get_history(name, limit):
     validate_name(name)
-    entries = db.get_all('SELECT page_id, page_userid, page_timestamp FROM pages'
+    entries = db.get_all('SELECT page_id, page_username, page_timestamp FROM pages'
             ' WHERE page_name = %s LIMIT %s', (name, int(limit)))
     arr = []
     for entry in entries:

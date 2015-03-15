@@ -20,11 +20,12 @@ xsrf_cookie = 'sodfksoihasg'
 #no tabs allowed
 #refactor database conection
 #login logout
+#break query strings to multiple lines
+#password tip, passphrase
 
-# break query strings to multiple lines
-# password tip, passphrase
 # registration
 # diff save
+# change email or password
 
 # error messages
 # hidden editor
@@ -43,8 +44,8 @@ def restricted(f):
             return args[0].redirect('/')
     return wrapper
 
-def authenticate(userid, password):
-    if userid == 'maxweldsouza' and password == 'u1tbf0s1tw':
+def authenticate(username, password):
+    if username == 'maxweldsouza' and password == 'u1tbf0s1tw':
         return True
     else:
         return False
@@ -55,10 +56,10 @@ class LoginHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
     def post(self):
-        userid = self.get_argument('userid', '')
+        username = self.get_argument('username', '')
         password = self.get_argument('password', '')
-        if authenticate(userid, password):
-            self.set_secure_cookie(xsrf_cookie, userid)
+        if authenticate(username, password):
+            self.set_secure_cookie(xsrf_cookie, username)
             self.redirect('/home')
         else:
             self.redirect('/login-fail')
@@ -78,10 +79,10 @@ class SignupHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
     def post(self):
-        userid = self.get_argument('userid', '')
+        username = self.get_argument('username', '')
         email = self.get_argument('email', '')
         password = self.get_argument('password', '')
-        create_user(userid, email, password)
+        database.create_user(username, email, password)
 
 # user permissions
 class UserHandler(tornado.web.RequestHandler):
@@ -128,8 +129,8 @@ class CreateHandler(tornado.web.RequestHandler):
             name = self.get_argument('name', '')
             ip = self.request.remote_ip
             group = 1
-            userid = ''
-            database.create_page(name, content, ip, group, userid)
+            username = ''
+            database.create_page(name, content, ip, group, username)
             self.set_status(200)
             self.redirect('/' + name)
         except InvalidPageName, e:
@@ -150,8 +151,8 @@ class SaveHandler(tornado.web.RequestHandler):
             content = self.get_argument('content', '')
             ip = self.request.remote_ip
             group = 1
-            userid = ''
-            database.save_page(name, content, ip, group, userid)
+            username = ''
+            database.save_page(name, content, ip, group, username)
             self.write('The page has been saved successfully')
 
         except InvalidPageName, e:
@@ -190,6 +191,7 @@ application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
     (r"/create", CreateHandler),
+    (r"/sign-up", SignupHandler),
     (r"/api/save", SaveHandler),
     (r"/api/history(.*)", HistoryHandler),
     (r"/api/diff(.*)", DiffHandler),
