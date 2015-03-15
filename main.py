@@ -57,12 +57,13 @@ class LoginHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
     def post(self):
-        username = self.get_argument('username', '')
-        password = self.get_argument('password', '')
-        if database.authenticate_user(username, password):
-            self.set_secure_cookie(xsrf_cookie, username)
-            self.redirect('/home')
-        else:
+        try:
+            username = self.get_argument('username', '')
+            password = self.get_argument('password', '')
+            if database.authenticate_user(username, password):
+                self.set_secure_cookie(xsrf_cookie, username)
+                self.redirect('/home')
+        except Exception, e:
             self.redirect('/login-fail')
 
 class LogoutHandler(tornado.web.RequestHandler):

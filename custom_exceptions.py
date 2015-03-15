@@ -7,6 +7,9 @@ class NoRights(Exception):
 class EntryNotFound(Exception):
     pass
 
+class LoginFailed(Exception):
+    pass
+
 """ Input validation """
 class InvalidPageName(Exception):
     pass

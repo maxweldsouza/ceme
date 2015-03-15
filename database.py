@@ -121,16 +121,20 @@ def create_user(username, email, password):
             , (username, hash, salt, email, group))
 
 def authenticate_user(username, password):
+    validate_username(username)
+    validate_password(password)
     salt = db.get_one('SELECT user_salt FROM users'
             ' WHERE user_name = %s', (username,))
     if not salt:
-        return false
+        raise LoginFailed()
     salt = salt[0]
     hash = hash_password(password, salt)
     dbhash = db.get_one('SELECT user_hash FROM users'
             ' WHERE user_name = %s', (username,))
     dbhash = dbhash[0]
-    return hash == dbhash
+    if hash != dbhash:
+        raise LoginFailed()
+    return True
 
 """ Pages """
 def create_page(name, content, ip, group, username):
