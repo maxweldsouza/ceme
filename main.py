@@ -27,7 +27,6 @@ xsrf_cookie = 'sodfksoihasg'
 #invalid input
 
 # diff save
-
 # error messages
 # accessibility
 # change email or password
@@ -39,20 +38,18 @@ xsrf_cookie = 'sodfksoihasg'
 # should you have "." in symbol names
 #  username already registered
 
-# authentication
+""" authentication """
 def restricted(f):
+    """ @ restricted decorator
+    allows only authenticated users
+    to have access """
+    # TODO use user groups for this
     def wrapper(*args, **kwargs):
         if args[0].get_secure_cookie(xsrf_cookie):
             return f(*args, **kwargs)
         else:
             return args[0].redirect('/')
     return wrapper
-
-def authenticate(username, password):
-    if username == 'maxweldsouza' and password == 'u1tbf0s1tw':
-        return True
-    else:
-        return False
 
 class LoginHandler(tornado.web.RequestHandler):
     def get(self):
@@ -88,8 +85,14 @@ class SignupHandler(tornado.web.RequestHandler):
             email = self.get_argument('email', '')
             password = self.get_argument('password', '')
             database.create_user(username, email, password)
+            # TODO message account created
+            self.set_secure_cookie(xsrf_cookie, username)
+            self.redirect('/home')
+        except InvalidUsername, e:
+            # TODO custom error message page
+            self.write('Username already exists')
         except Exception, e:
-            self.redirect('signup-fail')
+            self.redirect('/signup-fail')
 
 # user permissions
 class UserHandler(tornado.web.RequestHandler):
@@ -97,8 +100,6 @@ class UserHandler(tornado.web.RequestHandler):
         # get info
         # change info
         pass
-
-# use the @restricted decorator
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
@@ -119,7 +120,7 @@ def ceme_file(self, path):
         self.set_status(404)
         self.write(file.read())
 
-# ceme code
+""" Ceme code """
 class CodeHandler(tornado.web.RequestHandler):
     def get(self, path):
         ceme_file(self, path)
@@ -130,7 +131,7 @@ class CreateHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
     def post(self):
-        # this redirects after the post
+        """ redirects after post """
         try:
             content = "'Your page has been created. You can now edit it.'"
             name = self.get_argument('name', '')
@@ -140,7 +141,7 @@ class CreateHandler(tornado.web.RequestHandler):
             database.create_page(name, content, ip, group, username)
             self.set_status(200)
             self.redirect('/' + name)
-        except InvalidPageName, e:
+        except InvalidPageName:
             self.set_status(400)
             self.redirect('/invalid-name')
         except AlreadyExists:
@@ -152,7 +153,7 @@ class SaveHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
     def post(self):
-        # this uses an ajax post
+        """ post using ajax """
         try:
             name = self.get_argument('name', '')
             content = self.get_argument('content', '')
@@ -172,18 +173,26 @@ class SaveHandler(tornado.web.RequestHandler):
 
 class HistoryHandler(tornado.web.RequestHandler):
     def get(self, path):
-        name = self.get_argument("name")
-        limit = self.get_argument("limit", "20")
-        self.set_header("Content-Type", "application/json")
-        self.write(database.get_history(name, limit))
+        try:
+            name = self.get_argument("name")
+            limit = self.get_argument("limit", "20")
+            self.set_header("Content-Type", "application/json")
+            self.write(database.get_history(name, limit))
+        except Exception, e:
+            self.set_status(500)
+            self.write(str(e))
 
 class DiffHandler(tornado.web.RequestHandler):
     def get(self, path):
-        name = self.get_argument("name")
-        first = self.get_argument("first")
-        second = self.get_argument("second")
-        self.set_header("Content-Type", "application/json")
-        self.write(database.get_diff(name, first, second))
+        try:
+            name = self.get_argument("name")
+            first = self.get_argument("first")
+            second = self.get_argument("second")
+            self.set_header("Content-Type", "application/json")
+            self.write(database.get_diff(name, first, second))
+        except Exception, e:
+            self.set_status(500)
+            self.write(str(e))
 
 settings = {
     'default_handler_class': ErrorHandler,

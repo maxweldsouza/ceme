@@ -68,34 +68,32 @@ def validate_name(name):
 
 def validate_content(content):
     if content == '':
-        raise Exception('Page is empty')
+        raise InvalidContent('Page is empty')
     if '\t' in content:
-        raise Exception('Tabs are not allowed in code')
+        raise InvalidContent('Tabs are not allowed in code')
 
 USER_RE = re.compile('^[a-zA-Z]+[a-zA-Z_]+[a-zA-Z]+$')
 def validate_username(username):
     if not len(username) > 4:
-        raise Exception('Username should be more than 4 characters')
+        raise InvalidUsername('Username should be more than 4 characters')
     if not USER_RE.match(username):
-        raise Exception('Username has invalid characters')
+        raise InvalidUsername('Username has invalid characters')
     chars = ['.', '_']
     # TODO map reduce StartsWith
 
 EMAIL_RE = re.compile('[^@]+@[^@]+\.[^@]+')
 def validate_email(email):
-    if email == '':
-        return True
     if not EMAIL_RE.match(email):
-        raise Exception('Invalid email')
+        raise InvalidEmail('Invalid email')
 
 def validate_password(password):
     return True
     if not re.search(r'/d', password):
-        raise Exception('Password should contain atleast one digit')
+        raise InvalidPassword('Password should contain atleast one digit')
     if len(password) < 10:
-        raise Exception('Password needs to be atleast 10 characters')
+        raise InvalidPassword('Password needs to be atleast 10 characters')
     if len(password) > 128:
-        raise Exception('Password cannot be greater than 128 characters')
+        raise InvalidPassword('Password cannot be greater than 128 characters')
 
 def is_number(s):
     try:
@@ -113,7 +111,7 @@ def create_user(username, email, password):
     exists = db.get_one('SELECT user_name FROM users'
             ' WHERE user_name = %s', (username,))
     if exists:
-        raise Exception('This username already exists')
+        raise InvalidUsername('This username already exists')
 
     salt = generate_salt()
     hash = hash_password(password, salt)
@@ -181,5 +179,8 @@ def get_diff(name, first, second):
             ' WHERE page_name = %s AND page_id = %s', (name, first))
     snd = db.get_one('SELECT page_id, page_content, page_timestamp FROM pages'
             ' WHERE page_name = %s AND page_id = %s', (name, second))
-    somedict = [{ "id": fst[0], "content": fst[1], "timestamp": fst[2] },{ "id": snd[0], "content": snd[1], "timestamp": snd[2] }]
-    return json.dumps(somedict, default=date_handler)
+    if fst and snd:
+        somedict = [{ "id": fst[0], "content": fst[1], "timestamp": fst[2] },{ "id": snd[0], "content": snd[1], "timestamp": snd[2] }]
+        return json.dumps(somedict, default=date_handler)
+    else:
+        raise Exception('Invalid input parameters')
