@@ -62,9 +62,13 @@ def hash_password(password, salt):
     return hashlib.sha512(password + salt).hexdigest()
 
 """ Validation """
+# TODO make someone read rfc3986 and fix this
+PGNM_RE = re.compile('^[a-zA-Z0-9-]+$')
 def validate_name(name):
     if name == '':
         raise InvalidPageName('Page name is empty')
+    if not PGNM_RE.match(name):
+        raise InvalidPageName('Page name is invalid')
 
 def validate_content(content):
     if content == '':
@@ -172,6 +176,8 @@ def get_history(name, limit):
     entries = db.get_all('SELECT page_id, page_username, page_timestamp FROM pages'
             ' WHERE page_name = %s LIMIT %s', (name, int(limit)))
     arr = []
+    if not entries:
+        raise EntryNotFound
     for entry in entries:
         somedict = { "id": entry[0], "user": entry[1], "timestamp": entry[2], }
         arr.append(somedict)

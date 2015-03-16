@@ -71,6 +71,7 @@ function queryStringToJSON(queryString) {
 }
 
 $(document).on('submit', 'form', function (e) {
+    // TODO not for GET forms
     var url = $(this).attr('action');
     if (url.indexOf('/api/') === 0) {
         e.preventDefault();

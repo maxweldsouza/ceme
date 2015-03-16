@@ -10,6 +10,7 @@ xsrf_cookie = 'sodfksoihasg'
 
 # Meta
 # error handling
+# secure authentication
 
 # TODO list
 #name not empty
@@ -91,7 +92,11 @@ class SignupHandler(tornado.web.RequestHandler):
             self.redirect('/home')
         except InvalidUsername, e:
             # TODO custom error message page
-            self.write('Username already exists')
+            self.write(str(e))
+        except InvalidPassword, e:
+            self.write(str(e))
+        except InvalidEmail, e:
+            self.write(str(e))
         except Exception, e:
             self.redirect('/signup-fail')
 
@@ -175,12 +180,19 @@ class SaveHandler(tornado.web.RequestHandler):
 class HistoryHandler(tornado.web.RequestHandler):
     def get(self, path):
         try:
-            name = self.get_argument("name")
+            name = self.get_argument("name", '')
             limit = self.get_argument("limit", "20")
             self.set_header("Content-Type", "application/json")
             self.write(database.get_history(name, limit))
+        except InvalidPageName, e:
+            self.set_status(400)
+            self.write(str(e))
+        except EntryNotFound, e:
+            self.set_status(404)
+            self.write(str(e))
         except Exception, e:
             self.set_status(500)
+            print str(e)
             self.write(str(e))
 
 class DiffHandler(tornado.web.RequestHandler):
