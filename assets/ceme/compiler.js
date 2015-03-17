@@ -131,10 +131,10 @@ var ceme = function () {
                 return _let(tree);
             } else if (x === 'list') {
                 return _array(tree.slice(1, tree.length));
-            } else if (x === 'unnamed') {
+            } else if (x === 'function') {
                 return _lambda (tree[1].slice(1,tree[1].length),
                         compile(tree[2]));
-            } else if (x === 'cond') {
+            } else if (x === 'if') {
                 for (i = 1; i < tree.length; i++) {
                     tree[i] = compile(tree[i]);
                 }
@@ -569,7 +569,7 @@ var ceme = function () {
         return result;
     }
 
-    var compiler  = function (text) {
+    var compiler = function (text) {
         var tokens = lexer(text);
         tokens.unshift('(');
         tokens.unshift('main'); //dummy token

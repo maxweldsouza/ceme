@@ -596,6 +596,11 @@ var cemeEnv = function() {
                 return result;
             },
 
+            ////// Language
+            'EvalString': function (str) {
+                return ceme.compile(str);
+            },
+
             //////// Scantuary
 
             'Max': function (a, b) {

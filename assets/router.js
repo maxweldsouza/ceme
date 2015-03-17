@@ -115,6 +115,7 @@ var Router = function () {
                 }
             }
         });
+        myCodeMirror.setSize(550, 700);
         return myCodeMirror;
     }
 

@@ -1,13 +1,33 @@
 import
     '/assets/code/css.ceme'
 define
+    Example
+        x
+    +
+        pre
+            code
+                x
+        pre
+            code
+                EvalString
+                    x
+define
+    Link
+        url
+        name
+    +
+        a
+            attrib
+                href
+                    url
+            name
+define
     Alert
         x
         y
     Formatter
         '''
-        <div class="alert alert-%s alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <div class="alert alert-%s" role="alert">
             %s
         </div>
         '''
@@ -118,7 +138,7 @@ define
     content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-            <li><a href="/test">Documentation</a></li>
+            <li><a href="/documentation">Documentation</a></li>
             <li><a href="/create">Create</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right" id="login-logout">
