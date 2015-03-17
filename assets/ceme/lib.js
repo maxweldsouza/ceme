@@ -30,11 +30,11 @@ var cemeEnv = function() {
     }
 
     // TODO rename
-    var Cdr = function (list) {
+    var Rest = function (list) {
         if (IsEmptyArray(list)) {
-            cemeEnv.ReportError('cant Cdr an empty array: ' + list);
+            cemeEnv.ReportError('cant Rest an empty array: ' + list);
         } else if (cemeEnv.IsAtom(list)) {
-            cemeEnv.ReportError('cant Cdr an atom: ' + list);
+            cemeEnv.ReportError('cant Rest an atom: ' + list);
         }
         return list.slice(1, list.length);
     }
@@ -245,11 +245,8 @@ var cemeEnv = function() {
     };
     return {
 
-            'Formatter': Formatter,
-            'Print': function (a) {
-                //console.log(a);
-                return '';
-            },
+            //////// Html
+
             'WindowTitle': function (a) {
                 $('html > head > title').remove();
                 var title = '<title>' + a + '</title>';
@@ -263,7 +260,101 @@ var cemeEnv = function() {
                 return '';
             },
 
-             //////// Arrays
+            //////// Math
+
+            //// Logical
+
+            'not': function (a) {
+                return !a;
+            },
+            'and': function (a, b) {
+                return a && b;
+            },
+            'or': function (a, b) {
+                return a || b;
+            },
+
+            //// Comparison
+
+            'IsEqual': function (a, b) {
+                return (a >= b && a <= b);
+            },
+            '>': function (a, b) {
+                return a > b;
+            },
+            '<': function (a, b) {
+                return a < b;
+            },
+            '>=': function (a, b) {
+                return a >= b;
+            },
+            '<=': function (a, b) {
+                return a <= b;
+            },
+
+            //// Arithmetic
+
+            '*' : function (a, b) {
+                var i;
+                var result = arguments[0];
+                for (i = 1; i < arguments.length; i++) {
+                    result *= arguments[i];
+                }
+                return result;
+            },
+            '/' : function (a, b) {
+                var i;
+                var result = arguments[0];
+                for (i = 1; i < arguments.length; i++) {
+                    result /= arguments[i];
+                }
+                return result;
+            },
+            '+' : function () {
+                var i;
+                var result = arguments[0];
+                for (i = 1; i < arguments.length; i++) {
+                    result += arguments[i];
+                }
+                return result;
+            },
+            '-' : function (a, b) {
+                var i;
+                var result = arguments[0];
+                for (i = 1; i < arguments.length; i++) {
+                    result -= arguments[i];
+                }
+                return result;
+            },
+
+            //////// Functional
+
+            'Map': function (f, lst) {
+                var result = [];
+                var i;
+                for (i = 0; i < lst.length; i++) {
+                    result.push(f(lst[i]));
+                }
+                return result;
+            },
+
+            'Reduce': function (f, lst) {
+                if (lst.length === 0) {
+                    return lst;
+                }
+                var result = lst[0];
+                var i;
+                for (i = 1; i < lst.length; i++) {
+                    result = f(result, lst[i]);
+                }
+                return result;
+            },
+
+            'Filter': function (f, arg) {
+                return arg.filter(f);
+            },
+
+            //////// Arrays
 
             //// Predicates
 
@@ -288,7 +379,7 @@ var cemeEnv = function() {
             //// Items
 
             'First': First,
-            'Cdr': Cdr,
+            'Rest': Rest,
             'Second': function (a) {
                 return a[1];
             },
@@ -427,10 +518,16 @@ var cemeEnv = function() {
 
             //////// Strings
 
+            'Formatter': Formatter,
+            'Print': function (a) {
+                //console.log(a);
+                return '';
+            },
+
             'join': function(a, b) {
                 return a.concat(b);
             },
-            'DelimitedJoin': function(lst, delim) {
+            'Join': function(lst, delim) {
                 var i;
                 var result = '';
                 result = lst[0];
@@ -449,72 +546,6 @@ var cemeEnv = function() {
                 return (this.indexOf(start) > -1);
             },
 
-            //////// Operators
-
-            //// Logical
-
-            'not': function (a) {
-                return !a;
-            },
-            'and': function (a, b) {
-                return a && b;
-            },
-            'or': function (a, b) {
-                return a || b;
-            },
-
-            //// Comparison
-
-            'IsEqual': function (a, b) {
-                return (a >= b && a <= b);
-            },
-            '>': function (a, b) {
-                return a > b;
-            },
-            '<': function (a, b) {
-                return a < b;
-            },
-            '>=': function (a, b) {
-                return a >= b;
-            },
-            '<=': function (a, b) {
-                return a <= b;
-            },
-
-            //// Math
-
-            '*' : function (a, b) {
-                var i;
-                var result = arguments[0];
-                for (i = 1; i < arguments.length; i++) {
-                    result *= arguments[i];
-                }
-                return result;
-            },
-            '/' : function (a, b) {
-                var i;
-                var result = arguments[0];
-                for (i = 1; i < arguments.length; i++) {
-                    result /= arguments[i];
-                }
-                return result;
-            },
-            '+' : function () {
-                var i;
-                var result = arguments[0];
-                for (i = 1; i < arguments.length; i++) {
-                    result += arguments[i];
-                }
-                return result;
-            },
-            '-' : function (a, b) {
-                var i;
-                var result = arguments[0];
-                for (i = 1; i < arguments.length; i++) {
-                    result -= arguments[i];
-                }
-                return result;
-            },
             'MaxList': function (a) {
                 var temp = cemeEnv['Reduce'](cemeEnv['Max'], a);
                 return temp;
@@ -524,34 +555,6 @@ var cemeEnv = function() {
                 return temp;
             },
             'sum': sum,
-
-            //////// Functional
-
-            'Map': function (f, lst) {
-                var result = [];
-                var i;
-                for (i = 0; i < lst.length; i++) {
-                    result.push(f(lst[i]));
-                }
-                return result;
-            },
-
-            'Reduce': function (f, lst) {
-                if (lst.length === 0) {
-                    return lst;
-                }
-                var result = lst[0];
-                var i;
-                for (i = 1; i < lst.length; i++) {
-                    result = f(result, lst[i]);
-                }
-                return result;
-            },
-
-            // TODO function before args
-            'Filter': function (arg, f) {
-                return arg.filter(f);
-            },
 
             /* MapCar takes a function and a list of lists
             and applies the function successively to the nth element

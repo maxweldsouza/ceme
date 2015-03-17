@@ -268,7 +268,7 @@ var ceme = function () {
 
             // check whether stuck in infinite loop
             if (input.length === length) {
-                return cemeEnv.ReportError('Lexer stuck in infinite loop');
+                throw SyntaxError('Check your quotes. Lexer stuck in infinite loop.');
             } else {
                 length = input.length;
             }
