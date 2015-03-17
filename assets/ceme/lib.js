@@ -327,33 +327,6 @@ var cemeEnv = function() {
                 return result;
             },
 
-            //////// Functional
-
-            'Map': function (f, lst) {
-                var result = [];
-                var i;
-                for (i = 0; i < lst.length; i++) {
-                    result.push(f(lst[i]));
-                }
-                return result;
-            },
-
-            'Reduce': function (f, lst) {
-                if (lst.length === 0) {
-                    return lst;
-                }
-                var result = lst[0];
-                var i;
-                for (i = 1; i < lst.length; i++) {
-                    result = f(result, lst[i]);
-                }
-                return result;
-            },
-
-            'Filter': function (f, arg) {
-                return arg.filter(f);
-            },
-
             //////// Arrays
 
             //// Predicates
@@ -439,6 +412,33 @@ var cemeEnv = function() {
                     }
                 }
                 return result;
+            },
+
+            //////// Functional
+
+            'Map': function (f, lst) {
+                var result = [];
+                var i;
+                for (i = 0; i < lst.length; i++) {
+                    result.push(f(lst[i]));
+                }
+                return result;
+            },
+
+            'Reduce': function (f, lst) {
+                if (lst.length === 0) {
+                    return lst;
+                }
+                var result = lst[0];
+                var i;
+                for (i = 1; i < lst.length; i++) {
+                    result = f(result, lst[i]);
+                }
+                return result;
+            },
+
+            'Filter': function (f, arg) {
+                return arg.filter(f);
             },
 
             //// Cutting
