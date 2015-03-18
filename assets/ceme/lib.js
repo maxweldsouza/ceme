@@ -22,9 +22,9 @@ var cemeEnv = function() {
     // Arrays
     var First = function (list) {
         if (IsEmptyArray(list)) {
-            cemeEnv.ReportError('Cant get first of empty array ' + list);
+            throw Error('Cant get first of empty array ' + list);
         } else if (cemeEnv.IsAtom(list)) {
-            cemeEnv.ReportError('Cant get first of atom ' + list);
+            throw Error('Cant get first of atom ' + list);
         }
         return list[0];
     }
@@ -32,9 +32,9 @@ var cemeEnv = function() {
     // TODO rename
     var Rest = function (list) {
         if (IsEmptyArray(list)) {
-            cemeEnv.ReportError('cant Rest an empty array: ' + list);
+            throw Error('Cant Rest an empty array: ' + list);
         } else if (cemeEnv.IsAtom(list)) {
-            cemeEnv.ReportError('cant Rest an atom: ' + list);
+            throw Error('Cant Rest an atom: ' + list);
         }
         return list.slice(1, list.length);
     }
@@ -332,22 +332,6 @@ var cemeEnv = function() {
             //// Predicates
 
             'IsArray': IsArray,
-            'IsAtom': function (a) {
-                return !IsArray(a);
-            },
-            'IsNull': function (a) {
-                return IsArray(a)
-                    && a.length === 0; 
-            },
-            'IsMember': function (x, lst) {
-                var i;
-                for (i = 0; i < lst.length; i++) {
-                    if (lst[i] === x) {
-                        return true;
-                    }
-                }
-                return false;
-            },
 
             //// Items
 
@@ -362,6 +346,8 @@ var cemeEnv = function() {
 
             //// Create
 
+            // TODO rename
+
             'Cons': function (a, b) {
                 if (IsEmptyArray(b))
                     return [a];
@@ -375,9 +361,6 @@ var cemeEnv = function() {
                 return lst;
             },
 
-            'Getkey': function (item, key) {
-                return item[key];
-            },
             //// Other
 
             'Length': function (a) {
@@ -394,25 +377,6 @@ var cemeEnv = function() {
                 }
             },
             'IndexOf': IndexOf,
-            'ItemsAt': function (x, ids) {
-                var i;
-                var result = [];
-                for (i = 0; i < ids.length; i++) {
-                    result.push(x[ids[i]]);
-                }
-                return result;
-            },
-            'ItemWithIds': function (x, ids, target) {
-                var i,j;
-                var result = [];
-                for (i = 0; i < target.length; i++) {
-                    var ind = IndexOf(target[i], ids);
-                    if (ind !== -1) {
-                        result.push(x[ind]);
-                    }
-                }
-                return result;
-            },
 
             //////// Functional
 
@@ -441,39 +405,6 @@ var cemeEnv = function() {
                 return arg.filter(f);
             },
 
-            //// Cutting
-
-            'SplitIntoArraysOfSize': SplitIntoArraysOfSize,
-            'SplitInto': function(lst, no) {
-                var elemsperlist = Math.ceil(lst.length / no);
-                return SplitIntoArraysOfSize(lst, elemsperlist);
-            },
-            'Slice': function (arr, start, finish) {
-                return arr.slice(start, finish);
-            },
-            'Sublist': function (lst, start) {
-                return lst.slice(start, lst.length);
-            },
-            'Split': function (str, chr) {
-                return str.split(chr);
-            },
-            'RemoveAll': function (str, chr) {
-                return str.replace(new RegExp(ch, 'g'),'');
-            },
-
-            //////// Sorting
-
-            'SortNumbers': function (a) {
-                var result;
-                result = a.sort(function (b, c) { return b - c; });
-                return result;
-            },
-            'SortStrings': function (a) {
-                return a.sort();
-            },
-            'MaxwelSort': MaxwelSort,
-            'MaxwelSortReverse': MaxwelSortReverse,
-
             //////// Sets
 
             'MakeSet': function (x) {
@@ -498,6 +429,14 @@ var cemeEnv = function() {
                 return result;
             },
 
+            //// Cutting
+
+            'Slice': function (arr, start, finish) {
+                return arr.slice(start, finish);
+            },
+            'Sublist': function (lst, start) {
+                return lst.slice(start, lst.length);
+            },
             //////// Numbers
 
             'Range': function (a, b) {
@@ -518,6 +457,13 @@ var cemeEnv = function() {
 
             //////// Strings
 
+            'Split': function (str, chr) {
+                return str.split(chr);
+            },
+            'RemoveAll': function (str, chr) {
+                return str.replace(new RegExp(ch, 'g'),'');
+            },
+
             'Formatter': Formatter,
             'Print': function (a) {
                 //console.log(a);
@@ -535,10 +481,6 @@ var cemeEnv = function() {
                     result += delim;
                     result += lst[i];
                 }
-                return result;
-            },
-            'FirstWord': function (a) {
-                var result = a.split(' ')[0];
                 return result;
             },
             // TODO add to String.prototype
@@ -572,6 +514,12 @@ var cemeEnv = function() {
                 }
                 return result;
             },
+            ////// Language
+            'EvalString': function (str) {
+                return ceme.compile(str);
+            },
+
+            //////// Scantuary
 
             /* get the indices of the elements of the array which pass
             the given condition */
@@ -599,13 +547,68 @@ var cemeEnv = function() {
                 return result;
             },
 
-            ////// Language
-            'EvalString': function (str) {
-                return ceme.compile(str);
+            'IsAtom': function (a) {
+                return !IsArray(a);
+            },
+            'IsNull': function (a) {
+                return IsArray(a)
+                    && a.length === 0; 
+            },
+            'IsMember': function (x, lst) {
+                var i;
+                for (i = 0; i < lst.length; i++) {
+                    if (lst[i] === x) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+            'IsNumber': function (a) {
+                return typeof a === 'number';
+            },
+            'RandomInt': function (min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            },
+            'GetCookie': function(name) {
+                var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+                return r ? r[1] : undefined;
+            },
+            'Getkey': function (item, key) {
+                return item[key];
+            },
+            'AjaxGet': function (uri) {
+                var temp;
+                $.ajax({
+                    url: uri,
+                    async: false,
+                    dataType: 'json',
+                    success: function(data) {
+                        temp = data;
+                    }
+                });
+                return temp;
             },
 
-            //////// Scantuary
+            /***************************
+             * Scantuary
+             **************************/
+            //////// Sorting
 
+            'SortNumbers': function (a) {
+                var result;
+                result = a.sort(function (b, c) { return b - c; });
+                return result;
+            },
+            'SortStrings': function (a) {
+                return a.sort();
+            },
+            'MaxwelSort': MaxwelSort,
+            'MaxwelSortReverse': MaxwelSortReverse,
+
+            'FirstWord': function (a) {
+                var result = a.split(' ')[0];
+                return result;
+            },
             'Max': function (a, b) {
                 if (a === "-") return b;
                 if (b === "-") return a;
@@ -639,51 +642,27 @@ var cemeEnv = function() {
                 } else if (re.test(a)) {
                     return true;
                 }
-                //console.log('bad name: ' + a);
-                cemeEnv.ReportError('bad name: ' + a);
+                throw Error('bad name: ' + a);
                 return false;
             },
-            'IsNumber': function (a) {
-                return typeof a === 'number';
-            },
-            'NumberWithCommas' : function (x) {
-                var parts = x.toString().split(".");
-                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                return parts.join(".");
-            },
-            'PriceCeil' : function (x) {
-                return Math.ceil(x/500) * 500;
-            },
-            'PriceFloor' : function (x) {
-                return Math.floor(x/500) * 500;
-            },
-            'ResolutionLines': function (a) {
-                if (IsResolution(a)) {
-                    var vals = a.split('x');
-                    return Math.min(parseInt(vals[0]), parseInt(vals[1]));
-                } else {
-                    return '-';
+            'ItemsAt': function (x, ids) {
+                var i;
+                var result = [];
+                for (i = 0; i < ids.length; i++) {
+                    result.push(x[ids[i]]);
                 }
+                return result;
             },
-            'ResolutionValue': function (a) {
-                if (IsResolution(a)) {
-                    var vals = a.split('x');
-                    var result = parseInt(vals[0]) * parseInt(vals[1]);
-                    return result;
-                } else {
-                    return 0;
+            'ItemWithIds': function (x, ids, target) {
+                var i,j;
+                var result = [];
+                for (i = 0; i < target.length; i++) {
+                    var ind = IndexOf(target[i], ids);
+                    if (ind !== -1) {
+                        result.push(x[ind]);
+                    }
                 }
-            },
-            'WithoutUnknown': function (a) {
-                return a.filter(function (b) {
-                    return b !== '-';
-                });
-            },
-            'IsResolution': IsResolution,
-            'IsDefined': IsDefined,
-            'SymValue': SymValue,
-            'RandomInt': function (min, max) {
-                return Math.floor(Math.random() * (max - min + 1)) + min;
+                return result;
             },
             'ReportError': function (msg) {
                 if (typeof XMLHttpRequest !== 'undefined') {
@@ -726,21 +705,47 @@ var cemeEnv = function() {
             'ProductWithDashes': function (a) {
                 return a.replace(/\s/g, '-');
             },
-            'GetCookie': function(name) {
-                var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
-                return r ? r[1] : undefined;
+            'NumberWithCommas' : function (x) {
+                var parts = x.toString().split(".");
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return parts.join(".");
             },
-            'AjaxGet': function (uri) {
-                var temp;
-                $.ajax({
-                    url: uri,
-                    async: false,
-                    dataType: 'json',
-                    success: function(data) {
-                        temp = data;
-                    }
+            'PriceCeil' : function (x) {
+                return Math.ceil(x/500) * 500;
+            },
+            'PriceFloor' : function (x) {
+                return Math.floor(x/500) * 500;
+            },
+            'ResolutionLines': function (a) {
+                if (IsResolution(a)) {
+                    var vals = a.split('x');
+                    return Math.min(parseInt(vals[0]), parseInt(vals[1]));
+                } else {
+                    return '-';
+                }
+            },
+            'ResolutionValue': function (a) {
+                if (IsResolution(a)) {
+                    var vals = a.split('x');
+                    var result = parseInt(vals[0]) * parseInt(vals[1]);
+                    return result;
+                } else {
+                    return 0;
+                }
+            },
+            'WithoutUnknown': function (a) {
+                return a.filter(function (b) {
+                    return b !== '-';
                 });
-                return temp;
+            },
+            'IsResolution': IsResolution,
+            'IsDefined': IsDefined,
+            'SymValue': SymValue,
+
+            'SplitIntoArraysOfSize': SplitIntoArraysOfSize,
+            'SplitInto': function(lst, no) {
+                var elemsperlist = Math.ceil(lst.length / no);
+                return SplitIntoArraysOfSize(lst, elemsperlist);
             }
     }
 }();

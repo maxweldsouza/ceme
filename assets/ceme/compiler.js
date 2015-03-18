@@ -84,7 +84,7 @@ var ceme = function () {
                     output += tmp;
                 }
             } catch (e) {
-                cemeEnv.ReportError('Compiler error \nCode:' + code + ' \nMessage:' + e.message);
+                //cemeEnv.ReportError('Compiler error \nCode:' + code + ' \nMessage:' + e.message);
                 //console.log(code);
                 //console.log(e.message);
                 throw e;
@@ -178,7 +178,7 @@ var ceme = function () {
     }
 
     var parser  = function (tokens) {
-        if (tokens.length === 0) return cemeEnv.ReportError('no tokens found');
+        if (tokens.length === 0) return throw Error('no tokens found');
         var tree = [];
         var level = 0;
         while (tokens.length > 0) {

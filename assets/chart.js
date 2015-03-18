@@ -28,6 +28,7 @@ if (!window.cancelAnimationFrame)
 var lasttimecalled = Date.now();
 var timescalled = 0;
 
+var fnlist = [];
 var drawanimation = function (ts) {
     timescalled++;
     if (timescalled === 100) {
@@ -38,25 +39,62 @@ var drawanimation = function (ts) {
         lasttimecalled = Date.now();
     }
 
-    var ctx = document.getElementById('canvas').getContext('2d');
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
     if (ctx) {
+        cemeEnv.ctx = ctx;
 
         if (typeof starttime === 'undefined') {
             starttime = ts;
         }
         time = ts - starttime - 2000;
 
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // defaults
         ctx.fillStyle = "red";
-        ctx.fillRect(10,10,50,50);
+
+        var i;
+        for (i = 0; i < fnlist.length; i++) {
+            fnlist[i](ctx);
+        }
 
         if (time > 14000) {
             starttime = ts;
         }
     }
 
-    // runs for 9 secs
     window.requestAnimationFrame(drawanimation);
 }
 
 window.requestAnimationFrame(drawanimation);
+
+// Ceme Canvas Library
+cemeEnv.Text = function(txt, x, y, color, font) {
+    fnlist.push(function (ctx) {
+        ctx.font = font;
+        ctx.fillStyle = color;
+        ctx.fillText(txt, x, y);
+    });
+}
+
+cemeEnv.Rectangle = function (w, h, l, t) {
+    var args = [];
+    var i;
+    for (i = 0; i < arguments.length; i++) {
+        args[i] = arguments[i];
+    }
+
+    fnlist.push(function (ctx) {
+        ctx.fillRect(w, h, l, t);
+    });
+}
+
+cemeEnv.Circle = function (x, y, r) {
+    fnlist.push(function (ctx) {
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+        ctx.fill();
+    });
+}
+
