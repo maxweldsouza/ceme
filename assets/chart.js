@@ -28,7 +28,6 @@ if (!window.cancelAnimationFrame)
 var lasttimecalled = Date.now();
 var timescalled = 0;
 
-var fnlist = [];
 var ctx;
 var drawanimation = function (ts) {
     timescalled++;
@@ -57,13 +56,6 @@ var drawanimation = function (ts) {
 
         cemeEnv.Special();
 
-        /*
-        var i;
-        for (i = 0; i < fnlist.length; i++) {
-            fnlist[i](ctx);
-        }
-        */
-
         if (time > 14000) {
             starttime = ts;
         }
@@ -85,10 +77,8 @@ cemeEnv.Rectangle = function (w, h, l, t) {
 }
 
 cemeEnv.Circle = function (x, y, r) {
-    fnlist.push(function (ctx) {
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, 2 * Math.PI, false);
-        ctx.fill();
-    });
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, 2 * Math.PI, false);
+    ctx.fill();
 }
 

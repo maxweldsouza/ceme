@@ -136,12 +136,6 @@ var Router = function () {
         var mainarea = document.getElementById("ceme-input");
 
         var runCode = function () {
-            // list of canvas functions to be executed
-            // every frame
-            if (fnlist) {
-                fnlist = [];
-            }
-
             var text = editor.getValue();
             try {
                 var output = ceme.compile(text);

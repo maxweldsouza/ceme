@@ -169,7 +169,7 @@ class SaveHandler(tornado.web.RequestHandler):
             database.save_page(name, content, ip, group, username)
             self.write('The page has been saved successfully')
 
-        except InvalidPageName, e:
+        except (InvalidPageName, InvalidContent) as e:
             self.set_status(400)
             self.write(str(e))
         except Exception, e:
