@@ -178,7 +178,8 @@ var ceme = function () {
     }
 
     var parser  = function (tokens) {
-        if (tokens.length === 0) return throw Error('no tokens found');
+        if (tokens.length === 0) 
+            throw Error('no tokens found');
         var tree = [];
         var level = 0;
         while (tokens.length > 0) {
