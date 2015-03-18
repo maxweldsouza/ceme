@@ -51,7 +51,7 @@ var ceme = function () {
             }
             return fs.readFileSync(fileName, {encoding: 'utf8'});
         } else {
-            return ajaxRequest(addVersion(fileName));
+            return ajaxRequest(fileName);
         }
     }
 

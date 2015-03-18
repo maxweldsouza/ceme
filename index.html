@@ -4,14 +4,6 @@
     <head>
 
         <script type="text/javascript">
-        var ExploreApp = {};
-        ExploreApp['VERSION'] = 0;
-        var addVersion = function (a) {
-            var version = ExploreApp.VERSION;
-            return a;
-            a = a.replace(/(.+)\.(ceme)/, '$1.' + version + '.$2');
-            return a;
-        }
         var ajaxRequest = function (fileName) {
             var oRequest = new XMLHttpRequest();
 
@@ -20,19 +12,6 @@
 
             return oRequest.responseText;
         };
-
-        var refreshVersion = function () {
-            ExploreApp.VERSION = 1;
-        }
-        refreshVersion();
-        var prefetch = function (fileName) {
-            var oRequest = new XMLHttpRequest();
-
-            oRequest.open('GET', fileName, true);
-            oRequest.send(null);
-            //return oRequest.responseText;
-        };
-
         </script>
 
         <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"></meta>
