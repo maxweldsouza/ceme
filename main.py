@@ -7,6 +7,7 @@ import database
 from custom_exceptions import *
 
 xsrf_cookie = 'sodfksoihasg'
+ssl = False
 
 # Meta
 # error handling
@@ -234,5 +235,8 @@ if __name__ == "__main__":
         'certfile': os.path.join('certs/localhost.crt'),
         'keyfile': os.path.join('certs/localhost.key'),
         })
-    server.listen(8443)
+    if ssl:
+        server.listen(8443)
+    else:
+        application.listen(8443)
     tornado.ioloop.IOLoop.instance().start()
