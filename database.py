@@ -82,8 +82,6 @@ def validate_username(username):
         raise InvalidUsername('Username should be more than 4 characters')
     if not USER_RE.match(username):
         raise InvalidUsername('Username has invalid characters')
-    chars = ['.', '_']
-    # TODO map reduce StartsWith
 
 EMAIL_RE = re.compile('[^@]+@[^@]+\.[^@]+')
 def validate_email(email):

@@ -38,6 +38,12 @@ define
     let
         lineheight
         1.5
+        base
+        Math.pow
+            3
+            /
+                1
+                3
         +
             MediaQuery
                 'screen and (min-width: 480px)'
@@ -91,19 +97,27 @@ define
             CssSelector
                 'h1, .h1'
                 FontSizeEm
-                    3
+                    Math.pow
+                        base
+                        3
             CssSelector
                 'h2, .h2'
                 FontSizeEm
-                    1.5
+                    Math.pow
+                        base
+                        2
             CssSelector
                 'h3, .h3'
                 FontSizeEm
-                    1.25
+                    Math.pow
+                        base
+                        1
             CssSelector
                 'h4, .h4'
                 FontSizeEm
-                    1.1
+                    Math.pow
+                        base
+                        0
             CssSelector
                 'p'
                 'margin: 0 0 1.1em;'
