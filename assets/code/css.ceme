@@ -21,7 +21,7 @@ define
     PixelString
         name
         px
-    sum
+    +
         name
         ':'
         px
@@ -66,49 +66,49 @@ define
 define
     BackgroundColor
         x
-    sum
+    +
         'background-color:'
         x
         ';'
 define
     BorderColor
         x
-    sum
+    +
         'border-color:'
         x
         ';'
 define
     Color # TODO unused?
         x
-    sum
+    +
         'color:'
         x
         ';'
 define
     FontSize
         x
-    sum
+    +
         'font-size:'
         x
         'px;'
 define
     FontSizeEm
         x
-    sum
+    +
         'font-size:'
         x
         'em;'
 define
     MarginTopEm
         x
-    sum
+    +
         'margin-top:'
         x
         'em;'
 define
     MarginBottomEm
         x
-    sum
+    +
         'margin-bottom:'
         x
         'em;'

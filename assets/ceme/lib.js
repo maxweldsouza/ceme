@@ -354,7 +354,6 @@ var cemeEnv = function() {
                 var temp = cemeEnv['Reduce'](cemeEnv['Min'], a);
                 return temp;
             },
-            'sum': sum,
 
             /* MapCar takes a function and a list of lists
             and applies the function successively to the nth element

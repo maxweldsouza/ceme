@@ -6,8 +6,15 @@ import json
 import database
 from custom_exceptions import *
 
+# Install Instructions
+# set xsrf cookie name
 xsrf_cookie = 'sodfksoihasg'
+
+# set whether to use ssl server
 ssl = False
+
+# set port
+port = 8443
 
 # Meta
 # error handling
@@ -115,7 +122,7 @@ class MainHandler(tornado.web.RequestHandler):
 
 class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
-        self.write('An error occurred');\
+        self.write('An error occurred')
 
 def ceme_file(self, path):
     try:
@@ -236,7 +243,7 @@ if __name__ == "__main__":
         'keyfile': os.path.join('certs/localhost.key'),
         })
     if ssl:
-        server.listen(8443)
+        server.listen(port)
     else:
-        application.listen(8443)
+        application.listen(port)
     tornado.ioloop.IOLoop.instance().start()
