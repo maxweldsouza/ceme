@@ -91,144 +91,6 @@ var cemeEnv = function() {
         return Math.floor((Math.random() * u) + l);
     }
 
-    var MaxwelSortIds = function (lst, ids, gt) {
-        var lt = function (a, b) {
-            return !gt(a,b);
-        }
-
-        var merge = function (al, au, bu) {
-            var i;
-            var j;
-            var k;
-            var result, resultids;
-            var bl = au + 1;
-
-            if (al > au) {
-                return;
-            } else if (bl > bu) {
-                return;
-            } else if (gt(lst[bl],lst[au])) {
-                return;
-            } else if (gt(lst[al], lst[bu])) {
-                result = [];
-                resultids = [];
-                for (i = bl; i <= bu; i++) {
-                    result.push(lst[i]);
-                    resultids.push(ids[i]);
-                }
-                for (i = al; i <= au; i++) {
-                    result.push(lst[i]);
-                    resultids.push(ids[i]);
-                }
-                i = 0;
-                for (k = al; k <= bu; k++) {
-                    lst[k] = result[i];
-                    ids[k] = resultids[i];
-                    i++;
-                }
-                return;
-            }
-
-            result = [];
-            resultids = [];
-            i = al;
-            j = bl;
-            while (true) {
-                if (i > au) {
-                    for (;j <= bu; j++) {
-                        result.push(lst[j]);
-                        resultids.push(ids[j]);
-                    }
-                    break;
-                } else if (j > bu) {
-                    for (;i <= au; i++) {
-                        result.push(lst[i]);
-                        resultids.push(ids[i]);
-                    }
-                    break;
-                } else if (lt(lst[i], lst[j])) {
-                    result.push( lst[i] );
-                    resultids.push(ids[i]);
-                    i++;
-                } else {
-                    result.push( lst[j] );
-                    resultids.push(ids[j]);
-                    j++;
-                }
-            }
-            i = 0;
-            for (k = al; k <= bu; k++) {
-                lst[k] = result[i];
-                ids[k] = resultids[i];
-                i++;
-            }
-        }
-
-        var msort = function (l, u) {
-            if (l >= u) {
-                return;
-            }
-            var p = Math.floor((u + l) / 2);
-            msort(l, p);
-            msort(p+1, u);
-            merge(l, p, u);
-            return;
-        }
-
-        msort( 0, lst.length - 1 );
-        return ids;
-    }
-
-    // TODO Rename
-    var MaxwelSort = function (lst, ids) {
-        var gt = function (a, b) {
-            if (typeof a !== typeof b) {
-                return typeof a > typeof b;
-            }
-            if (a === '-') {
-                return true;
-            }
-            if (b === '-') {
-                return false;
-            }
-            return a > b;
-        }
-        return MaxwelSortIds(lst, ids, gt);
-    }
-    var MaxwelSortReverse = function (lst, ids) {
-        var gt = function (a, b) {
-            if (typeof a !== typeof b) {
-                return typeof a < typeof b;
-            }
-            if (a === '-') {
-                return false;
-            }
-            if (b === '-') {
-                return true;
-            }
-            return a > b;
-        }
-        return MaxwelSortIds(lst, ids, gt);
-    }
-
-    var sum = function () {
-        var i;
-        var result = arguments[0];
-        for (i = 1; i < arguments.length; i++) {
-            result += arguments[i];
-        }
-        return result;
-    }
-
-    var SymValue = function (a) {
-        var value = scanEnv[a];
-        return value;
-    }
-
-    var IsDefined = function (a) {
-        return typeof cemeEnv.SymValue(a) !== 'undefined';
-    }
-
     var Formatter = function () {
         // TODO check if typeof string
         var str = arguments[0];
@@ -239,10 +101,6 @@ var cemeEnv = function() {
         return str;
     }
 
-    var IsResolution = function (a) {
-        var re = /\s*[0-9]+\s*x\s*[0-9]+\s*/;
-        return re.test(a);
-    };
     return {
 
             //////// Html
@@ -588,10 +446,6 @@ var cemeEnv = function() {
                 });
                 return temp;
             },
-
-            /***************************
-             * Scantuary
-             **************************/
             //////// Sorting
 
             'SortNumbers': function (a) {
@@ -602,49 +456,10 @@ var cemeEnv = function() {
             'SortStrings': function (a) {
                 return a.sort();
             },
-            'MaxwelSort': MaxwelSort,
-            'MaxwelSortReverse': MaxwelSortReverse,
 
-            'FirstWord': function (a) {
-                var result = a.split(' ')[0];
-                return result;
-            },
-            'Max': function (a, b) {
-                if (a === "-") return b;
-                if (b === "-") return a;
-                if (a > b) {
-                    return a;
-                } else {
-                    return b;
-                }
-            },
-            'Min': function (a, b) {
-                if (a === "-") return b;
-                if (b === "-") return a;
-                if (a < b) {
-                    return a;
-                } else {
-                    return b;
-                }
-            },
-            'MultipleOptions': function (a) {
-                if (typeof a === 'string') {
-                    return a.indexOf('/') > -1;
-                }
-                return false;
-            },
-            'SensibleName': function (a) {
-                var re = /[a-zA-Z0-9]+/;
-                if (a === '-') {
-                    return false;
-                } else if (cemeEnv.MultipleOptions(a)) {
-                    return false;
-                } else if (re.test(a)) {
-                    return true;
-                }
-                throw Error('bad name: ' + a);
-                return false;
-            },
+            /***************************
+             * Scantuary
+             **************************/
             'ItemsAt': function (x, ids) {
                 var i;
                 var result = [];
@@ -664,83 +479,6 @@ var cemeEnv = function() {
                 }
                 return result;
             },
-            'ReportError': function (msg) {
-                if (typeof XMLHttpRequest !== 'undefined') {
-                    var oRequest = new XMLHttpRequest();
-
-                    oRequest.open('POST', '/errorReport', true);
-                    oRequest.setRequestHeader('Content-type', 'text/plain');
-                    oRequest.send(msg);
-
-                    return oRequest.responseText;
-                }
-            },
-            'Decommentify': function (a) {
-                if (typeof a === "string") {
-                    if (a.indexOf('(') > -1 && a.indexOf(')') > -1) {
-                        a = a.replace(/\(.*\)/g, "");
-                        a = a.trim();
-                    }
-                    if (!isNaN(a)) {
-                        return parseFloat(a);
-                    }
-                }
-                return a;
-            },
-            'SecurityCheckNumber': function (a) {
-                if (typeof a === 'number') {
-                    return a;
-                } else {
-                    throw "failed number security check";
-                }
-            },
-            'DocWidth': function () {
-                if (typeof exports === 'undefined') {
-                    var width = $('#width-scale').width();
-                    return width;
-                } else {
-                    return 1024;
-                }
-            },
-            'ProductWithDashes': function (a) {
-                return a.replace(/\s/g, '-');
-            },
-            'NumberWithCommas' : function (x) {
-                var parts = x.toString().split(".");
-                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                return parts.join(".");
-            },
-            'PriceCeil' : function (x) {
-                return Math.ceil(x/500) * 500;
-            },
-            'PriceFloor' : function (x) {
-                return Math.floor(x/500) * 500;
-            },
-            'ResolutionLines': function (a) {
-                if (IsResolution(a)) {
-                    var vals = a.split('x');
-                    return Math.min(parseInt(vals[0]), parseInt(vals[1]));
-                } else {
-                    return '-';
-                }
-            },
-            'ResolutionValue': function (a) {
-                if (IsResolution(a)) {
-                    var vals = a.split('x');
-                    var result = parseInt(vals[0]) * parseInt(vals[1]);
-                    return result;
-                } else {
-                    return 0;
-                }
-            },
-            'WithoutUnknown': function (a) {
-                return a.filter(function (b) {
-                    return b !== '-';
-                });
-            },
-            'IsResolution': IsResolution,
-            'IsDefined': IsDefined,
-            'SymValue': SymValue,
 
             'SplitIntoArraysOfSize': SplitIntoArraysOfSize,
             'SplitInto': function(lst, no) {
