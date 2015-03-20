@@ -2,6 +2,10 @@
 
 use cemeio;
 
+SET SESSION storage_engine = "InnoDB";
+SET SESSION time_zone = "+0:00";
+ALTER DATABASE CHARACTER SET "utf8";
+
 DROP TABLE IF EXISTS users;
 CREATE TABLE users
 (

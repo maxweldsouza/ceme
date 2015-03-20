@@ -286,8 +286,8 @@ var ceme = function () {
     }
 
     var reShortString  = function () {
-        var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n])*"/;
-        var singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n])*'/;
+        var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n\r])*"/;
+        var singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n\r])*'/;
         var result = new RegExp(singleQuoted.source +
                 '|' + doubleQuoted.source);
         return result;
@@ -297,9 +297,9 @@ var ceme = function () {
         var regs = {
             'COMMENT': /^[\r\n]* *#[^\r\n]*/,
             'NUMBER': /^-?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][+-]?[0-9]*)?/,
-            'SYMBOL': /^[^ '"\n#:()]+/,
-            'INDSPACE': /^\n */,
-            'SPACE': /(^ +)|(^\n+)/,
+            'SYMBOL': /^[^ '"\r\n#:()]+/,
+            'INDSPACE': /^(\n|\r\n|\r) */,
+            'SPACE': /(^ +)|(^\n+)|(^\r\n+)|(^\r+)/,
             'INDENT': /^\(/,
             'DEDENT': /^\)/,
             'LONGSTRING': /^"""[^"""]*"""|^'''[^''']*'''/,

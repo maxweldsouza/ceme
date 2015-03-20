@@ -165,6 +165,7 @@ def read_page(name):
     page = db.get_one('SELECT page_content FROM pages'
             ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
     if page:
+        print ord(page[0][7])
         return page[0]
     else:
         raise EntryNotFound('this entry was not found')

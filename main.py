@@ -128,6 +128,7 @@ def ceme_file(self, path):
     try:
         code = database.read_page(path)
         self.set_header("X-Robots-Tag", "noindex")
+        self.set_header("Content-Type", "text/plain; charset=UTF-8")
         self.write(code)
     except EntryNotFound:
         file = open('./assets/code/empty.ceme', 'r')
