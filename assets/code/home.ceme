@@ -4,9 +4,13 @@ define
     Example
         x
     +
+        h3
+            'Example'
         pre
             code
                 x
+        h3
+            'Output'
         pre
             code
                 EvalString
@@ -105,13 +109,13 @@ define
                 FontSizeEm
                     Math.pow
                         base
-                        2
+                        1
             CssSelector
                 'h3, .h3'
                 FontSizeEm
                     Math.pow
                         base
-                        1
+                        0
             CssSelector
                 'h4, .h4'
                 FontSizeEm
@@ -200,8 +204,8 @@ div
 
                 <button class="btn btn-default" id="ceme-history">History</button>
 
-                <input type="hidden" name="name" value="%s">
                 </div>
+                <input type="hidden" name="name" value="%s">
                 </form>
                 '''
                 cemeFileName
