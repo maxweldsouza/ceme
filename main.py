@@ -47,6 +47,11 @@ port = 8443
 # should you have "." in symbol names
 #  username already registered
 
+def internal_error(self, e):
+    print e
+    self.set_status(500)
+    self.write('An internal error occurred.')
+
 """ authentication """
 def restricted(f):
     """ @ restricted decorator
@@ -74,6 +79,8 @@ class LoginHandler(tornado.web.RequestHandler):
                 self.redirect('/home')
         except Exception, e:
             self.redirect('/login-fail')
+        except Exception, e:
+            internal_error(self, e)
 
 class LogoutHandler(tornado.web.RequestHandler):
     def get(self):
@@ -106,7 +113,7 @@ class SignupHandler(tornado.web.RequestHandler):
         except InvalidEmail, e:
             self.write(str(e))
         except Exception, e:
-            self.redirect('/signup-fail')
+            internal_error(self, e)
 
 # user permissions
 class UserHandler(tornado.web.RequestHandler):
@@ -134,6 +141,8 @@ def ceme_file(self, path):
         file = open('./assets/code/empty.ceme', 'r')
         self.set_status(404)
         self.write(file.read())
+    except Exception, e:
+        internal_error(self, e)
 
 """ Ceme code """
 class CodeHandler(tornado.web.RequestHandler):
@@ -161,6 +170,8 @@ class CreateHandler(tornado.web.RequestHandler):
             self.redirect('/invalid-name')
         except AlreadyExists:
             self.redirect('/already-exists')
+        except Exception, e:
+            internal_error(self, e)
 
 class SaveHandler(tornado.web.RequestHandler):
     def get(self, path):
@@ -182,9 +193,7 @@ class SaveHandler(tornado.web.RequestHandler):
             self.set_status(400)
             self.write(str(e))
         except Exception, e:
-            print e
-            self.set_status(500)
-            self.write('An internal error occurred.')
+            internal_error(self, e)
 
 class HistoryHandler(tornado.web.RequestHandler):
     def get(self, path):
@@ -200,9 +209,7 @@ class HistoryHandler(tornado.web.RequestHandler):
             self.set_status(404)
             self.write(str(e))
         except Exception, e:
-            self.set_status(500)
-            print str(e)
-            self.write(str(e))
+            internal_error(self, e)
 
 class DiffHandler(tornado.web.RequestHandler):
     def get(self, path):
@@ -213,8 +220,7 @@ class DiffHandler(tornado.web.RequestHandler):
             self.set_header("Content-Type", "application/json")
             self.write(database.get_diff(name, first, second))
         except Exception, e:
-            self.set_status(500)
-            self.write(str(e))
+            internal_error(self, e)
 
 settings = {
     'default_handler_class': ErrorHandler,
