@@ -71,10 +71,15 @@ def validate_name(name):
         raise InvalidPageName('Page name is invalid')
 
 def validate_content(content):
+    content = content.replace('\r\n', '\n')
+    content = content.replace('\r', '\n')
     if content == '':
         raise InvalidContent('Page is empty')
     if '\t' in content:
         raise InvalidContent('Tabs are not allowed in code')
+    if '\r' in content:
+        raise Exception('Carraige return in content')
+    return content
 
 USER_RE = re.compile('^[a-zA-Z]+[a-zA-Z_]+[a-zA-Z]+$')
 def validate_username(username):
@@ -141,7 +146,7 @@ def authenticate_user(username, password):
 """ Pages """
 def create_page(name, content, ip, group, username):
     validate_name(name)
-    validate_content(content)
+    content = validate_content(content)
     exists = db.get_one('SELECT page_timestamp FROM pages'
             ' WHERE page_name = %s limit 1', (name,))
     if (exists):
@@ -154,7 +159,7 @@ def create_page(name, content, ip, group, username):
 
 def save_page(name, content, ip, group, username):
     validate_name(name)
-    validate_content(content)
+    content = validate_content(content)
     exists = db.get_one('SELECT page_timestamp from pages where page_name = %s limit 1', (name,))
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
@@ -165,7 +170,8 @@ def read_page(name):
     page = db.get_one('SELECT page_content FROM pages'
             ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
     if page:
-        print page[0]
+        if '\r\n' in page[0]:
+            print 'present in output'
         return page[0]
     else:
         raise EntryNotFound('this entry was not found')

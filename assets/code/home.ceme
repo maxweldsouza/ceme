@@ -1,5 +1,5 @@
 import
-    '/assets/code/css.ceme'
+    '/code/css'
 define
     Example
         x
