@@ -101,14 +101,14 @@ $(document).on('click', '#logout', function() {
     $('#logout-form').submit();
 });
 
-$(window).on('swiperight', function() {
+$(document).on('click', '#ceme-btn-page', function() {
     $('#ceme-btn-page').addClass('active');
     $('#ceme-btn-code').removeClass('active');
     $('#ceme-code').hide();
     $('#ceme-output').fadeIn();
 });
 
-$(window).on('swipeleft', function() {
+$(document).on('click', '#ceme-btn-code', function() {
     $('#ceme-btn-code').addClass('active');
     $('#ceme-btn-page').removeClass('active');
     $('#ceme-output').hide();
