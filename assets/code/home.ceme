@@ -79,7 +79,7 @@ define
             CssSelector
                 'body'
                 +
-                    'color:#444;line-height:1.5em;'
+                    'overflow-y:scroll;color:#444;line-height:1.5em;'
                     SansSerif
             CssSelector
                 'h1, h2, h3, h4, h5, h6 .h1, .h2, .h3, .h4, .h5, .h6'
@@ -182,7 +182,10 @@ Css
     +
         TYPOGRAPHY
         CssSelector
-            '.navbar-header, .btn-mobile-tab'
+            '.CodeMirror'
+            'height:auto;'
+        CssSelector
+            '.navbar-fixed-top, .btn-mobile-tab'
             'background:#fff;z-index:10000;'
         CssSelector
             '.btn-mobile-tab'
@@ -195,8 +198,8 @@ Css
                     15
 '''
 <div class="btn-group btn-mobile-tab FixedTop" role="group" aria-label="">
-  <button type="button" style="width:50%;" class="btn btn-danger">Page</button>
-  <button type="button" style="width:50%;" class="btn btn-default">Code</button>
+  <button id="ceme-btn-page" type="button" style="width:50%;" class="btn btn-default">Page</button>
+  <button id="ceme-btn-code" type="button" style="width:50%;" class="btn btn-default">Code</button>
 </div>
 '''
 div
@@ -210,7 +213,7 @@ div
     div
         attrib
             class
-                'col-md-6'
+                'col-md-12'
         div
             attrib
                 id
@@ -219,29 +222,32 @@ div
     div
         attrib
             class
-                'col-md-6'
-        h3
-            'Code'
+                'col-md-12'
         div
             attrib
-                class
-                    'panel'
-            Formatter
-                '''
-                <form action="/api/save" method="post" id="submit-form">
-                <textarea name="content" id="ceme-input" rows="30"></textarea>
-                <div class="btn-group" role="group">
-                <div class="btn btn-default" id="ceme-run">Run</div>
-                <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
-
-                <button class="btn btn-default" id="ceme-history">History</button>
-
-                </div>
-                <input type="hidden" name="name" value="%s">
-                </form>
-                '''
-                cemeFileName
-                    ''
+                id
+                    'ceme-code'
+            div
+                attrib
+                    class
+                        'panel'
+                Formatter
+                    '''
+                    <form action="/api/save" method="post" id="submit-form">
+                    <div class="container-fluid">
+                    <h3 style="display:inline;">Code</h3>
+                    <div class="btn-group pull-right" role="group">
+                    <div class="btn btn-default" id="ceme-run">Run</div>
+                    <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+                    <button class="btn btn-default" id="ceme-history">History</button>
+                    </div>
+                    </div>
+                    <textarea name="content" id="ceme-input" width="100%"></textarea>
+                    <input type="hidden" name="name" value="%s">
+                    </form>
+                    '''
+                    cemeFileName
+                        ''
             div
                 attrib
                     id

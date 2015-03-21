@@ -101,6 +101,20 @@ $(document).on('click', '#logout', function() {
     $('#logout-form').submit();
 });
 
+$(document).on('click', '#ceme-btn-page', function() {
+    $('#ceme-btn-page').addClass('active');
+    $('#ceme-btn-code').removeClass('active');
+    $('#ceme-output').show();
+    $('#ceme-code').hide();
+});
+
+$(document).on('click', '#ceme-btn-code', function() {
+    $('#ceme-btn-code').addClass('active');
+    $('#ceme-btn-page').removeClass('active');
+    $('#ceme-output').hide();
+    $('#ceme-code').show();
+});
+
 var Router = function () {
     var makeEditor = function (elem) {
         var editor;
@@ -115,7 +129,7 @@ var Router = function () {
                 }
             }
         });
-        myCodeMirror.setSize(550, 700);
+        //myCodeMirror.setSize(550, 700);
         return myCodeMirror;
     }
 
