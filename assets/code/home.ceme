@@ -185,21 +185,36 @@ Css
             '.CodeMirror'
             'height:auto;'
         CssSelector
+            '#ceme-output'
+            'max-width:800px;'
+        CssSelector
+            '#ceme-btn-page, #ceme-btn-code'
+            'width:50%;'
+        CssSelector
             '.navbar-fixed-top, .btn-mobile-tab'
             'background:#fff;z-index:10000;'
         CssSelector
             '.btn-mobile-tab'
             'position:fixed;top:50px;padding:15px 30px;width:100%;'
+        # Responsiveness
+        CssSelector
+            '.btn-mobile-tab'
+            'display:block;'
+        CssSelector
+            '#ceme-output'
+            'display:none;'
         MediaQuery
-            'screen and (min-width: 480px)'
+            'screen and (min-width: 992px)'
             CssSelector
-                'body'
-                FontSize
-                    15
+                '.btn-mobile-tab'
+                'display:none;'
+            CssSelector
+                '#ceme-output, #ceme-code'
+                'display:block;'
 '''
 <div class="btn-group btn-mobile-tab FixedTop" role="group" aria-label="">
-  <button id="ceme-btn-page" type="button" style="width:50%;" class="btn btn-default">Page</button>
-  <button id="ceme-btn-code" type="button" style="width:50%;" class="btn btn-default">Code</button>
+  <button id="ceme-btn-page" type="button" class="btn btn-default">Page</button>
+  <button id="ceme-btn-code" type="button" class="btn btn-default">Code</button>
 </div>
 '''
 div
@@ -213,7 +228,7 @@ div
     div
         attrib
             class
-                'col-md-12'
+                'col-md-6'
         div
             attrib
                 id
@@ -222,7 +237,7 @@ div
     div
         attrib
             class
-                'col-md-12'
+                'col-md-6'
         div
             attrib
                 id

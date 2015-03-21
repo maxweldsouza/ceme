@@ -101,18 +101,18 @@ $(document).on('click', '#logout', function() {
     $('#logout-form').submit();
 });
 
-$(document).on('click', '#ceme-btn-page', function() {
+$(window).on('swiperight', function() {
     $('#ceme-btn-page').addClass('active');
     $('#ceme-btn-code').removeClass('active');
-    $('#ceme-output').show();
     $('#ceme-code').hide();
+    $('#ceme-output').fadeIn();
 });
 
-$(document).on('click', '#ceme-btn-code', function() {
+$(window).on('swipeleft', function() {
     $('#ceme-btn-code').addClass('active');
     $('#ceme-btn-page').removeClass('active');
     $('#ceme-output').hide();
-    $('#ceme-code').show();
+    $('#ceme-code').fadeIn();
 });
 
 var Router = function () {
