@@ -85,7 +85,16 @@ define
                 'h1, h2, h3, h4, h5, h6 .h1, .h2, .h3, .h4, .h5, .h6'
                 'font-weight:bold;'
             CssSelector
-                'h1, h2, h3, .h1, .h2, .h3'
+                'h1, .h1'
+                +
+                    MarginTopEm
+                        0
+                    MarginBottomEm
+                        /
+                            lineheight
+                            3
+            CssSelector
+                'h2, h3, .h2, .h3'
                 +
                     MarginTopEm
                         /
@@ -95,7 +104,6 @@ define
                         /
                             lineheight
                             3
-                    'font-weight:bold;'
             CssSelector
                 'h4, h5, h6, .h4, .h5, .h6'
                 +
@@ -188,33 +196,51 @@ Css
             '#ceme-output'
             'max-width:800px;'
         CssSelector
-            '#ceme-btn-page, #ceme-btn-code'
-            'width:50%;'
-        CssSelector
             '.navbar-fixed-top, .btn-mobile-tab'
             'background:#fff;z-index:10000;'
         CssSelector
-            '.btn-mobile-tab'
-            'position:fixed;top:50px;padding:15px 30px;width:100%;'
+            '.btn-mobile-tab, .btn-desktop-tab'
+            'position:fixed;top:50px;padding:15px 30px;'
         # Responsiveness
-        CssSelector
-            '.btn-mobile-tab'
-            'display:block;'
-        CssSelector
-            '#ceme-output'
-            'display:none;'
+        MediaQuery
+            'screen and (max-width: 991px)'
+            +
+                CssSelector
+                    '.btn-mobile-tab'
+                    'display:block;width:100%;'
+                CssSelector
+                    '.btn-desktop-tab'
+                    'display:none;'
+                CssSelector
+                    '#ceme-output'
+                    'display:none;'
+                CssSelector
+                    '.ceme-btn-page, .ceme-btn-code'
+                    'width:50%;'
         MediaQuery
             'screen and (min-width: 992px)'
-            CssSelector
-                '.btn-mobile-tab'
-                'display:none;'
-            CssSelector
-                '#ceme-output, #ceme-code'
-                'display:block;'
+            +
+                CssSelector
+                    '.btn-mobile-tab'
+                    'display:none;'
+                CssSelector
+                    '.btn-desktop-tab'
+                    'display:block;width:30%;right:0;'
+                CssSelector
+                    '#ceme-output, #ceme-code'
+                    'display:block;'
+                CssSelector
+                    '.ceme-btn-page, .ceme-btn-code'
+                    'width:33.333333%;'
 '''
 <div class="btn-group btn-mobile-tab FixedTop" role="group" aria-label="">
-  <button id="ceme-btn-page" type="button" class="btn btn-default">Page</button>
-  <button id="ceme-btn-code" type="button" class="btn btn-default">Code</button>
+  <button id="" type="button" class="btn btn-default ceme-btn-page">View</button>
+  <button id="" type="button" class="btn btn-default ceme-btn-code">Edit</button>
+</div>
+<div class="btn-group btn-desktop-tab FixedTop" role="group" aria-label="">
+  <button id="" type="button" class="btn btn-default ceme-btn-page">View</button>
+  <button id="" type="button" class="btn btn-default ceme-btn-code">Edit</button>
+  <button id="" type="button" class="btn btn-default ceme-btn-code">Both</button>
 </div>
 '''
 div
@@ -249,15 +275,13 @@ div
                 Formatter
                     '''
                     <form action="/api/save" method="post" id="submit-form">
-                    <div class="container-fluid">
                     <h3 style="display:inline;">Code</h3>
-                    <div class="btn-group pull-right" role="group">
+                    <textarea name="content" id="ceme-input" width="100%"></textarea>
+                    <div class="btn-group" role="group">
                     <div class="btn btn-default" id="ceme-run">Run</div>
                     <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
                     <button class="btn btn-default" id="ceme-history">History</button>
                     </div>
-                    </div>
-                    <textarea name="content" id="ceme-input" width="100%"></textarea>
                     <input type="hidden" name="name" value="%s">
                     </form>
                     '''
