@@ -373,7 +373,7 @@ var cemeEnv = function() {
             },
             ////// Language
             'EvalString': function (str) {
-                return ceme.compile(str);
+                return ceme.compileText(str);
             },
 
             //////// Scantuary

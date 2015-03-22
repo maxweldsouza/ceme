@@ -565,13 +565,13 @@ var ceme = function () {
         return indent + result;
     }
 
-    var runUrl = function (sURL) {
+    var compileFile = function (sURL) {
         var text = fetchFile(sURL);
-        var result = compiler(text);
+        var result = compileText(text);
         return result;
     }
 
-    var compiler = function (text) {
+    var compileText = function (text) {
         var tokens = lexer(text);
         tokens.unshift('(');
         tokens.unshift('main'); //dummy token
@@ -584,7 +584,7 @@ var ceme = function () {
 
     var importFile = function (file) {
         var text = fetchFile(file);
-        compiler(text);
+        compileText(text);
     }
 
     /*********************************************************************************************/
@@ -603,10 +603,6 @@ var ceme = function () {
 
     Symbol.prototype.toString = function symbolToString() {
         return '[Symbol: ' + this.name + ']';
-    }
-
-    var updateVariable  = function (name, value) {
-        cemeEnv[name] = value;
     }
 
     // Generate a unique variable name on each call
@@ -672,26 +668,23 @@ var ceme = function () {
     }
 
     return {
-        'importFile': importFile,
-        'updateVariable' : updateVariable,
-        'main': runUrl,
         'lexer': lexer,
         'Symbol': Symbol,
         'isSymbol': isSymbol,
-        'compile': compiler,
-        'cemestart' : runUrl
+        'importFile': importFile,
+        'compileText': compileText,
+        'compileFile' : compileFile
     };
 }();
 
 (function(exports) {
 
-    exports.importFile = ceme.importFile;
-    exports.updateVariable = ceme.updateVariable;
-    exports.cemestart = ceme.cemestart;
     exports.lexer = ceme.lexer;
     exports.Symbol = ceme.Symbol;
     exports.isSymbol = ceme.isSymbol;
-    exports.compile = ceme.compile;
+    exports.importFile = ceme.importFile;
+    exports.compileFile = ceme.compileFile;
+    exports.compileText = ceme.compileText;
     exports.cemeEnv = cemeEnv;
 
 })(typeof exports === 'undefined'? {} : exports);

@@ -57,14 +57,13 @@ var Router = function () {
         var text = editor.getValue();
         $('#alert').hide();
         try {
-            var output = ceme.compile(text);
+            var output = ceme.compileText(text);
             $('#ceme-output').hide().html(output).fadeIn(300);
             if (currentMode === 'edit') {
                 changeMode('view');
             }
         } catch (err) {
             $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
-            throw err;
         }
 
         var textareas = document.getElementsByClassName("ceme-editor");
@@ -178,7 +177,7 @@ var Router = function () {
     var editor;
 
     var firstLoad = function() {
-        var temp = ceme.cemestart('/assets/code/home.ceme');
+        var temp = ceme.compileFile('/assets/code/home.ceme');
         $('#page-container').hide().html(temp).fadeIn(300);
 
         var mainarea = document.getElementById("ceme-input");
