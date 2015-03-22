@@ -47,6 +47,16 @@ define
         y
         x
 define
+    DEBUG_CSS
+    '''
+    * { background-color: rgba(255,0,0,.2); }
+    * * { background-color: rgba(0,255,0,.2); }
+    * * * { background-color: rgba(0,0,255,.2); }
+    * * * * { background-color: rgba(255,0,255,.2); }
+    * * * * * { background-color: rgba(0,255,255,.2); }
+    * * * * * * { background-color: rgba(255,255,0,.2); }
+    '''
+define
     TYPOGRAPHY
     let
         lineheight
@@ -88,7 +98,9 @@ define
                 'h1, .h1'
                 +
                     MarginTopEm
-                        0
+                        /
+                            lineheight
+                            3
                     MarginBottomEm
                         /
                             lineheight
@@ -148,6 +160,7 @@ define
             CssSelector
                 '.bulleted-list > li'
                 'margin-bottom: 0.75em;list-style-type:disc;'
+            #DEBUG_CSS
 define
     Panel
         x
@@ -164,8 +177,10 @@ define
 <nav class="navbar navbar-fixed-top FixedTop">
 <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-        <a class="navbar-brand" href="#mobile-menu"><i class="fa fa-bars"></i></a>
+    <div class="navbar-nav">
+        <a class="navbar-brand" style="font-size:2em;" href="#mobile-menu"><i style="line-height:inherit;" class="fa fa-bars"></i></a>
+    </div>
+    <div class="navbar-header" style="padding-left:50px;">
         <a class="navbar-brand" href="/">Ceme.io</a>
     </div>
 
@@ -178,6 +193,11 @@ define
         </ul>
         <ul class="nav navbar-nav navbar-right" id="login-logout">
         </ul>
+        <div class="btn-group btn-desktop-tab navbar-right" role="group" aria-label="">
+          <button id="" type="button" class="btn btn-default ceme-btn-page">View</button>
+          <button id="" type="button" class="btn btn-default ceme-btn-code">Edit</button>
+          <button id="" type="button" class="btn btn-default ceme-btn-both">Both</button>
+        </div>
     </div><!--
     /.navbar-collapse
     -->
@@ -199,24 +219,39 @@ Css
             '.navbar-fixed-top, .btn-mobile-tab'
             'background:#fff;z-index:10000;'
         CssSelector
+            '.btn-mobile-tab'
+            'margin:15px 0px;'
+        CssSelector
             '.btn-mobile-tab, .btn-desktop-tab'
-            'position:fixed;top:50px;padding:15px 30px;'
+            'padding:8px 15px;'
         # Responsiveness
         MediaQuery
             'screen and (max-width: 991px)'
             +
                 CssSelector
                     '.btn-mobile-tab'
-                    'display:block;width:100%;'
+                    'display:block;position:fixed;left:0px;top:35px;width:100%;'
                 CssSelector
                     '.btn-desktop-tab'
                     'display:none;'
                 CssSelector
-                    '#ceme-output'
+                    '#ceme-code'
                     'display:none;'
                 CssSelector
-                    '.ceme-btn-page, .ceme-btn-code'
-                    'width:50%;'
+                    '.ceme-btn-page, .ceme-btn-code, .ceme-btn-both'
+                    'width:33.33333%;'
+                CssSelector
+                    '#page-container'
+                    'margin-top:50px;'
+                CssSelector
+                    '.spacer'
+                    'margin-top:100px;'
+        MediaQuery
+            'screen and (min-width: 992px)'
+            +
+                CssSelector
+                    '.btn-mobile-tab'
+                    'display:none;'
         MediaQuery
             'screen and (min-width: 992px)'
             +
@@ -230,27 +265,21 @@ Css
                     '#ceme-output, #ceme-code'
                     'display:block;'
                 CssSelector
-                    '.ceme-btn-page, .ceme-btn-code'
+                    '.ceme-btn-page, .ceme-btn-code, .ceme-btn-both'
                     'width:33.333333%;'
-'''
-<div class="btn-group btn-mobile-tab FixedTop" role="group" aria-label="">
-  <button id="" type="button" class="btn btn-default ceme-btn-page">View</button>
-  <button id="" type="button" class="btn btn-default ceme-btn-code">Edit</button>
-</div>
-<div class="btn-group btn-desktop-tab FixedTop" role="group" aria-label="">
-  <button id="" type="button" class="btn btn-default ceme-btn-page">View</button>
-  <button id="" type="button" class="btn btn-default ceme-btn-code">Edit</button>
-  <button id="" type="button" class="btn btn-default ceme-btn-code">Both</button>
-</div>
-'''
+                CssSelector
+                    '.spacer'
+                    'margin-top:100px;'
 div
     attrib
         class
             'container-fluid'
+    '''
+    '''
     div
         attrib
-            style
-                'height:120px;'
+            class
+                'spacer'
     div
         attrib
             class
@@ -295,3 +324,17 @@ div
     <form action="/logout" method="post" id="logout-form">
     </form>
     '''
+div
+    attrib
+        class
+            'footer'
+    div
+        attrib
+            class
+                'container-fluid'
+    div
+        attrib
+            style
+                'text-align:center;'
+        p
+            'Footer for the Ceme Project'
