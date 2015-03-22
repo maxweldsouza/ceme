@@ -284,42 +284,39 @@ div
         attrib
             class
                 'col-md-6'
-        div
-            attrib
-                id
-                    'ceme-output'
-            ''
+            id
+                'ceme-output'
     div
         attrib
             class
                 'col-md-6'
+            id
+                'ceme-code'
         div
             attrib
+                class
+                    'panel'
+            Formatter
+                '''
+                <form action="/api/save" method="post" id="submit-form">
+                <h3 style="display:inline;">Code</h3>
+                <textarea name="content" id="ceme-input" width="100%"></textarea>
+                <div class="btn-group" role="group">
+                <div class="btn btn-default" id="ceme-run">Run</div>
+                <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+                <button class="btn btn-default" id="ceme-history">History</button>
+                </div>
+                <input type="hidden" name="name" value="%s">
+                </form>
+                '''
+                cemeFileName
+                    ''
+        div
+            attrib
+                style
+                    'position:fixed;bottom:100px;left:100px;'
                 id
-                    'ceme-code'
-            div
-                attrib
-                    class
-                        'panel'
-                Formatter
-                    '''
-                    <form action="/api/save" method="post" id="submit-form">
-                    <h3 style="display:inline;">Code</h3>
-                    <textarea name="content" id="ceme-input" width="100%"></textarea>
-                    <div class="btn-group" role="group">
-                    <div class="btn btn-default" id="ceme-run">Run</div>
-                    <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
-                    <button class="btn btn-default" id="ceme-history">History</button>
-                    </div>
-                    <input type="hidden" name="name" value="%s">
-                    </form>
-                    '''
-                    cemeFileName
-                        ''
-            div
-                attrib
-                    id
-                        'alert'
+                    'alert'
     '''
     <form action="/logout" method="post" id="logout-form">
     </form>

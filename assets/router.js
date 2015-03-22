@@ -102,27 +102,15 @@ $(document).on('click', '#logout', function() {
 });
 
 $(document).on('click', '.ceme-btn-page', function() {
-    $('.ceme-btn-page').addClass('active');
-    $('.ceme-btn-code').removeClass('active');
-    $('.ceme-btn-both').removeClass('active');
-    $('#ceme-code').hide();
-    $('#ceme-output').fadeIn();
+    Router.changeMode('view');
 });
 
 $(document).on('click', '.ceme-btn-code', function() {
-    $('.ceme-btn-code').addClass('active');
-    $('.ceme-btn-page').removeClass('active');
-    $('.ceme-btn-both').removeClass('active');
-    $('#ceme-output').hide();
-    $('#ceme-code').fadeIn();
+    Router.changeMode('edit');
 });
 
 $(document).on('click', '.ceme-btn-both', function() {
-    $('.ceme-btn-both').addClass('active');
-    $('.ceme-btn-page').removeClass('active');
-    $('.ceme-btn-code').removeClass('active');
-    $('#ceme-output').fadeIn();
-    $('#ceme-code').fadeIn();
+    Router.changeMode('both');
 });
 
 var Router = function () {
@@ -143,6 +131,25 @@ var Router = function () {
         return myCodeMirror;
     }
 
+    var changeMode = function(mode) {
+        $('.ceme-btn-page').removeClass('active');
+        $('.ceme-btn-code').removeClass('active');
+        $('.ceme-btn-both').removeClass('active');
+        if (mode === 'view') {
+            $('.ceme-btn-page').addClass('active');
+            $('#ceme-code').hide();
+            $('#ceme-output').fadeIn();
+        } else if (mode === 'edit') {
+            $('.ceme-btn-code').addClass('active');
+            $('#ceme-output').hide();
+            $('#ceme-code').fadeIn();
+        } else if (mode === 'both') {
+            $('.ceme-btn-both').addClass('active');
+            $('#ceme-output').fadeIn();
+            $('#ceme-code').fadeIn();
+        }
+    }
+
     var route = function (url) {
         if (url.indexOf('?') > 0) {
             url = url.substr(url.indexOf('?'));
@@ -161,9 +168,11 @@ var Router = function () {
 
         var runCode = function () {
             var text = editor.getValue();
+            $('#alert').hide();
             try {
                 var output = ceme.compile(text);
                 $('#ceme-output').hide().html(output).fadeIn(300);
+                changeMode('view');
             } catch (err) {
                 $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
                 throw err;
@@ -200,7 +209,8 @@ var Router = function () {
 
     }
     return {
-        'route': route
+        'route': route,
+        'changeMode': changeMode
     }
 }();
 
