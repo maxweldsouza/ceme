@@ -140,13 +140,12 @@ var Router = function () {
         var editor;
         var myCodeMirror = CodeMirror.fromTextArea(elem, {
             lineNumbers: true,
-            indentUnit: 4,
-            indentWithTabs: false,
+            mode: "text/html",
             extraKeys: {
-                Tab: function(cm) {
-                    var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
-                    cm.replaceSelection(spaces, "end", "+input");
-                }
+                "Tab": "indentMore",
+                "Shift-Tab": "indentLess",
+                "Shift-Ctrl-Up": "swapLineUp",
+                "Shift-Ctrl-Down": "swapLineDown"
             }
         });
         //myCodeMirror.setSize(550, 700);
@@ -185,13 +184,13 @@ var Router = function () {
 
     }
 
-    var getUrl = function () {
+    var getPageName = function () {
         var url = window.location.pathname;
         if (url === '/') {
             // TODO use redirect instead?
             url = '/home';
         }
-        return url;
+        return url.substr(1);
     }
 
     var route = function (url) {
@@ -200,8 +199,10 @@ var Router = function () {
             queryObj = queryStringToJSON(url);
         }
 
-        var url = getUrl();
-        var text = ajaxRequest('/code' + url);
+        var pagename = getPageName();
+        var text = ajaxRequest('/code/' + pagename);
+
+        $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
 
         editor.setValue(text);
         changeMode('view');

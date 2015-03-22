@@ -167,11 +167,10 @@ def save_page(name, content, ip, group, username):
 
 def read_page(name):
     validate_name(name)
+    print name
     page = db.get_one('SELECT page_content FROM pages'
             ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
     if page:
-        if '\r\n' in page[0]:
-            print 'present in output'
         return page[0]
     else:
         raise EntryNotFound('this entry was not found')

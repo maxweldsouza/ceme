@@ -230,7 +230,7 @@ Css
             +
                 CssSelector
                     '.btn-mobile-tab'
-                    'display:block;position:fixed;left:0px;top:35px;width:100%;'
+                    'display:block;position:fixed;left:0px;top:40px;width:100%;'
                 CssSelector
                     '.btn-desktop-tab'
                     'display:none;'
@@ -306,7 +306,7 @@ div
                 <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
                 <button class="btn btn-default" id="ceme-history">History</button>
                 </div>
-                <input type="hidden" name="name" value="%s">
+                <input type="hidden" name="name" id="ceme-page-name">
                 </form>
                 '''
                 cemeFileName
