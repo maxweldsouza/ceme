@@ -125,7 +125,8 @@ var ceme = function () {
                                 compile(tree[2])));
                 }
             } else if (x === 'import') {
-                importFile(removeOneQuote(tree[1]));
+                var filename = removeOneQuote(tree[1]);
+                importFile('/code/' + filename);
                 return new Box('""', '');
             } else if (x === 'let') {
                 return _let(tree);

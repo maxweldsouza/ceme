@@ -1,5 +1,5 @@
 import
-    '/code/css'
+    'css'
 define
     Example
         x
