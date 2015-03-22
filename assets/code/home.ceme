@@ -219,8 +219,8 @@ Css
             '.navbar-fixed-top, .btn-mobile-tab'
             'background:#fff;z-index:10000;'
         CssSelector
-            '.btn-mobile-tab'
-            'margin:15px 0px;'
+            '.navbar-nav'
+            'margin:0;'
         CssSelector
             '.btn-mobile-tab, .btn-desktop-tab'
             'padding:8px 15px;'
@@ -230,7 +230,7 @@ Css
             +
                 CssSelector
                     '.btn-mobile-tab'
-                    'display:block;position:fixed;left:0px;top:40px;width:100%;'
+                    'display:block;position:fixed;left:0px;top:50px;width:100%;'
                 CssSelector
                     '.btn-desktop-tab'
                     'display:none;'
