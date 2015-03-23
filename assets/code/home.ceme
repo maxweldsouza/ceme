@@ -57,6 +57,73 @@ define
     * * * * * * { background-color: rgba(255,255,0,.2); }
     '''
 define
+    BASE_COLOR
+    '#4DCAA8'
+    #'#e74c3c'
+define
+    DARK_COLOR
+    '#2CA080'
+    #'#ba3e31'
+define
+    LIGHT_COLOR
+    '#AEE7D7'
+    #'#eca59e'
+define
+    BUTTONS
+    +
+        CssSelector
+            '.btn-default'
+            BorderColor
+                '#ddd'
+        CssSelector
+            '.btn'
+            'border-bottom-width:3px;'
+        CssSelector
+            '.btn-default.active'
+            'box-shadow:none; -webkit-box-shadow:none;'
+        CssSelector
+            '.btn-default:hover, .btn-default.active, .btn-default.active:hover'
+            +
+                BackgroundColor
+                    BASE_COLOR
+                Color
+                    '#fff'
+                BorderColor
+                    BASE_COLOR
+                +
+                    'border-bottom-width:3px;border-bottom-color:'
+                    DARK_COLOR
+                    ';'
+        CssSelector
+            '.btn.active:focus, .btn.active:active'
+            'outline:none;'
+define
+    DESIGN
+    +
+        CssSelector
+            '.nav>li>a:hover'
+            'background:#f9f9f9;'
+        CssSelector
+            'pre'
+            'border-color:#eeeeee;'
+        BUTTONS
+        CssSelector
+            'a'
+            Color
+                BASE_COLOR
+        CssSelector
+            'a:hover, a:focus'
+            +
+                Color
+                    DARK_COLOR
+                'text-decoration:none;'
+        CssSelector
+            '.navbar-fixed-top'
+            'border-bottom: solid 1px #eee;'
+        CssSelector
+            '.footer'
+            'margin-top:50px;border-top: solid 1px #eee;'
+define
     TYPOGRAPHY
     let
         lineheight
@@ -209,6 +276,7 @@ define
 Css
     +
         TYPOGRAPHY
+        DESIGN
         CssSelector
             '.CodeMirror'
             'height:auto;'
@@ -283,6 +351,14 @@ div
     div
         attrib
             class
+                'col-md-12'
+        div
+            attrib
+                id
+                    'alert'
+    div
+        attrib
+            class
                 'col-md-6'
             id
                 'ceme-output'
@@ -299,22 +375,18 @@ div
             Formatter
                 '''
                 <form action="/api/save" method="post" id="submit-form">
-                <h3 style="display:inline;">Code</h3>
-                <textarea name="content" id="ceme-input" width="100%"></textarea>
-                <div class="btn-group" role="group">
-                <div class="btn btn-default" id="ceme-run">Run</div>
-                <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
-                <button class="btn btn-default" id="ceme-history">History</button>
+                <div class="btn-group pull-right" role="group">
+                    <div class="btn btn-default" id="ceme-run">Run</div>
+                    <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+                    <button class="btn btn-default" id="ceme-history">History</button>
                 </div>
+                <h2>Code</h2>
+                <textarea name="content" id="ceme-input" width="100%"></textarea>
                 <input type="hidden" name="name" id="ceme-page-name">
                 </form>
                 '''
                 cemeFileName
                     ''
-        div
-            attrib
-                id
-                    'alert'
     '''
     <form action="/logout" method="post" id="logout-form">
     </form>

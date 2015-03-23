@@ -57,8 +57,11 @@ var Router = function () {
         var text = editor.getValue();
         $('#alert').hide();
         try {
+            var outputelem = $('#ceme-output');
+            outputelem.hide();
+
             var output = ceme.compileText(text);
-            $('#ceme-output').hide().html(output).fadeIn(300);
+            outputelem.html(output).fadeIn(300);
             if (currentMode === 'edit') {
                 changeMode('view');
             }
@@ -200,7 +203,11 @@ var Router = function () {
         }
 
         var pagename = getPageName();
-        var text = ajaxRequest('/code/' + pagename);
+        try {
+            var text = ajaxRequest('/code/' + pagename);
+        } catch (err) {
+            $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
+        }
 
         $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
 

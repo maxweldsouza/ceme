@@ -204,17 +204,11 @@ var cemeEnv = function() {
 
             //// Create
 
-            // TODO rename
-
-            'Cons': function (a, b) {
-                if (IsEmptyArray(b))
-                    return [a];
-                if (IsEmptyArray(a))
-                    return b;
-                b.unshift(a);
-                return b;
+            'Insert': function (lst, item) {
+                lst.unshift(item);
+                return lst;
             },
-            'Append': function (item, lst) {
+            'Append': function (lst, item) {
                 lst.push(item);
                 return lst;
             },
