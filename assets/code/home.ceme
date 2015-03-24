@@ -69,44 +69,195 @@ define
     '#AEE7D7'
     #'#eca59e'
 define
-    BUTTONS
+    GRAY_SUPERLIGHT
+    '#f9f9f9'
+define
+    GRAY_LIGHT
+    '#f5f5f5'
+define
+    PRIMARY_COLOR
+    '#34495e'
+define
+    PRIMARY_COLOR_LIGHT
+    '#4E6378'
+define
+    PRIMARY_COLOR_DARK
+    '#1B3045'
+define
+    SUCCESS_COLOR
+    '#15b358'
+define
+    SUCCESS_COLOR_LIGHT
+    '#2ecc71'
+define
+    SUCCESS_COLOR_DARK
+    '#009A3F'
+define
+    INFO_COLOR
+    '#95a5a6'
+define
+    INFO_COLOR_LIGHT
+    '#95a5a6'
+define
+    INFO_COLOR_DARK
+    '#95a5a6'
+define
+    WARNING_COLOR
+    '#f39c12'
+define
+    WARNING_COLOR_LIGHT
+    '#ffb62c'
+define
+    WARNING_COLOR_DARK
+    '#da8300'
+define
+    DANGER_COLOR
+    '#e74c3c'
+define
+    DANGER_COLOR_LIGHT
+    '#ff6656'
+define
+    DANGER_COLOR_DARK
+    '#ce3323'
+define
+    ButtonStyling
+        btnclass
+        base
+        light
+        dark
     +
         CssSelector
-            '.btn-default'
-            BorderColor
-                '#ddd'
-        CssSelector
-            '.btn'
-            'border-bottom-width:3px;'
-        CssSelector
-            '.btn-default.active'
-            'box-shadow:none; -webkit-box-shadow:none;'
-        CssSelector
-            '.btn-default:hover, .btn-default.active, .btn-default.active:hover'
             +
-                BackgroundColor
-                    BASE_COLOR
+                btnclass
+                ', '
+                btnclass
+                '.active:hover'
+            +
                 Color
                     '#fff'
+                BackgroundColor
+                    light
                 BorderColor
-                    BASE_COLOR
-                +
-                    'border-bottom-width:3px;border-bottom-color:'
-                    DARK_COLOR
-                    ';'
+                    light
+                BorderBottomColor
+                    base
         CssSelector
-            '.btn.active:focus, .btn.active:active'
-            'outline:none;'
+            +
+                btnclass
+                ':hover, '
+                btnclass
+                ':focus, '
+                btnclass
+                '.active, '
+                btnclass
+                '.active:focus, '
+                btnclass
+                '.active:active'
+            +
+                BackgroundColor
+                    base
+                BorderColor
+                    base
+                BorderBottomColor
+                    dark
+                Color
+                    '#fff'
+        CssSelector
+            +
+                btnclass
+                ':active'
+            +
+                BorderColor
+                    base
+                'border-bottom-width:0px;'
+define
+    BUTTONS
+    +
+        ButtonStyling
+            '.btn-default'
+            BASE_COLOR
+            LIGHT_COLOR
+            DARK_COLOR
+        ButtonStyling
+            '.btn-primary'
+            PRIMARY_COLOR
+            PRIMARY_COLOR_LIGHT
+            PRIMARY_COLOR_DARK
+        ButtonStyling
+            '.btn-success'
+            SUCCESS_COLOR
+            SUCCESS_COLOR_LIGHT
+            SUCCESS_COLOR_DARK
+        ButtonStyling
+            '.btn-warning'
+            WARNING_COLOR
+            WARNING_COLOR_LIGHT
+            WARNING_COLOR_DARK
+        ButtonStyling
+            '.btn-danger'
+            DANGER_COLOR
+            DANGER_COLOR_LIGHT
+            DANGER_COLOR_DARK
+        CssSelector
+            '.btn-default'
+            'background:#fff;'
+        CssSelector
+            '.btn'
+            'border-bottom-width:3px;box-shadow:none; -webkit-box-shadow:none;'
+        CssSelector
+            '.btn.active'
+            'border-bottom-width:3px;box-shadow:none; -webkit-box-shadow:none;'
+        CssSelector
+            '.btn-default'
+            +
+                BorderColor
+                    '#bbb'
+                Color
+                    '#999'
+define
+    ALERTS
+    +
+        CssSelector
+            '.alert'
+            +
+                'border:none;'
+                BackgroundColor
+                    GRAY_LIGHT
+        CssSelector
+            '.alert-success'
+            Color
+                SUCCESS_COLOR
+        CssSelector
+            '.alert-info'
+            Color
+                INFO_COLOR
+        CssSelector
+            '.alert-warning'
+            Color
+                WARNING_COLOR
+        CssSelector
+            '.alert-danger'
+            Color
+                DANGER_COLOR
 define
     DESIGN
     +
+        BUTTONS
+        ALERTS
+        CssSelector
+            'a:focus, .btn:focus, a:active, .btn:active, a:active:focus, .btn:active:focus'
+            +
+                'outline-color:#777;'
         CssSelector
             '.nav>li>a:hover'
-            'background:#f9f9f9;'
+            BackgroundColor
+                GRAY_SUPERLIGHT
+        CssSelector
+            '.nav>li>a'
+            'color:#999;'
         CssSelector
             'pre'
             'border-color:#eeeeee;'
-        BUTTONS
         CssSelector
             'a'
             Color
@@ -290,8 +441,14 @@ Css
             '.navbar-nav'
             'margin:0;'
         CssSelector
-            '.btn-mobile-tab, .btn-desktop-tab'
-            'padding:8px 15px;'
+            '.btn-mobile-tab'
+            +
+                'padding:20px 15px;'
+                BackgroundColor
+                    GRAY_LIGHT
+        CssSelector
+            '.btn-desktop-tab'
+            'padding:7px 15px;'
         # Responsiveness
         MediaQuery
             'screen and (max-width: 991px)'

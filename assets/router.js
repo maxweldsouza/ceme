@@ -58,7 +58,7 @@ var Router = function () {
         $('#alert').hide();
         try {
             var outputelem = $('#ceme-output');
-            outputelem.hide();
+            outputelem.empty();
 
             var output = ceme.compileText(text);
             outputelem.html(output).fadeIn(300);
