@@ -84,15 +84,6 @@ define
     PRIMARY_COLOR_DARK
     '#1B3045'
 define
-    SUCCESS_COLOR
-    '#15b358'
-define
-    SUCCESS_COLOR_LIGHT
-    '#2ecc71'
-define
-    SUCCESS_COLOR_DARK
-    '#009A3F'
-define
     INFO_COLOR
     '#95a5a6'
 define
@@ -185,19 +176,19 @@ define
             PRIMARY_COLOR_DARK
         ButtonStyling
             '.btn-success'
-            SUCCESS_COLOR
-            SUCCESS_COLOR_LIGHT
-            SUCCESS_COLOR_DARK
+            DARK_COLOR
+            BASE_COLOR
+            LIGHT_COLOR
         ButtonStyling
             '.btn-warning'
+            WARNING_COLOR_DARK
             WARNING_COLOR
             WARNING_COLOR_LIGHT
-            WARNING_COLOR_DARK
         ButtonStyling
             '.btn-danger'
+            DANGER_COLOR_DARK
             DANGER_COLOR
             DANGER_COLOR_LIGHT
-            DANGER_COLOR_DARK
         CssSelector
             '.btn-default'
             'background:#fff;'
@@ -226,7 +217,7 @@ define
         CssSelector
             '.alert-success'
             Color
-                SUCCESS_COLOR
+                BASE_COLOR
         CssSelector
             '.alert-info'
             Color
@@ -449,6 +440,9 @@ Css
         CssSelector
             '.btn-desktop-tab'
             'padding:7px 15px;'
+        CssSelector
+            '.footer-block'
+            'margin:40px 0;'
         # Responsiveness
         MediaQuery
             'screen and (max-width: 991px)'
@@ -471,12 +465,18 @@ Css
                 CssSelector
                     '.spacer'
                     'margin-top:100px;'
+                CssSelector
+                    '.footer-block'
+                    'text-align:center;'
         MediaQuery
             'screen and (min-width: 992px)'
             +
                 CssSelector
                     '.btn-mobile-tab'
                     'display:none;'
+                CssSelector
+                    '.footer-right'
+                    'text-align:right;'
         MediaQuery
             'screen and (min-width: 992px)'
             +
@@ -548,6 +548,37 @@ div
     <form action="/logout" method="post" id="logout-form">
     </form>
     '''
+define
+    FooterLink
+        x
+        y
+    li
+        attrib
+            style
+                'margin-right:30px;display:inline;'
+        a
+            attrib
+                href
+                    x
+            y
+define
+    FooterSocial
+        x
+        y
+    span
+        attrib
+            class
+                'btn btn-success'
+            style
+                'margin-left:10px;'
+            href
+                y
+        span
+            attrib
+                class
+                    +
+                        'fa fa-'
+                        x
 div
     attrib
         class
@@ -556,9 +587,30 @@ div
         attrib
             class
                 'container-fluid'
-    div
-        attrib
-            style
-                'text-align:center;'
-        p
-            'Footer for the Ceme Project'
+        div
+            attrib
+                class
+                    'col-md-6 footer-block'
+            ul
+                attrib
+                    style
+                        'margin:0;padding:0;'
+                FooterLink
+                    '/'
+                    'Terms'
+                FooterLink
+                    '/faq'
+                    'FAQ'
+                FooterLink
+                    '/'
+                    'Privacy'
+        div
+            attrib
+                class
+                    'col-md-6 footer-block footer-right'
+            FooterSocial
+                'facebook'
+                'http://facebook.com/'
+            FooterSocial
+                'twitter'
+                'http://twitter.com/'
