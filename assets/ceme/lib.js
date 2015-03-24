@@ -134,7 +134,7 @@ var cemeEnv = function() {
 
             //// Comparison
 
-            'IsEqual': function (a, b) {
+            '==': function (a, b) {
                 return (a >= b && a <= b);
             },
             '>': function (a, b) {

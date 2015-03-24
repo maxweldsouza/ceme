@@ -677,6 +677,54 @@ var ceme = function () {
     };
 }();
 
+(function () {
+    // make list of files to import
+    // update list whenever necessary
+    var filelist = {};
+
+    var addToList = function (file) {
+        filelist[file] = false;
+    }
+
+    var runMainFile = function () {
+        // run main file text
+    }
+
+    // check if all imports are available
+    var checkAllDone = function () {
+        var file;
+        for (file in filelist) {
+            if (!filelist[file]) {
+                return;
+            }
+        }
+        runMainFile();
+    }
+
+    var makeRequest = function (file) {
+        $.ajax({
+                url : file,
+                type : 'GET',
+                success : function (data) {
+                    filelist[file] = data;
+                    checkAllDone();
+                },
+                error : function (request,error) {
+                    alert("Request: "+JSON.stringify(request));
+                }
+        });
+    }
+
+    addToList('/code/css');
+    addToList('/code/chart');
+
+    var file;
+    for (file in filelist) {
+        makeRequest(file);
+    }
+
+})();
+
 (function(exports) {
 
     exports.lexer = ceme.lexer;
