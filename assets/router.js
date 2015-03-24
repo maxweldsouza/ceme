@@ -144,6 +144,8 @@ var Router = function () {
         var myCodeMirror = CodeMirror.fromTextArea(elem, {
             lineNumbers: true,
             mode: "text/html",
+            tabSize: 4,
+            indentUnit: 4,
             extraKeys: {
                 "Tab": "indentMore",
                 "Shift-Tab": "indentLess",
