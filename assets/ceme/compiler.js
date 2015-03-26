@@ -10,6 +10,17 @@
 
 var cemeEnv = {};
 var ceme = function () {
+
+    var success = function (message) {
+        $('#alert').hide().html(cemeEnv.Alert(message, 'success')).fadeIn(200);
+    }
+    var warning = function (message) {
+        $('#alert').hide().html(cemeEnv.Alert(message, 'warning')).fadeIn(200);
+    }
+    var error = function (message) {
+        $('#alert').hide().html(cemeEnv.Alert(message, 'danger')).fadeIn(200);
+    }
+
     /*********************************************************************************************/
     /* General
     /*********************************************************************************************/
@@ -35,6 +46,7 @@ var ceme = function () {
         if (platform() === 'nodejs') {
             return eval(src);
         } else {
+            src.replace('\r\n', '\n');
             return eval(src);
         }
     };
@@ -70,7 +82,7 @@ var ceme = function () {
     /* Compiler                                                                               */
     /*********************************************************************************************/
 
-    var compileAll = function (tree) {
+    var compileTree = function (tree) {
         var input = '';
         var output = '';
         var tmp;
@@ -83,11 +95,8 @@ var ceme = function () {
                 if (typeof tmp !== 'undefined') {
                     output += tmp;
                 }
-            } catch (e) {
-                //cemeEnv.ReportError('Compiler error \nCode:' + code + ' \nMessage:' + e.message);
-                //console.log(code);
-                //console.log(e.message);
-                throw e;
+            } catch (err) {
+                error(err.message);
             }
         }
         return output;
@@ -100,6 +109,21 @@ var ceme = function () {
         result +='</code></pre><h3> Evaluated: </h2>';
         result += output;
         return result;
+    }
+
+    var getImports = function (tree) {
+        var i;
+        var imports = [];
+        for (i = 0; i < tree.length; i++) {
+            if (isSymbol(tree[i][0])) {
+                var x = unsymbol(escapeSymbol(tree[i][0]));
+                if (x === 'import') {
+                    var filename = removeOneQuote(tree[i][1]);
+                    imports.push('/code/' + filename);
+                }
+            }
+        }
+        return imports;
     }
 
     var compile = function (tree) {
@@ -567,18 +591,22 @@ var ceme = function () {
 
     var compileFile = function (sURL) {
         var text = fetchFile(sURL);
-        var result = compileText(text);
-        return result;
+        var compiler = new AsyncCompiler(sURL);
+        //var result = compileText(text);
     }
 
-    var compileText = function (text) {
+    var textToParseTree = function (text) {
         var tokens = lexer(text);
         tokens.unshift('(');
         tokens.unshift('main'); //dummy token
         tokens.push(')');
         var tree = parser(tokens);
-        var result = compileAll(tree);
+        return tree;
+    }
 
+    var compileText = function (text) {
+        var tree = textToParseTree(text);
+        var result = compileTree(tree);
         return result;
     }
 
@@ -667,63 +695,120 @@ var ceme = function () {
             .replace(/'/g, "&#039;");
     }
 
+    var FileImports = function (name, callback) {
+        this.name = name;
+        this.done = false;
+        this.code = '';
+        this.children = [];
+        this.callback = callback;
+    }
+
+    FileImports.prototype.toString = function () {
+        return 'FileImport: ' + this.name;
+    }
+
+    FileImports.prototype.checkdone = function () {
+        return this.done;
+    }
+
+    FileImports.prototype.addToList = function (child) {
+        var childobj = new FileImports(child, this.callback);
+        this.children.push(childobj);
+    }
+
+    FileImports.prototype.checkAllDone = function () {
+        var i;
+        for (i = 0; i < this.children.length; i++) {
+            var child = this.children[i];
+            if (child.done === false) {
+                return false;
+            }
+            if (!child.checkAllDone()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    FileImports.prototype.request = function () {
+        var fileobj = this;
+        if (!fileobj.done) {
+            $.ajax({
+                    url : this.name,
+                    type : 'GET',
+                    success : function (data) {
+                        var tree = textToParseTree(data);
+                        var imports = getImports(tree);
+                        var i;
+                        fileobj.code = data;
+                        fileobj.tree = tree;
+                        fileobj.done = true;
+                        for (i = 0; i < imports.length; i++) {
+                            fileobj.addToList(imports[i]);
+                        }
+                        fileobj.requestAll();
+                        fileobj.callback();
+                    },
+                    error : function (request,error) {
+                        alert("Request: "+JSON.stringify(request));
+                    }
+            });
+        }
+        fileobj.callback();
+    }
+
+    FileImports.prototype.requestAll = function () {
+        this.request();
+        var i;
+        for (i = 0; i < this.children.length; i++) {
+            var child = this.children[i];
+            child.requestAll();
+        }
+    }
+
+    FileImports.prototype.importAll = function () {
+        var i;
+        for (i = 0; i < this.children.length; i++) {
+            this.children[i].importAll();
+        }
+        compileText(this.code);
+    }
+
+    var asyncCompiler = function (filename, callback, code) {
+        var mainFile = new FileImports(filename, function () {
+            if (mainFile.checkAllDone()) {
+                mainFile.importAll();
+                var output = compileTree(mainFile.tree);
+                callback(mainFile.code, output);
+            }
+        });
+        if (code) {
+            var tree = textToParseTree(code);
+            var imports = getImports(tree);
+            var i;
+            mainFile.code = code;
+            mainFile.done = true;
+            mainFile.tree = tree;
+            for (i = 0; i < imports.length; i++) {
+                mainFile.addToList(imports[i]);
+            }
+        }
+        mainFile.requestAll();
+    }
+
     return {
         'lexer': lexer,
         'Symbol': Symbol,
         'isSymbol': isSymbol,
         'importFile': importFile,
         'compileText': compileText,
-        'compileFile' : compileFile
+        'compileFile' : compileFile,
+        'asyncCompiler' : asyncCompiler,
+        'success': success,
+        'warning': warning,
+        'error': error
     };
 }();
-
-(function () {
-    // make list of files to import
-    // update list whenever necessary
-    var filelist = {};
-
-    var addToList = function (file) {
-        filelist[file] = false;
-    }
-
-    var runMainFile = function () {
-        // run main file text
-    }
-
-    // check if all imports are available
-    var checkAllDone = function () {
-        var file;
-        for (file in filelist) {
-            if (!filelist[file]) {
-                return;
-            }
-        }
-        runMainFile();
-    }
-
-    var makeRequest = function (file) {
-        $.ajax({
-                url : file,
-                type : 'GET',
-                success : function (data) {
-                    filelist[file] = data;
-                    checkAllDone();
-                },
-                error : function (request,error) {
-                    alert("Request: "+JSON.stringify(request));
-                }
-        });
-    }
-
-    addToList('/code/css');
-    addToList('/code/chart');
-
-    var file;
-    for (file in filelist) {
-        makeRequest(file);
-    }
-
-})();
 
 (function(exports) {
 

@@ -56,15 +56,17 @@ var Router = function () {
     var runCode = function () {
         var text = editor.getValue();
         $('#alert').hide();
-        try {
-            var outputelem = $('#ceme-output');
-            outputelem.empty();
+        var outputelem = $('#ceme-output');
+        outputelem.empty();
 
-            var output = ceme.compileText(text);
+        ceme.asyncCompiler('', function (code, output) {
             outputelem.html(output).fadeIn(300);
             if (currentMode === 'edit') {
                 changeMode('view');
             }
+        }, text);
+
+        try {
         } catch (err) {
             $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
         }
@@ -88,9 +90,11 @@ var Router = function () {
                 data: $(this).serialize() + xsrfToken(),
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (jqXHR.status == 500) {
-                        alert('Internal error: ' + jqXHR.responseText);
+                        ceme.error('Internal server error');
+                    } else if (jqXHR.status == 400) {
+                        ceme.error(errorThrown.message);
                     } else {
-                        alert('Unexpected error.');
+                        ceme.error('Unexpected error error');
                     }
                 }
             }).done(function (response) {
@@ -181,12 +185,16 @@ var Router = function () {
     var editor;
 
     var firstLoad = function() {
-        var temp = ceme.compileFile('/assets/code/home.ceme');
-        $('#page-container').hide().html(temp).fadeIn(300);
+        ceme.asyncCompiler('/assets/code/home.ceme', function (code, output) {
+            $('#page-container').hide().html(output).fadeIn(300);
 
-        var mainarea = document.getElementById("ceme-input");
-        editor = makeEditor(mainarea);
+            var mainarea = document.getElementById("ceme-input");
+            editor = makeEditor(mainarea);
 
+            $("#mobile-menu").mmenu();
+
+            Router.route(window.location.toString());
+        });
     }
 
     var getPageName = function () {
@@ -205,24 +213,26 @@ var Router = function () {
         }
 
         var pagename = getPageName();
+        ceme.asyncCompiler('/code/' + pagename, function (code, output) {
+            $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
+
+            editor.setValue(code);
+            changeMode('view');
+
+            runCode();
+
+            if (document.cookie.indexOf('sodfksoihasg') > 0) {
+                $('#login-logout').html('<li><a href="#" id="logout" >Log Out</a></li>');
+            } else {
+                $('#login-logout').html('<li><a href="/login">Login</a></li><li><a href="/sign-up">Sign Up</a></li>');
+            }
+        });
+
         try {
-            var text = ajaxRequest('/code/' + pagename);
         } catch (err) {
             $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
         }
 
-        $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
-
-        editor.setValue(text);
-        changeMode('view');
-
-        runCode();
-
-        if (document.cookie.indexOf('sodfksoihasg') > 0) {
-            $('#login-logout').html('<li><a href="#" id="logout" >Log Out</a></li>');
-        } else {
-            $('#login-logout').html('<li><a href="/login">Login</a></li><li><a href="/sign-up">Sign Up</a></li>');
-        }
     }
     return {
         'route': route,
