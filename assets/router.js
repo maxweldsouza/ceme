@@ -186,6 +186,7 @@ var Router = function () {
 
     var firstLoad = function() {
         ceme.asyncCompiler('/assets/code/home.ceme', function (code, output) {
+            $('body').show();
             $('#page-container').hide().html(output).fadeIn(300);
 
             var mainarea = document.getElementById("ceme-input");
