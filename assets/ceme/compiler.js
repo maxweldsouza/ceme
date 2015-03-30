@@ -589,8 +589,8 @@ var ceme = function () {
 
     var compileFile = function (sURL) {
         var text = fetchFile(sURL);
-        var compiler = new AsyncCompiler(sURL);
-        //var result = compileText(text);
+        var result = compileText(text);
+        return result;
     }
 
     var textToParseTree = function (text) {
@@ -750,8 +750,8 @@ var ceme = function () {
                         fileobj.requestAll();
                         fileobj.callback();
                     },
-                    error : function (request,error) {
-                        error("Request: "+JSON.stringify(request));
+                    error : function (request, e) {
+                        error(request.responseText);
                     }
             });
         }

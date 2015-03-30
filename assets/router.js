@@ -91,10 +91,12 @@ var Router = function () {
                 error: function (jqXHR, textStatus, errorThrown) {
                     if (jqXHR.status == 500) {
                         ceme.error('Internal server error');
+                    } else if (jqXHR.status == 404) {
+                        ceme.error(errorThrown.message);
                     } else if (jqXHR.status == 400) {
                         ceme.error(errorThrown.message);
                     } else {
-                        ceme.error('Unexpected error error');
+                        ceme.error('Unexpected error');
                     }
                 }
             }).done(function (response) {

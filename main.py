@@ -138,9 +138,8 @@ def ceme_file(self, path):
         self.set_header("Content-Type", "text/plain; charset=UTF-8")
         self.write(code)
     except EntryNotFound:
-        file = open('./assets/code/empty.ceme', 'r')
         self.set_status(404)
-        self.write(file.read())
+        self.write('404: No such page exists')
     except Exception, e:
         internal_error(self, e)
 

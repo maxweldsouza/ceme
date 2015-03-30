@@ -402,8 +402,7 @@ var cemeEnv = function() {
                 return !IsArray(a);
             },
             'IsNull': function (a) {
-                return IsArray(a)
-                    && a.length === 0; 
+                return IsArray(a) && a.length === 0;
             },
             'IsMember': function (x, lst) {
                 var i;
