@@ -149,8 +149,6 @@ var ceme = function () {
                                 compile(tree[2])));
                 }
             } else if (x === 'import') {
-                var filename = removeOneQuote(tree[1]);
-                importFile('/code/' + filename);
                 return new Box('""', '');
             } else if (x === 'let') {
                 return _let(tree);
@@ -204,7 +202,7 @@ var ceme = function () {
 
     var parser  = function (tokens) {
         if (tokens.length === 0) 
-            throw Error('no tokens found');
+            error('no tokens found');
         var tree = [];
         var level = 0;
         while (tokens.length > 0) {
@@ -294,7 +292,7 @@ var ceme = function () {
 
             // check whether stuck in infinite loop
             if (input.length === length) {
-                throw SyntaxError('Check your quotes. Lexer stuck in infinite loop.');
+                error('Check your quotes. Lexer stuck in infinite loop.');
             } else {
                 length = input.length;
             }
@@ -718,6 +716,9 @@ var ceme = function () {
 
     FileImports.prototype.checkAllDone = function () {
         var i;
+        if (!this.done) {
+            return false;
+        }
         for (i = 0; i < this.children.length; i++) {
             var child = this.children[i];
             if (child.done === false) {
@@ -750,7 +751,7 @@ var ceme = function () {
                         fileobj.callback();
                     },
                     error : function (request,error) {
-                        alert("Request: "+JSON.stringify(request));
+                        error("Request: "+JSON.stringify(request));
                     }
             });
         }
