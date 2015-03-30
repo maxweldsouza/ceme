@@ -88,6 +88,9 @@ var ceme = function () {
         var tmp;
         var i;
         for (i = 0; i < tree.length; i++) {
+            tree[i] = processMacros(tree[i]);
+        }
+        for (i = 0; i < tree.length; i++) {
             var code = _expression(_unbox(compile(tree[i])));
             input += code;
             try {
@@ -126,6 +129,53 @@ var ceme = function () {
         return imports;
     }
 
+    var macroTable = {};
+
+    var replace = function (tree, old, nu) {
+        var i;
+        for (i = 0; i < tree.length; i++) {
+            if (cemeEnv.IsAtom(tree[i])) {
+                if (isSymbol(tree[i])) {
+                    if (tree[i].name === old.name) {
+                        tree[i] = nu;
+                    }
+                }
+            } else {
+                tree[i] = replace(tree[i], old, nu);
+            }
+        }
+        return tree;
+    }
+
+    var addMacro = function (name, params, body) {
+        var obj = {};
+        obj.params = params;
+        obj.body = body;
+        macroTable[name] = obj;
+    }
+
+    var processMacros = function (tree) {
+        if (isSymbol(tree[0])) {
+            var x = unsymbol(escapeSymbol(tree[0]));
+        }
+        if (x === 'macro') {
+            var name = unsymbol(tree[1][0]);
+            var params = tree[1].slice(1);
+            var body = tree[2];
+            addMacro(name, params, body);
+        } else if (x in macroTable) {
+            var params = macroTable[x].params;
+            var body = macroTable[x].body;
+            var called = tree.slice(1);
+            var i;
+            for (i = 0; i < called.length; i++) {
+                body = replace(body, params[i], called[i]);
+            }
+            tree = body;
+        }
+        return tree;
+    }
+
     var compile = function (tree) {
         var i;
         if (isSymbol(tree)) {
@@ -149,6 +199,8 @@ var ceme = function () {
                                 compile(tree[2])));
                 }
             } else if (x === 'import') {
+                return new Box('""', '');
+            } else if (x === 'macro') {
                 return new Box('""', '');
             } else if (x === 'let') {
                 return _let(tree);
