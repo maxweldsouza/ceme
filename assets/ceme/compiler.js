@@ -78,6 +78,28 @@ var ceme = function () {
         return this;
     }
 
+    var IsArray = Array.isArray || function (a) {
+        return Object.prototype.toString.call(a) === '[object Array]';
+    }
+
+    var NestedArrayToString = function (a) {
+        var i;
+        var result = '';
+        if (IsArray(a[0])) {
+            result += NestedArrayToString(a[0]);
+        } else {
+            result += a[0];
+        }
+        for (i = 1; i < a.length; i++) {
+            if (IsArray(a[i])) {
+                result += ', ' + NestedArrayToString(a[i]);
+            } else {
+                result += ', ' + a[i];
+            }
+        }
+        return '[' + result + ']';
+    }
+
     /*********************************************************************************************/
     /* Compiler                                                                               */
     /*********************************************************************************************/
@@ -95,7 +117,10 @@ var ceme = function () {
             input += code;
             try {
                 tmp = evalInEnv(cemeEnv, code);
-                if (typeof tmp !== 'undefined') {
+                if (typeof tmp === 'undefined') {
+                } else if (IsArray(tmp)) {
+                    output += NestedArrayToString(tmp);
+                } else {
                     output += tmp;
                 }
             } catch (err) {
