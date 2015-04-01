@@ -400,7 +400,7 @@ define
             <li><a href="/documentation">Documentation</a></li>
             <li><a href="/create">Create</a></li>
         </ul>
-        <ul class="nav navbar-nav navbar-right" id="login-logout">
+        <ul class="nav navbar-nav navbar-right login-logout">
         </ul>
         <div class="btn-group btn-desktop-tab navbar-right" role="group" aria-label="">
           <button id="" type="button" class="btn btn-default ceme-btn-page">View</button>
@@ -477,9 +477,6 @@ Css
                 CssSelector
                     '.footer-right'
                     'text-align:right;'
-        MediaQuery
-            'screen and (min-width: 992px)'
-            +
                 CssSelector
                     '.btn-mobile-tab'
                     'display:none;'
@@ -596,14 +593,8 @@ div
                     style
                         'margin:0;padding:0;'
                 FooterLink
-                    '/'
-                    'Terms'
-                FooterLink
-                    '/faq'
-                    'FAQ'
-                FooterLink
-                    '/'
-                    'Privacy'
+                    '/legal'
+                    'Legal'
         div
             attrib
                 class
