@@ -122,16 +122,16 @@ define
                 btnclass
                 ', '
                 btnclass
-                '.active:hover'
+                '.active'
             +
                 Color
                     '#fff'
                 BackgroundColor
-                    light
-                BorderColor
-                    light
-                BorderBottomColor
                     base
+                BorderColor
+                    base
+                BorderBottomColor
+                    dark
         CssSelector
             +
                 btnclass
@@ -139,28 +139,27 @@ define
                 btnclass
                 ':focus, '
                 btnclass
-                '.active, '
-                btnclass
-                '.active:focus, '
-                btnclass
-                '.active:active'
+                ':active'
             +
                 BackgroundColor
-                    base
-                BorderColor
-                    base
-                BorderBottomColor
                     dark
+                BorderColor
+                    dark
+                BorderBottomColor
+                    base
                 Color
                     '#fff'
         CssSelector
             +
                 btnclass
-                ':active'
+                ':active, '
+                btnclass
+                '.active:active'
             +
                 BorderColor
                     base
-                'border-bottom-width:0px;'
+                BorderBottomColor
+                    dark
 define
     BUTTONS
     +
@@ -176,19 +175,19 @@ define
             PRIMARY_COLOR_DARK
         ButtonStyling
             '.btn-success'
-            DARK_COLOR
             BASE_COLOR
             LIGHT_COLOR
+            DARK_COLOR
         ButtonStyling
             '.btn-warning'
-            WARNING_COLOR_DARK
             WARNING_COLOR
             WARNING_COLOR_LIGHT
+            WARNING_COLOR_DARK
         ButtonStyling
             '.btn-danger'
-            DANGER_COLOR_DARK
             DANGER_COLOR
             DANGER_COLOR_LIGHT
+            DANGER_COLOR_DARK
         CssSelector
             '.btn-default'
             'background:#fff;'
