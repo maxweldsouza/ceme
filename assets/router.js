@@ -239,7 +239,8 @@ var Router = function () {
     }
     return {
         'route': route,
-        'firstLoad': firstLoad
+        'firstLoad': firstLoad,
+        'runCode': runCode
     }
 }();
 

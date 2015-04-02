@@ -232,8 +232,14 @@ var ceme = function () {
             } else if (x === 'list') {
                 return _array(tree.slice(1, tree.length));
             } else if (x === 'function') {
-                return _lambda (tree[1].slice(1,tree[1].length),
-                        compile(tree[2]));
+                var pms, bdy;
+                if (tree[1].length > 1) {
+                    pms = tree[1].slice(1,tree[1].length);
+                } else {
+                    pms = false;
+                }
+                bdy = compile(tree[2]);
+                return _lambda (pms, bdy);
             } else if (x === 'if') {
                 for (i = 1; i < tree.length; i++) {
                     tree[i] = compile(tree[i]);
@@ -602,6 +608,9 @@ var ceme = function () {
     // Non hoisted
 
     var _parameters  = function (params) {
+        if (!params) {
+            return '';
+        }
         var i;
         var result = ' ';
         result += escapeSymbol(params[0]).name;
