@@ -281,19 +281,19 @@ define
                 CssSelector
                     'body'
                     FontSize
-                        15
+                        13
             MediaQuery
                 'screen and (min-width: 768px)'
                 CssSelector
                     'body'
                     FontSize
-                        16
+                        14
             MediaQuery
                 'screen and (min-width: 992px)'
                 CssSelector
                     'body'
                     FontSize
-                        17
+                        15
             CssSelector
                 'body'
                 +
@@ -525,21 +525,20 @@ div
             attrib
                 class
                     'panel'
-            Formatter
-                '''
-                <form action="/api/save" method="post" id="submit-form">
-                <div class="btn-group pull-right" role="group">
-                    <div class="btn btn-default" id="ceme-run">Run</div>
-                    <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
-                    <button class="btn btn-default" id="ceme-history">History</button>
-                </div>
-                <h2>Code</h2>
-                <textarea name="content" id="ceme-input" width="100%"></textarea>
-                <input type="hidden" name="name" id="ceme-page-name">
-                </form>
-                '''
-                cemeFileName
-                    ''
+            '''
+            <form action="/api/save" method="post" id="submit-form">
+            <div class="btn-group pull-right" role="group">
+                <div class="btn btn-default" id="ceme-run">Run</div>
+                <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+                <button class="btn btn-default" id="ceme-history">History</button>
+            </div>
+            <h2>Code</h2>
+            <div style="width:100%;margin-top:20px;">
+            <textarea name="content" style="width:100%" id="ceme-input" ></textarea>
+            <input type="hidden" name="name" id="ceme-page-name">
+            </div>
+            </form>
+            '''
     '''
     <form action="/logout" method="post" id="logout-form">
     </form>
