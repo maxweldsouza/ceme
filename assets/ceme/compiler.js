@@ -122,9 +122,9 @@ var ceme = function () {
             tree[i] = processMacros(tree[i]);
         }
         for (i = 0; i < tree.length; i++) {
-            var code = _expression(_unbox(compile(tree[i])));
-            input += code;
             try {
+                var code = _expression(_unbox(compile(tree[i])));
+                input += code;
                 tmp = evalInEnv(cemeEnv, code);
                 if (typeof tmp === 'undefined') {
                 } else if (IsArray(tmp)) {
@@ -292,9 +292,7 @@ var ceme = function () {
         }
     }
 
-    var parser  = function (lexed) {
-        var tokens = lexed.tokens;
-        var linenos = lexed.linenos;
+    var parser  = function (tokens) {
         if (tokens.length === 0) 
             error('No tokens found');
 
@@ -418,7 +416,7 @@ var ceme = function () {
             tokens.push(')');
         }
 
-        return { 'tokens': tokens, 'linenos': linenos };
+        return tokens;
     }
 
     var reShortString  = function () {
@@ -711,11 +709,11 @@ var ceme = function () {
     }
 
     var textToParseTree = function (text) {
-        var lexed = lexer(text);
-        lexed.tokens.unshift('(');
-        lexed.tokens.unshift('main'); //dummy token
-        lexed.tokens.push(')');
-        var tree = parser(lexed);
+        var tokens = lexer(text);
+        tokens.unshift('(');
+        tokens.unshift('main'); //dummy token
+        tokens.push(')');
+        var tree = parser(tokens);
         return tree;
     }
 
@@ -813,7 +811,8 @@ var ceme = function () {
     var FileImports = function (name, callback) {
         this.name = name;
         this.done = false;
-        this.code = '';
+        this.executed = false;
+        this.code;
         this.children = [];
         this.callback = callback;
     }
@@ -872,11 +871,13 @@ var ceme = function () {
                     }
             });
         }
-        fileobj.callback();
     }
 
     FileImports.prototype.requestAll = function () {
-        this.request();
+        if (!this.code) {
+            this.request();
+        }
+        this.callback();
         var i;
         for (i = 0; i < this.children.length; i++) {
             var child = this.children[i];
@@ -894,13 +895,14 @@ var ceme = function () {
 
     var asyncCompiler = function (filename, callback, code) {
         var mainFile = new FileImports(filename, function () {
-            if (mainFile.checkAllDone()) {
+            if (mainFile.checkAllDone() && !mainFile.executed) {
                 mainFile.importAll();
                 var output = compileTree(mainFile.tree);
                 callback(mainFile.code, output);
+                mainFile.executed = true;
             }
         });
-        if (code) {
+        if (typeof code !== 'undefined') {
             var tree = textToParseTree(code);
             var imports = getImports(tree);
             var i;

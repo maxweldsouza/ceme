@@ -385,10 +385,10 @@ define
 <nav class="navbar navbar-fixed-top FixedTop">
 <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-nav">
+    <div class="navbar-nav mobile-menu">
         <a class="navbar-brand" style="font-size:2em;" href="#mobile-menu"><i style="line-height:inherit;" class="fa fa-bars"></i></a>
     </div>
-    <div class="navbar-header" style="padding-left:50px;">
+    <div class="navbar-header">
         <a class="navbar-brand" href="/">Ceme.io</a>
     </div>
 
@@ -447,6 +447,9 @@ Css
             'screen and (max-width: 991px)'
             +
                 CssSelector
+                    '.mobile-menu'
+                    'display:initial;'
+                CssSelector
                     '.btn-mobile-tab'
                     'display:block;position:fixed;left:0px;top:50px;width:100%;'
                 CssSelector
@@ -470,6 +473,9 @@ Css
         MediaQuery
             'screen and (min-width: 992px)'
             +
+                CssSelector
+                    '.mobile-menu'
+                    'display:none;'
                 CssSelector
                     '.btn-mobile-tab'
                     'display:none;'
@@ -525,20 +531,23 @@ div
             attrib
                 class
                     'panel'
-            '''
-            <form action="/api/save" method="post" id="submit-form">
-            <div class="btn-group pull-right" role="group">
-                <div class="btn btn-default" id="ceme-run">Run</div>
-                <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
-                <button class="btn btn-default" id="ceme-history">History</button>
-            </div>
-            <h2>Code</h2>
-            <div style="width:100%;margin-top:20px;">
-            <textarea name="content" style="width:100%" id="ceme-input" ></textarea>
-            <input type="hidden" name="name" id="ceme-page-name">
-            </div>
-            </form>
-            '''
+            Formatter
+                '''
+                <form action="/api/save" method="post" id="submit-form">
+                <div class="btn-group pull-right" role="group">
+                    <div class="btn btn-default" id="ceme-run">Run</div>
+                    <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
+                    <button class="btn btn-default" id="ceme-history">History</button>
+                </div>
+                <h2>Code</h2>
+                <div style="width:100%;margin-top:20px;">
+                <textarea name="content" style="width:100%" id="ceme-input" ></textarea>
+                <input type="hidden" name="name" id="ceme-page-name">
+                </div>
+                </form>
+                '''
+                cemeFileName
+                    ''
     '''
     <form action="/logout" method="post" id="logout-form">
     </form>
