@@ -17,8 +17,17 @@ var ceme = function () {
     var warning = function (message) {
         $('#alert').hide().html(cemeEnv.Alert(message, 'warning')).fadeIn(200);
     }
-    var error = function (message) {
-        $('#alert').hide().html(cemeEnv.Alert(message, 'danger')).fadeIn(200);
+    var error = function (msg, lineno) {
+        var message = msg;
+        if (typeof lineno !== 'undefined') {
+            message += ' at line ' + lineno;
+        }
+        if (cemeEnv.Alert) {
+            $('#alert').hide().html(cemeEnv.Alert(message, 'danger')).fadeIn(200);
+        } else {
+            //console.log(message);
+        }
+        throw message;
     }
 
     /*********************************************************************************************/
@@ -283,9 +292,12 @@ var ceme = function () {
         }
     }
 
-    var parser  = function (tokens) {
+    var parser  = function (lexed) {
+        var tokens = lexed.tokens;
+        var linenos = lexed.linenos;
         if (tokens.length === 0) 
-            error('no tokens found');
+            error('No tokens found');
+
         var tree = [];
         var level = 0;
         while (tokens.length > 0) {
@@ -298,8 +310,8 @@ var ceme = function () {
             tokens.shift();
         }
         tree = tree[0];
-        tree.shift();
-        return tree; // remove dummy token
+        tree.shift(); // remove dummy token
+        return tree;
     }
 
     var makeList  = function (tokens) {
@@ -318,6 +330,17 @@ var ceme = function () {
     }
 
     var lexer  = function (input) {
+        var lineno = 1;
+        var linenos = [];
+
+        var addLines = function (no) {
+            lineno += no;
+            linenos.push(lineno);
+        }
+        var countLines = function (str) {
+            return str.split(/\r\n|\r|\n/).length - 1;
+        }
+
         var i;
         var tokens = [];
         var indentStack = [];
@@ -344,8 +367,11 @@ var ceme = function () {
                                 tokens.push(')');
                             }
                         }
-                    } else if (i !== 'SPACE' && i !== 'COMMENT') {
-                        if (i === 'NUMBER') {
+                        addLines(1);
+                    } else  {
+                        if (i === 'SPACE' || i === 'COMMENT') {
+                            addLines(countLines(res));
+                        } else if (i === 'NUMBER') {
                             tokens.push(parseFloat(res));
                         } else if (res === 'true') {
                             tokens.push(true);
@@ -361,9 +387,13 @@ var ceme = function () {
                         } else if (i === 'STRING') {
                             tokens.push(res);
                         } else if (i === 'LONGSTRING') {
+                            addLines(countLines(res));
+
                             var temp = res;
                             temp = toStringLiteral(removeOneQuote(removeOneQuote(temp)));
                             tokens.push(temp);
+                        //} else if (i === 'DANGEROUS') {
+                        //    error('Dangerous character');
                         } else {
                             tokens.push(res);
                         }
@@ -375,7 +405,7 @@ var ceme = function () {
 
             // check whether stuck in infinite loop
             if (input.length === length) {
-                error('Check your quotes. Lexer stuck in infinite loop.');
+                error('Check your quotes. Lexer stuck in infinite loop', lineno);
             } else {
                 length = input.length;
             }
@@ -388,7 +418,7 @@ var ceme = function () {
             tokens.push(')');
         }
 
-        return tokens;
+        return { 'tokens': tokens, 'linenos': linenos };
     }
 
     var reShortString  = function () {
@@ -402,6 +432,7 @@ var ceme = function () {
     var regexes  = function () {
         var regs = {
             'COMMENT': /^[\r\n]* *#[^\r\n]*/,
+            //'DANGEROUS': /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
             'NUMBER': /^-?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][+-]?[0-9]*)?/,
             'SYMBOL': /^[^ '"\r\n#:()]+/,
             'INDSPACE': /^(\r\n|\n|\r) */,
@@ -680,11 +711,11 @@ var ceme = function () {
     }
 
     var textToParseTree = function (text) {
-        var tokens = lexer(text);
-        tokens.unshift('(');
-        tokens.unshift('main'); //dummy token
-        tokens.push(')');
-        var tree = parser(tokens);
+        var lexed = lexer(text);
+        lexed.tokens.unshift('(');
+        lexed.tokens.unshift('main'); //dummy token
+        lexed.tokens.push(')');
+        var tree = parser(lexed);
         return tree;
     }
 

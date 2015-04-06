@@ -191,6 +191,7 @@ class SaveHandler(tornado.web.RequestHandler):
         except (InvalidPageName, InvalidContent) as e:
             self.set_status(400)
             self.write(str(e))
+            print str(e)
         except Exception, e:
             internal_error(self, e)
 
