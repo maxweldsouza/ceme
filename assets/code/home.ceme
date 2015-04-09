@@ -444,7 +444,7 @@ Css
             'margin:40px 0;'
         # Responsiveness
         MediaQuery
-            'screen and (max-width: 991px)'
+            'screen and (max-width: 767px)'
             +
                 CssSelector
                     '.mobile-menu'
@@ -471,7 +471,7 @@ Css
                     '.footer-block'
                     'text-align:center;'
         MediaQuery
-            'screen and (min-width: 992px)'
+            'screen and (min-width: 768px)'
             +
                 CssSelector
                     '.mobile-menu'
