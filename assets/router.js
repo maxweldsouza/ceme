@@ -222,6 +222,9 @@ var Router = function () {
             queryObj = queryStringToJSON(loc[1]);
         }
         var pagename = loc[0];
+        if (pagename === '') {
+            pagename = 'home';
+        }
 
         ceme.asyncCompiler('/code/' + pagename, function (code, output) {
             $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
