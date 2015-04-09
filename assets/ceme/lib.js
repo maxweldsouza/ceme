@@ -376,6 +376,10 @@ var cemeEnv = function() {
             'EvalString': function (str) {
                 return ceme.compileText(str);
             },
+            'UTCToLocalTime': function (utc) {
+                var date = new Date(utc);
+                return date.toLocaleString();
+            },
 
             //////// Scantuary
 
