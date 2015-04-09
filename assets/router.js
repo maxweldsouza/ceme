@@ -2,20 +2,22 @@
 
 var clientSide = function () {
     return typeof exports === 'undefined';
-}
+}();
 
-if (!clientSide()) {
+if (!clientSide) {
     var ceme = require('./ceme/compiler');
     var lib = require('./ceme/lib');
     var cemeEnv = lib.cemeEnv;
 }
 
-var cemeFileName = function () {
-    var file = window.location.pathname.substr(1);
-    if (file === '') {
-        return 'home';
-    } else {
-        return file;
+if (clientSide) {
+    var cemeFileName = function () {
+        var file = window.location.pathname.substr(1);
+        if (file === '') {
+            return 'home';
+        } else {
+            return file;
+        }
     }
 }
 
@@ -29,8 +31,10 @@ cemeEnv.GetPageName = function () {
     }
 }
 
-window.onpopstate = function (event) {
-    Router.route(window.location.toString());
+if (clientSide) {
+    window.onpopstate = function (event) {
+        Router.route(window.location.pathname + window.location.search);
+    }
 }
 
 var queryObj = {};
@@ -79,71 +83,73 @@ var Router = function () {
 
     }
 
-    $(document).on('submit', 'form', function (e) {
-        // TODO not for GET forms
-        var url = $(this).attr('action');
-        if (url.indexOf('/api/') === 0) {
-            e.preventDefault();
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: $(this).serialize() + xsrfToken(),
-                error: function (jqXHR, textStatus, errorThrown) {
-                    if (jqXHR.status == 500) {
-                        ceme.error('Internal server error');
-                    } else if (jqXHR.status == 404) {
-                        ceme.error(jqXHR.responseText);
-                    } else if (jqXHR.status == 400) {
-                        ceme.error(jqXHR.responseText);
-                    } else {
-                        ceme.error('Unexpected error');
+    if (clientSide) {
+        $(document).on('submit', 'form', function (e) {
+            // TODO not for GET forms
+            var url = $(this).attr('action');
+            if (url.indexOf('/api/') === 0) {
+                e.preventDefault();
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: $(this).serialize() + xsrfToken(),
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        if (jqXHR.status == 500) {
+                            ceme.error('Internal server error');
+                        } else if (jqXHR.status == 404) {
+                            ceme.error(jqXHR.responseText);
+                        } else if (jqXHR.status == 400) {
+                            ceme.error(jqXHR.responseText);
+                        } else {
+                            ceme.error('Unexpected error');
+                        }
                     }
-                }
-            }).done(function (response) {
-                $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
-            });
-        } else {
-            var input = $("<input>")
-                      .attr("type", "hidden")
-                      .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
-            $(this).append(input);
-        }
-    });
+                }).done(function (response) {
+                    $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
+                });
+            } else {
+                var input = $("<input>")
+                          .attr("type", "hidden")
+                          .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
+                $(this).append(input);
+            }
+        });
 
-    $(document).on('click', '#logout', function() {
-        $('#logout-form').submit();
-    });
+        $(document).on('click', '#logout', function() {
+            $('#logout-form').submit();
+        });
 
-    $(document).on('click', '.ceme-btn-page', function() {
-        changeMode('view');
-    });
+        $(document).on('click', '.ceme-btn-page', function() {
+            changeMode('view');
+        });
 
-    $(document).on('click', '.ceme-btn-code', function() {
-        changeMode('edit');
-    });
+        $(document).on('click', '.ceme-btn-code', function() {
+            changeMode('edit');
+        });
 
-    $(document).on('click', '.ceme-btn-both', function() {
-        changeMode('both');
-    });
+        $(document).on('click', '.ceme-btn-both', function() {
+            changeMode('both');
+        });
 
-    $(document).on('click', '#ceme-run', runCode);
+        $(document).on('click', '#ceme-run', runCode);
 
-    $(document).on('click', '#ceme-history', function (e) {
-        window.location = '/history?name=' + cemeEnv.GetPageName();
-        e.preventDefault();
-    });
-
-    $(document).on('click', 'a', function (e) {
-        var url = $(this).attr("href");
-        if (url && url[0] === '/') {
-            history.pushState(null, null, url);
-
+        $(document).on('click', '#ceme-history', function (e) {
+            window.location = '/history?name=' + cemeEnv.GetPageName();
             e.preventDefault();
-            setTimeout(function () {
-                Router.route(url);
-            }, 0);
-        }
-    });
+        });
+
+        $(document).on('click', 'a', function (e) {
+            var url = $(this).attr("href");
+            if (url && url[0] === '/') {
+                history.pushState(null, null, url);
+
+                e.preventDefault();
+                setTimeout(function () {
+                    Router.route(url);
+                }, 0);
+            }
+        });
+    }
 
     var makeEditor = function (elem) {
         var editor;
@@ -196,12 +202,12 @@ var Router = function () {
 
             $("#mobile-menu").mmenu();
 
-            Router.route(window.location.toString());
+            Router.route(window.location.pathname + window.location.search);
         });
     }
 
-    var getPageName = function () {
-        var url = window.location.pathname;
+    var getPageName = function (url) {
+        url = window.location.pathname;
         if (url === '/') {
             // TODO use redirect instead?
             url = '/home';
@@ -210,12 +216,13 @@ var Router = function () {
     }
 
     var route = function (url) {
-        if (url.indexOf('?') > 0) {
-            url = url.substr(url.indexOf('?'));
-            queryObj = queryStringToJSON(url);
+        url = url.substr(1);
+        var loc = url.split('?');
+        if (loc[1]) {
+            queryObj = queryStringToJSON(loc[1]);
         }
+        var pagename = loc[0];
 
-        var pagename = getPageName();
         ceme.asyncCompiler('/code/' + pagename, function (code, output) {
             $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
 

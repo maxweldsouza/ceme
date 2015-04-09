@@ -938,6 +938,7 @@ var ceme = function () {
     exports.importFile = ceme.importFile;
     exports.compileFile = ceme.compileFile;
     exports.compileText = ceme.compileText;
+    exports.asyncCompiler = ceme.asyncCompiler;
     exports.cemeEnv = cemeEnv;
 
 })(typeof exports === 'undefined'? {} : exports);

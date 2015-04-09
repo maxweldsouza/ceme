@@ -256,6 +256,13 @@ var cemeEnv = function() {
             'Filter': function (f, arg) {
                 return arg.filter(f);
             },
+            //////// Iteration
+            'Repeat': function (no, f) {
+                var i;
+                for (i = 0; i < no; i++) {
+                    f();
+                }
+            },
 
             //////// Sets
 

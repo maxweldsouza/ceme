@@ -241,7 +241,7 @@ define
         CssSelector
             '.nav>li>a:hover'
             BackgroundColor
-                GRAY_SUPERLIGHT
+                GRAY_LIGHT
         CssSelector
             '.nav>li>a'
             'color:#999;'
