@@ -140,13 +140,15 @@ class SaveHandler(tornado.web.RequestHandler):
             name = self.get_argument('name', '')
             content = self.get_argument('content', '')
             ip = self.request.remote_ip
-            group = 1
             username = self.get_secure_cookie(xsrf_cookie)
             if not username:
                 username = ''
-            database.save_page(name, content, ip, group, username)
+            database.save_page(name, content, ip, username)
             self.write('The page has been saved successfully')
 
+        except NoRights as e:
+            self.set_status(400)
+            self.write(str(e))
         except InvalidInput as e:
             self.set_status(400)
             self.write(str(e))

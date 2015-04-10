@@ -3,16 +3,16 @@ import json
 import hashlib, uuid
 import re
 
-from settings import *
+import settings
 from custom_exceptions import *
 
 class DatabaseConnection:
     def connect(self):
         try:
-            self.connection = MySQLdb.connect(host=db_host,
-                    user=db_user,
-                    passwd=db_password,
-                    db=db_name)
+            self.connection = MySQLdb.connect(host=settings.db_host,
+                    user=settings.db_user,
+                    passwd=settings.db_password,
+                    db=settings.db_name)
 
             self.cur = self.connection.cursor()
             return self.cur
@@ -65,11 +65,11 @@ def hash_password(password, salt):
 
 """ Validation """
 # TODO make someone read rfc3986 and fix this
-PGNM_RE = re.compile('^[a-zA-Z0-9-]+$')
 def validate_name(name):
+    reg = re.compile('^[a-zA-Z0-9-]+$')
     if name == '':
         raise InvalidInput('Page name is empty')
-    if not PGNM_RE.match(name):
+    if not reg.match(name):
         raise InvalidInput('Page name is invalid')
 
 def validate_content(content):
@@ -83,20 +83,19 @@ def validate_content(content):
         raise Exception('Carraige return in content')
     return content
 
-USER_RE = re.compile('^[a-zA-Z]+[a-zA-Z_]+[a-zA-Z]+$')
 def validate_username(username):
+    reg = re.compile('^[a-zA-Z]+[a-zA-Z_]+[a-zA-Z]+$')
     if not len(username) > 4:
         raise InvalidInput('Username should be more than 4 characters')
-    if not USER_RE.match(username):
+    if not reg.match(username):
         raise InvalidInput('Username has invalid characters')
 
-EMAIL_RE = re.compile('[^@]+@[^@]+\.[^@]+')
 def validate_email(email):
-    if not EMAIL_RE.match(email):
+    reg = re.compile('[^@]+@[^@]+\.[^@]+')
+    if not reg.match(email):
         raise InvalidInput('Invalid email')
 
 def validate_password(password):
-    return True
     if not re.search(r'/d', password):
         raise InvalidInput('Password should contain atleast one digit')
     if len(password) < 10:
@@ -132,6 +131,7 @@ def create_user(username, email, password):
 def authenticate_user(username, password):
     validate_username(username)
     validate_password(password)
+
     salt = db.get_one('SELECT user_salt FROM users'
             ' WHERE user_name = %s', (username,))
     if not salt:
@@ -149,6 +149,7 @@ def authenticate_user(username, password):
 def create_page(name, content, ip, group, username):
     validate_name(name)
     content = validate_content(content)
+
     exists = db.get_one('SELECT page_timestamp FROM pages'
             ' WHERE page_name = %s limit 1', (name,))
     if (exists):
@@ -159,10 +160,19 @@ def create_page(name, content, ip, group, username):
                 ' VALUES (%s, %s, %s, %s, %s) ',
                 (name, content, group, username, ip))
 
-def save_page(name, content, ip, group, username):
+def save_page(name, content, ip, username):
     validate_name(name)
     content = validate_content(content)
-    exists = db.get_one('SELECT page_timestamp from pages where page_name = %s limit 1', (name,))
+
+    user_group = db.get_one('SELECT user_group FROM users'
+            ' WHERE user_name = %s', (username,))
+    page_group, old_content = db.get_one('SELECT page_group, page_content FROM pages'
+            ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
+    if content == old_content:
+        raise InvalidInput("No changes to save")
+    if page_group and user_group and user_group < page_group:
+        raise NoRights('User level %d is lower than page level %d' % (user_group, page_group))
+    group = 1
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
             , (name, content, group, username, ip))
