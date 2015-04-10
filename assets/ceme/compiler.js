@@ -1,11 +1,3 @@
-/** Copyright 2014, Maxwel D'souza
-
- The information contained herein is the intellectual
- property of Maxwel D'souza. It is NOT property of any
- partnerships and/or companies owned by the author.
- Reproduction in any form is strictly prohibited unless
- prior written permission is obtained from the author.  */
-
 "use strict";
 
 var cemeEnv = {};
