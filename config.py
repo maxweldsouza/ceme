@@ -9,4 +9,4 @@ db_user = "root"
 db_password = "dttmw5d"
 
 # this is the default level of created pages
-default_level = 1
+default_level = 0

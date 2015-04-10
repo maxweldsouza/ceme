@@ -29,6 +29,11 @@ class DatabaseConnection:
             cur.execute(qry, tpl)
             result = cur.fetchone()
             self.disconnect()
+            # unpack tuple if it has only
+            # one element
+            print result
+            if len(result) == 1:
+                result = result[0]
             return result
         except Exception, e:
             raise
@@ -132,11 +137,9 @@ def authenticate_user(username, password):
             ' WHERE user_name = %s', (username,))
     if not salt:
         raise LoginFailed()
-    salt = salt[0]
     hash = hash_password(password, salt)
     dbhash = db.get_one('SELECT user_hash FROM users'
             ' WHERE user_name = %s', (username,))
-    dbhash = dbhash[0]
     if hash != dbhash:
         raise LoginFailed('Incorrect details')
     return True
@@ -168,9 +171,16 @@ def save_page(name, content, ip, username):
             ' WHERE user_name = %s', (username,))
     page_group, old_content = db.get_one('SELECT page_group, page_content FROM pages'
             ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
+    if page_group:
+        page_group = int(page_group)
+    if user_group:
+        user_group = int(user_group)
+    else:
+        user_group = 0
+
     if content == old_content:
         raise InvalidInput("No changes to save")
-    if page_group and user_group and user_group < page_group:
+    if user_group < page_group:
         raise NoRights('User level %d is lower than page level %d' % (user_group, page_group))
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
@@ -180,10 +190,9 @@ def read_page(name):
     validate_name(name)
     page = db.get_one('SELECT page_content FROM pages'
             ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
-    if page:
-        return page[0]
-    else:
+    if not page:
         raise EntryNotFound('this entry was not found')
+    return page
 
 def get_history(name, limit):
     validate_name(name)
