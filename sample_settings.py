@@ -7,3 +7,6 @@ db_host = "localhost"
 db_name = "databasename"
 db_user = "username"
 db_password = "password"
+
+# this is the default level of created pages
+default_level = 1

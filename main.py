@@ -116,9 +116,8 @@ class CreateHandler(tornado.web.RequestHandler):
             content = "'Your page has been created. You can now edit it.'"
             name = self.get_argument('name', '')
             ip = self.request.remote_ip
-            group = 1
-            username = ''
-            database.create_page(name, content, ip, group, username)
+            username = self.get_secure_cookie(xsrf_cookie)
+            database.create_page(name, content, ip, username)
             self.set_status(200)
             self.redirect('/' + name)
         except InvalidInput:
@@ -141,8 +140,6 @@ class SaveHandler(tornado.web.RequestHandler):
             content = self.get_argument('content', '')
             ip = self.request.remote_ip
             username = self.get_secure_cookie(xsrf_cookie)
-            if not username:
-                username = ''
             database.save_page(name, content, ip, username)
             self.write('The page has been saved successfully')
 

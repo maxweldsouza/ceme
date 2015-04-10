@@ -123,10 +123,9 @@ def create_user(username, email, password):
 
     salt = generate_salt()
     hash = hash_password(password, salt)
-    group = 1
     db.put('INSERT INTO users (user_name, user_hash, user_salt, user_email, user_group)'
             ' VALUES (%s, %s, %s, %s, %s) '
-            , (username, hash, salt, email, group))
+            , (username, hash, salt, email, default_level))
 
 def authenticate_user(username, password):
     validate_username(username)
@@ -146,9 +145,11 @@ def authenticate_user(username, password):
     return True
 
 """ Pages """
-def create_page(name, content, ip, group, username):
+def create_page(name, content, ip, username):
     validate_name(name)
     content = validate_content(content)
+    if not username:
+        username = ''
 
     exists = db.get_one('SELECT page_timestamp FROM pages'
             ' WHERE page_name = %s limit 1', (name,))
@@ -158,11 +159,13 @@ def create_page(name, content, ip, group, username):
         db.put('INSERT INTO pages '
                 '(page_name, page_content, page_group, page_username, page_ip)'
                 ' VALUES (%s, %s, %s, %s, %s) ',
-                (name, content, group, username, ip))
+                (name, content, default_level, username, ip))
 
 def save_page(name, content, ip, username):
     validate_name(name)
     content = validate_content(content)
+    if not username:
+        username = ''
 
     user_group = db.get_one('SELECT user_group FROM users'
             ' WHERE user_name = %s', (username,))
@@ -172,14 +175,12 @@ def save_page(name, content, ip, username):
         raise InvalidInput("No changes to save")
     if page_group and user_group and user_group < page_group:
         raise NoRights('User level %d is lower than page level %d' % (user_group, page_group))
-    group = 1
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
-            , (name, content, group, username, ip))
+            , (name, content, default_level, username, ip))
 
 def read_page(name):
     validate_name(name)
-    print name
     page = db.get_one('SELECT page_content FROM pages'
             ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
     if page:
