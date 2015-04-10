@@ -867,7 +867,11 @@ var ceme = function () {
                         fileobj.callback();
                     },
                     error : function (request, e) {
-                        error(request.responseText);
+                        if (request.status === 0) {
+                            ceme.error('No internet connection');
+                        } else {
+                            error(request.responseText);
+                        }
                     }
             });
         }

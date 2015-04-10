@@ -95,7 +95,9 @@ var Router = function () {
                         type: 'POST',
                         data: $(this).serialize() + xsrfToken(),
                         error: function (jqXHR, textStatus, errorThrown) {
-                            if (jqXHR.status == 500) {
+                            if (jqXHR.status === 0) {
+                                ceme.error('No internet connection');
+                            } else if (jqXHR.status == 500) {
                                 ceme.error('Internal server error');
                             } else if (jqXHR.status == 404) {
                                 ceme.error(jqXHR.responseText);
