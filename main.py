@@ -5,7 +5,7 @@ from tornado.httpserver import HTTPServer
 import json
 
 import database
-from settings import *
+import config
 from custom_exceptions import *
 
 def internal_error(self, e):
@@ -20,13 +20,17 @@ def restricted(f):
     to have access """
     # TODO use user groups for this
     def wrapper(*args, **kwargs):
-        if args[0].get_secure_cookie(xsrf_cookie):
+        if args[0].get_secure_cookie(config.xsrf_cookie):
             return f(*args, **kwargs)
         else:
             return args[0].redirect('/')
     return wrapper
 
 class LoginHandler(tornado.web.RequestHandler):
+    """ Ajax requests cannot handle redirects.
+    So login and logout requests need to be submitted
+    without ajax. Without this it is not possible to
+    have common ajax code for all forms."""
     def get(self):
         self.xsrf_token
         self.render("index.html")
@@ -36,9 +40,10 @@ class LoginHandler(tornado.web.RequestHandler):
             username = self.get_argument('username', '')
             password = self.get_argument('password', '')
             if database.authenticate_user(username, password):
-                self.set_secure_cookie(xsrf_cookie, username)
+                self.set_secure_cookie(config.xsrf_cookie, username)
                 self.redirect('/home')
         except Exception, e:
+            self.set_status(400)
             self.redirect('/login-fail')
         except Exception, e:
             internal_error(self, e)
@@ -49,8 +54,8 @@ class LogoutHandler(tornado.web.RequestHandler):
         self.render("index.html")
 
     def post(self):
-        self.clear_cookie(xsrf_cookie)
-        self.redirect('/home')
+        self.clear_cookie(config.xsrf_cookie)
+        self.redirect('/logged-out')
 
 class SignupHandler(tornado.web.RequestHandler):
     def get(self):
@@ -64,7 +69,7 @@ class SignupHandler(tornado.web.RequestHandler):
             password = self.get_argument('password', '')
             database.create_user(username, email, password)
             # TODO message account created
-            self.set_secure_cookie(xsrf_cookie, username)
+            self.set_secure_cookie(config.xsrf_cookie, username)
             self.redirect('/home')
         except InvalidInput, e:
             # TODO custom error message page
@@ -116,7 +121,7 @@ class CreateHandler(tornado.web.RequestHandler):
             content = "'Your page has been created. You can now edit it.'"
             name = self.get_argument('name', '')
             ip = self.request.remote_ip
-            username = self.get_secure_cookie(xsrf_cookie)
+            username = self.get_secure_cookie(config.xsrf_cookie)
             database.create_page(name, content, ip, username)
             self.set_status(200)
             self.redirect('/' + name)
@@ -139,7 +144,7 @@ class SaveHandler(tornado.web.RequestHandler):
             name = self.get_argument('name', '')
             content = self.get_argument('content', '')
             ip = self.request.remote_ip
-            username = self.get_secure_cookie(xsrf_cookie)
+            username = self.get_secure_cookie(config.xsrf_cookie)
             database.save_page(name, content, ip, username)
             self.write('The page has been saved successfully')
 
@@ -184,10 +189,11 @@ settings = {
     'default_handler_args': dict(status_code=404),
     'compress_response': True,
     'debug' : True,
-    'cookie_secret' : cookie_secret,
+    'cookie_secret' : config.cookie_secret,
     'xsrf_cookies': True
 }
 
+# Urls starting with api are for ajax requests.
 application = tornado.web.Application([
     (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
@@ -206,8 +212,8 @@ if __name__ == "__main__":
         'certfile': os.path.join('certs/localhost.crt'),
         'keyfile': os.path.join('certs/localhost.key'),
         })
-    if ssl:
-        server.listen(port)
+    if config.ssl:
+        server.listen(config.port)
     else:
-        application.listen(port)
+        application.listen(config.port)
     tornado.ioloop.IOLoop.instance().start()

@@ -125,12 +125,9 @@ def create_user(username, email, password):
     hash = hash_password(password, salt)
     db.put('INSERT INTO users (user_name, user_hash, user_salt, user_email, user_group)'
             ' VALUES (%s, %s, %s, %s, %s) '
-            , (username, hash, salt, email, default_level))
+            , (username, hash, salt, email, settings.default_level))
 
 def authenticate_user(username, password):
-    validate_username(username)
-    validate_password(password)
-
     salt = db.get_one('SELECT user_salt FROM users'
             ' WHERE user_name = %s', (username,))
     if not salt:
@@ -141,7 +138,7 @@ def authenticate_user(username, password):
             ' WHERE user_name = %s', (username,))
     dbhash = dbhash[0]
     if hash != dbhash:
-        raise LoginFailed()
+        raise LoginFailed('Incorrect details')
     return True
 
 """ Pages """
@@ -159,7 +156,7 @@ def create_page(name, content, ip, username):
         db.put('INSERT INTO pages '
                 '(page_name, page_content, page_group, page_username, page_ip)'
                 ' VALUES (%s, %s, %s, %s, %s) ',
-                (name, content, default_level, username, ip))
+                (name, content, settings.default_level, username, ip))
 
 def save_page(name, content, ip, username):
     validate_name(name)
@@ -177,7 +174,7 @@ def save_page(name, content, ip, username):
         raise NoRights('User level %d is lower than page level %d' % (user_group, page_group))
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
-            , (name, content, default_level, username, ip))
+            , (name, content, settings.default_level, username, ip))
 
 def read_page(name):
     validate_name(name)
