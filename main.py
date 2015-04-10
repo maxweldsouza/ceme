@@ -3,49 +3,10 @@ import tornado.ioloop
 import tornado.web
 from tornado.httpserver import HTTPServer
 import json
+
 import database
+from settings import *
 from custom_exceptions import *
-
-# Install Instructions
-# set xsrf cookie name
-xsrf_cookie = 'sodfksoihasg'
-
-# set whether to use ssl server
-ssl = False
-
-# set port
-port = 8443
-
-# Meta
-# error handling
-# secure authentication
-
-# TODO list
-#name not empty
-#fork
-#default groups etc
-#history
-#remove is current
-#no tabs allowed
-#refactor database conection
-#login logout
-#break query strings to multiple lines
-#password tip, passphrase
-#registration
-#signup errors
-#invalid input
-
-# diff save
-# error messages
-# accessibility
-# change email or password
-# hidden editor
-# admin section
-# ip bans
-# infinite loop protection
-# embed
-# should you have "." in symbol names
-#  username already registered
 
 def internal_error(self, e):
     print e
@@ -105,12 +66,8 @@ class SignupHandler(tornado.web.RequestHandler):
             # TODO message account created
             self.set_secure_cookie(xsrf_cookie, username)
             self.redirect('/home')
-        except InvalidUsername, e:
+        except InvalidInput, e:
             # TODO custom error message page
-            self.write(str(e))
-        except InvalidPassword, e:
-            self.write(str(e))
-        except InvalidEmail, e:
             self.write(str(e))
         except Exception, e:
             internal_error(self, e)
@@ -164,7 +121,7 @@ class CreateHandler(tornado.web.RequestHandler):
             database.create_page(name, content, ip, group, username)
             self.set_status(200)
             self.redirect('/' + name)
-        except InvalidPageName:
+        except InvalidInput:
             self.set_status(400)
             self.redirect('/invalid-name')
         except AlreadyExists:
@@ -190,10 +147,9 @@ class SaveHandler(tornado.web.RequestHandler):
             database.save_page(name, content, ip, group, username)
             self.write('The page has been saved successfully')
 
-        except (InvalidPageName, InvalidContent) as e:
+        except InvalidInput as e:
             self.set_status(400)
             self.write(str(e))
-            print str(e)
         except Exception, e:
             internal_error(self, e)
 
@@ -204,7 +160,7 @@ class HistoryHandler(tornado.web.RequestHandler):
             limit = self.get_argument("limit", "20")
             self.set_header("Content-Type", "application/json")
             self.write(database.get_history(name, limit))
-        except InvalidPageName, e:
+        except InvalidInput, e:
             self.set_status(400)
             self.write(str(e))
         except EntryNotFound, e:
@@ -229,7 +185,7 @@ settings = {
     'default_handler_args': dict(status_code=404),
     'compress_response': True,
     'debug' : True,
-    'cookie_secret' : 'asdfn034uih4usygfp89dghu23780tghdsfgbshx',
+    'cookie_secret' : cookie_secret,
     'xsrf_cookies': True
 }
 

@@ -1,16 +1,18 @@
 import MySQLdb
 import json
-from custom_exceptions import *
 import hashlib, uuid
 import re
+
+from settings import *
+from custom_exceptions import *
 
 class DatabaseConnection:
     def connect(self):
         try:
-            self.connection = MySQLdb.connect(host="localhost",
-                    user="root",
-                    passwd="dttmw5d",
-                    db="cemeio")
+            self.connection = MySQLdb.connect(host=db_host,
+                    user=db_user,
+                    passwd=db_password,
+                    db=db_name)
 
             self.cur = self.connection.cursor()
             return self.cur
@@ -66,17 +68,17 @@ def hash_password(password, salt):
 PGNM_RE = re.compile('^[a-zA-Z0-9-]+$')
 def validate_name(name):
     if name == '':
-        raise InvalidPageName('Page name is empty')
+        raise InvalidInput('Page name is empty')
     if not PGNM_RE.match(name):
-        raise InvalidPageName('Page name is invalid')
+        raise InvalidInput('Page name is invalid')
 
 def validate_content(content):
     content = content.replace('\r\n', '\n')
     content = content.replace('\r', '\n')
     if content == '':
-        raise InvalidContent('Page is empty')
+        raise InvalidInput('Page is empty')
     if '\t' in content:
-        raise InvalidContent('Tabs are not allowed in code')
+        raise InvalidInput('Tabs are not allowed in code')
     if '\r' in content:
         raise Exception('Carraige return in content')
     return content
@@ -84,23 +86,23 @@ def validate_content(content):
 USER_RE = re.compile('^[a-zA-Z]+[a-zA-Z_]+[a-zA-Z]+$')
 def validate_username(username):
     if not len(username) > 4:
-        raise InvalidUsername('Username should be more than 4 characters')
+        raise InvalidInput('Username should be more than 4 characters')
     if not USER_RE.match(username):
-        raise InvalidUsername('Username has invalid characters')
+        raise InvalidInput('Username has invalid characters')
 
 EMAIL_RE = re.compile('[^@]+@[^@]+\.[^@]+')
 def validate_email(email):
     if not EMAIL_RE.match(email):
-        raise InvalidEmail('Invalid email')
+        raise InvalidInput('Invalid email')
 
 def validate_password(password):
     return True
     if not re.search(r'/d', password):
-        raise InvalidPassword('Password should contain atleast one digit')
+        raise InvalidInput('Password should contain atleast one digit')
     if len(password) < 10:
-        raise InvalidPassword('Password needs to be atleast 10 characters')
+        raise InvalidInput('Password needs to be atleast 10 characters')
     if len(password) > 128:
-        raise InvalidPassword('Password cannot be greater than 128 characters')
+        raise InvalidInput('Password cannot be greater than 128 characters')
 
 def is_number(s):
     try:
@@ -118,7 +120,7 @@ def create_user(username, email, password):
     exists = db.get_one('SELECT user_name FROM users'
             ' WHERE user_name = %s', (username,))
     if exists:
-        raise InvalidUsername('This username already exists')
+        raise InvalidInput('This username already exists')
 
     salt = generate_salt()
     hash = hash_password(password, salt)
