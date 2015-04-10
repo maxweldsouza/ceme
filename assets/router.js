@@ -24,7 +24,7 @@ if (clientSide) {
 cemeEnv.GetPageName = function () {
     var path = window.location.pathname;
     path = path.substr(1);
-    if (path === '/') {
+    if (path === '') {
         return 'home';
     } else {
         return path;
@@ -208,15 +208,6 @@ var Router = function () {
 
             Router.route(window.location.pathname + window.location.search);
         });
-    }
-
-    var getPageName = function (url) {
-        url = window.location.pathname;
-        if (url === '/') {
-            // TODO use redirect instead?
-            url = '/home';
-        }
-        return url.substr(1);
     }
 
     var route = function (url) {
