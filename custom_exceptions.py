@@ -10,6 +10,8 @@ class EntryNotFound(Exception):
 class LoginFailed(Exception):
     pass
 
+# TODO use common exception for all 
+# input validation
 """ Input validation """
 class InvalidPageName(Exception):
     pass

@@ -87,31 +87,33 @@ var Router = function () {
         $(document).on('submit', 'form', function (e) {
             // TODO not for GET forms
             var url = $(this).attr('action');
-            if (url.indexOf('/api/') === 0) {
-                e.preventDefault();
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: $(this).serialize() + xsrfToken(),
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        if (jqXHR.status == 500) {
-                            ceme.error('Internal server error');
-                        } else if (jqXHR.status == 404) {
-                            ceme.error(jqXHR.responseText);
-                        } else if (jqXHR.status == 400) {
-                            ceme.error(jqXHR.responseText);
-                        } else {
-                            ceme.error('Unexpected error');
+            if ($(this).attr('method') === 'post') {
+                if (url.indexOf('/api/') === 0) {
+                    e.preventDefault();
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: $(this).serialize() + xsrfToken(),
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            if (jqXHR.status == 500) {
+                                ceme.error('Internal server error');
+                            } else if (jqXHR.status == 404) {
+                                ceme.error(jqXHR.responseText);
+                            } else if (jqXHR.status == 400) {
+                                ceme.error(jqXHR.responseText);
+                            } else {
+                                ceme.error('Unexpected error');
+                            }
                         }
-                    }
-                }).done(function (response) {
-                    $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
-                });
-            } else {
-                var input = $("<input>")
-                          .attr("type", "hidden")
-                          .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
-                $(this).append(input);
+                    }).done(function (response) {
+                        $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
+                    });
+                } else {
+                    var input = $("<input>")
+                              .attr("type", "hidden")
+                              .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
+                    $(this).append(input);
+                }
             }
         });
 
