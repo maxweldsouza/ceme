@@ -31,8 +31,7 @@ class DatabaseConnection:
             self.disconnect()
             # unpack tuple if it has only
             # one element
-            print result
-            if len(result) == 1:
+            if type(result) is tuple and len(result) == 1:
                 result = result[0]
             return result
         except Exception, e:
@@ -163,7 +162,6 @@ def create_page(name, content, ip, username):
 
 def save_page(name, content, ip, username):
     validate_name(name)
-    content = validate_content(content)
     if not username:
         username = ''
 
@@ -181,7 +179,13 @@ def save_page(name, content, ip, username):
     if content == old_content:
         raise InvalidInput("No changes to save")
     if user_group < page_group:
-        raise NoRights('User level %d is lower than page level %d' % (user_group, page_group))
+        if user_group is 0:
+            raise NoRights('This page can only be edited by authenticated users of level %d and above.' % (page_group,))
+        raise NoRights('You are a level %d user and the page is level %d' % (user_group, page_group))
+
+    # check user level before validating content
+    # to save one query
+    content = validate_content(content)
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
             , (name, content, settings.default_level, username, ip))
