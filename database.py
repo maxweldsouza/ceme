@@ -220,4 +220,4 @@ def get_diff(name, first, second):
         somedict = [{ "id": fst[0], "content": fst[1], "timestamp": fst[2] },{ "id": snd[0], "content": snd[1], "timestamp": snd[2] }]
         return json.dumps(somedict, default=date_handler)
     else:
-        raise Exception('Invalid input parameters')
+        raise InvalidInput('Page with the given id or name does not exist')
