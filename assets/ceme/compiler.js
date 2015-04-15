@@ -233,6 +233,9 @@ var ceme = function () {
             } else if (x === 'list') {
                 return _array(tree.slice(1, tree.length));
             } else if (x === 'function') {
+                if (!tree[1][0].name) {
+                    error('Function parameters not defined');
+                }
                 if (tree[1][0].name === 'unnamed') {
                     var pms, bdy;
                     if (tree[1].length > 1) {

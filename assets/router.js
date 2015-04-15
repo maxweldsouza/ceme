@@ -223,8 +223,8 @@ var Router = function () {
             pagename = 'home';
         }
 
+        $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
         ceme.asyncCompiler('/code/' + pagename, function (code, output) {
-            $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
 
             editor.setValue(code);
             changeMode('view');
