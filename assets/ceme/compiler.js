@@ -3,6 +3,9 @@
 var cemeEnv = {};
 var ceme = function () {
 
+    var CustomException = function (message) {
+        this.message = message;
+    }
     var success = function (message) {
         $('#alert').hide().html(cemeEnv.Alert(message, 'success')).fadeIn(200);
     }
@@ -213,6 +216,7 @@ var ceme = function () {
 
         if (isSymbol(tree[0])) {
             var x = unsymbol(escapeSymbol(tree[0]));
+            var lineno = tree[0].lineno;
 
             if (x === 'define') {
                 if (cemeEnv.IsAtom(tree[1])) { // single variable
@@ -233,8 +237,8 @@ var ceme = function () {
             } else if (x === 'list') {
                 return _array(tree.slice(1, tree.length));
             } else if (x === 'function') {
-                if (!tree[1][0].name) {
-                    error('Function parameters not defined');
+                if (typeof tree[1][0] === 'undefined') {
+                    throw new CustomException ('Function parameters not defined at line ' + lineno);
                 }
                 if (tree[1][0].name === 'unnamed') {
                     var pms, bdy;
@@ -266,7 +270,7 @@ var ceme = function () {
                     called[i] = compile(called[i]);
                     if (isCurryDot(called[i])) {
                         curry = true;
-                        var temp = new Symbol(unique());
+                        var temp = new Symbol(unique(), 0);
                         params.push(temp);
                         called[i] = compile(temp);
                     }
@@ -382,7 +386,7 @@ var ceme = function () {
                         } else if (res === 'empty-list') {
                             tokens.push('[]');
                         } else if (i === 'SYMBOL') {
-                            var symbol = new Symbol(res);
+                            var symbol = new Symbol(res, lineno);
                             tokens.push(symbol);
                         } else if (i === 'STRING') {
                             tokens.push(res);
@@ -734,8 +738,9 @@ var ceme = function () {
     /* Helper
     /*********************************************************************************************/
 
-    var Symbol = function (name) {
+    var Symbol = function (name, lineno) {
         this.name = name;
+        this.lineno = lineno;
     }
 
     var isSymbol = function (a) {
@@ -787,7 +792,7 @@ var ceme = function () {
             result = result.replace(/_/g, '__');
             result = result.replace(/-/g, '_d');
             result = result.replace(/\?/g, '_q');
-            return new Symbol(result);
+            return new Symbol(result, 0);
         }
     }
 
