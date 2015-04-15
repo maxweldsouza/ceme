@@ -58,6 +58,9 @@ class DatabaseConnection:
 
 db = DatabaseConnection()
 
+def json_output(obj):
+    return json.dumps(obj, default=date_handler)
+
 def date_handler(obj):
         return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 
@@ -206,9 +209,9 @@ def get_history(name, limit):
     if not entries:
         raise EntryNotFound('No more pages to show')
     for entry in entries:
-        somedict = { "id": entry[0], "user": entry[1], "timestamp": entry[2], }
-        arr.append(somedict)
-    return json.dumps(arr, default=date_handler)
+        tmpobj = { "id": entry[0], "user": entry[1], "timestamp": entry[2], }
+        arr.append(tmpobj)
+    return json_output(arr)
 
 def get_diff(name, first, second):
     validate_name(name)
@@ -217,7 +220,18 @@ def get_diff(name, first, second):
     snd = db.get_one('SELECT page_id, page_content, page_timestamp FROM pages'
             ' WHERE page_name = %s AND page_id = %s', (name, second))
     if fst and snd:
-        somedict = [{ "id": fst[0], "content": fst[1], "timestamp": fst[2] },{ "id": snd[0], "content": snd[1], "timestamp": snd[2] }]
-        return json.dumps(somedict, default=date_handler)
+        tmpobj = [{ "id": fst[0], "content": fst[1], "timestamp": fst[2] },{ "id": snd[0], "content": snd[1], "timestamp": snd[2] }]
+        return json_output(tmpobj)
     else:
         raise InvalidInput('Page with the given id or name does not exist')
+
+def search(query):
+    entries = db.get_all('SELECT DISTINCT page_name FROM pages'
+            ' WHERE page_content LIKE %s LIMIT 10', (query, ))
+    arr = []
+    if not entries:
+        raise EntryNotFound('No results found')
+    for entry in entries:
+        tmpobj = { "name": entry[0] }
+        arr.append(tmpobj)
+    return json_output(arr)
