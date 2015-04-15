@@ -533,7 +533,7 @@ div
                     'panel'
             Formatter
                 '''
-                <form action="/api/" method="post" id="submit-form">
+                <form action="/api" method="post" id="submit-form">
                 <div class="btn-group pull-right" role="group">
                     <div class="btn btn-default" id="ceme-run">Run</div>
                     <button id="ceme-save" class="btn btn-default" type="submit">Save</button>

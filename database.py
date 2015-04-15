@@ -204,7 +204,7 @@ def get_history(name, limit):
             ' WHERE page_name = %s LIMIT %s', (name, int(limit)))
     arr = []
     if not entries:
-        raise EntryNotFound
+        raise EntryNotFound('No more pages to show')
     for entry in entries:
         somedict = { "id": entry[0], "user": entry[1], "timestamp": entry[2], }
         arr.append(somedict)

@@ -88,7 +88,7 @@ var Router = function () {
             // TODO not for GET forms
             var url = $(this).attr('action');
             if ($(this).attr('method') === 'post') {
-                if (url.indexOf('/api/') === 0) {
+                if (url.indexOf('/api') === 0) {
                     e.preventDefault();
                     $.ajax({
                         url: url,
@@ -104,7 +104,7 @@ var Router = function () {
                             } else if (jqXHR.status == 400) {
                                 ceme.error(jqXHR.responseText);
                             } else {
-                                ceme.error('Unexpected error');
+                                ceme.error('Unexpected error status:' + jqXHR.status);
                             }
                         }
                     }).done(function (response) {

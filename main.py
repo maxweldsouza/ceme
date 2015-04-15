@@ -33,7 +33,7 @@ class LoginHandler(tornado.web.RequestHandler):
     have common ajax code for all forms."""
     def get(self):
         self.xsrf_token
-        self.render("index.html")
+        self.render('index.html')
 
     def post(self):
         try:
@@ -51,7 +51,7 @@ class LoginHandler(tornado.web.RequestHandler):
 class LogoutHandler(tornado.web.RequestHandler):
     def get(self):
         self.xsrf_token
-        self.render("index.html")
+        self.render('index.html')
 
     def post(self):
         self.clear_cookie(config.xsrf_cookie)
@@ -60,7 +60,7 @@ class LogoutHandler(tornado.web.RequestHandler):
 class SignupHandler(tornado.web.RequestHandler):
     def get(self):
         self.xsrf_token
-        self.render("index.html")
+        self.render('index.html')
 
     def post(self):
         try:
@@ -87,7 +87,7 @@ class UserHandler(tornado.web.RequestHandler):
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
         self.xsrf_token
-        self.render("index.html")
+        self.render('index.html')
 
 class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
@@ -96,8 +96,8 @@ class ErrorHandler(tornado.web.ErrorHandler):
 def ceme_file(self, path):
     try:
         code = database.read_page(path)
-        self.set_header("X-Robots-Tag", "noindex")
-        self.set_header("Content-Type", "text/plain; charset=UTF-8")
+        self.set_header('X-Robots-Tag', 'noindex')
+        self.set_header('Content-Type', 'text/plain; charset=UTF-8')
         self.write(code)
     except EntryNotFound:
         self.set_status(404)
@@ -113,7 +113,7 @@ class CodeHandler(tornado.web.RequestHandler):
 class CreateHandler(tornado.web.RequestHandler):
     def get(self):
         self.xsrf_token
-        self.render("index.html")
+        self.render('index.html')
 
     def post(self):
         """ redirects after post """
@@ -136,26 +136,28 @@ class CreateHandler(tornado.web.RequestHandler):
 class SaveHandler(tornado.web.RequestHandler):
     def get(self, path):
         self.xsrf_token
-        self.render("index.html")
+        self.render('index.html')
 
     def post(self):
         """ post using ajax """
 
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
-        action = self.get_argument("action")
+        action = self.get_argument('action')
         try:
             if action == 'history':
-                    name = self.get_argument("name", '')
-                    limit = self.get_argument("limit", "20")
-                    self.set_header("Content-Type", "application/json")
-                    self.write(database.get_history(name, limit))
+                name = self.get_argument('name', '')
+                limit = self.get_argument('limit', '20')
+                self.set_header('Content-Type', 'application/json')
+                self.write(database.get_history(name, limit))
             elif action == 'diff':
-                    name = self.get_argument("name")
-                    first = self.get_argument("first")
-                    second = self.get_argument("second")
-                    self.set_header("Content-Type", "application/json")
-                    self.write(database.get_diff(name, first, second))
+                name = self.get_argument('name')
+                first = self.get_argument('first')
+                second = self.get_argument('second')
+                self.set_header('Content-Type', 'application/json')
+                self.write(database.get_diff(name, first, second))
+            elif action == 'search':
+                query = self.get_argument('query')
             else:
                 raise InvalidInput('Invalid action')
         except InvalidInput, e:
@@ -168,7 +170,7 @@ class ApiHandler(tornado.web.RequestHandler):
             internal_error(self, e)
 
     def post(self):
-        action = self.get_argument("action")
+        action = self.get_argument('action')
         name = self.get_argument('name', '')
         content = self.get_argument('content', '')
         ip = self.request.remote_ip
@@ -200,18 +202,17 @@ settings = {
 
 # Urls starting with api are for ajax requests.
 application = tornado.web.Application([
-    (r"/login", LoginHandler),
-    (r"/logout", LogoutHandler),
-    (r"/create", CreateHandler),
-    (r"/sign-up", SignupHandler),
-    (r"/api/save", SaveHandler),
-    (r"/api", ApiHandler),
-    (r"/code/(.*)", CodeHandler),
-    (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),
-    (r"/(.*)", MainHandler),
+    (r'/login', LoginHandler),
+    (r'/logout', LogoutHandler),
+    (r'/create', CreateHandler),
+    (r'/sign-up', SignupHandler),
+    (r'/api', ApiHandler),
+    (r'/code/(.*)', CodeHandler),
+    (r'/assets/(.*)',tornado.web.StaticFileHandler, {'path': './assets'},),
+    (r'/(.*)', MainHandler),
     ], **settings)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     server = HTTPServer(application, ssl_options = {
         'certfile': os.path.join('certs/localhost.crt'),
         'keyfile': os.path.join('certs/localhost.key'),
