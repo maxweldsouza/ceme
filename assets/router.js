@@ -162,6 +162,7 @@ var Router = function () {
             mode: "text/html",
             tabSize: 4,
             indentUnit: 4,
+            vimMode: true,
             extraKeys: {
                 "Tab": "indentMore",
                 "Shift-Tab": "indentLess",
@@ -179,6 +180,7 @@ var Router = function () {
         $('.ceme-btn-page').removeClass('active');
         $('.ceme-btn-code').removeClass('active');
         $('.ceme-btn-both').removeClass('active');
+        editor.refresh();
         if (mode === 'view') {
             $('.ceme-btn-page').addClass('active');
             $('#ceme-code').hide();

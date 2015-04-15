@@ -140,30 +140,24 @@ class SaveHandler(tornado.web.RequestHandler):
 
     def post(self):
         """ post using ajax """
-        try:
-            name = self.get_argument('name', '')
-            content = self.get_argument('content', '')
-            ip = self.request.remote_ip
-            username = self.get_secure_cookie(config.xsrf_cookie)
-            database.save_page(name, content, ip, username)
-            self.write('The page has been saved successfully')
 
-        except NoRights as e:
-            self.set_status(400)
-            self.write(str(e))
-        except InvalidInput as e:
-            self.set_status(400)
-            self.write(str(e))
-        except Exception, e:
-            internal_error(self, e)
-
-class HistoryHandler(tornado.web.RequestHandler):
-    def get(self, path):
+class ApiHandler(tornado.web.RequestHandler):
+    def get(self):
+        action = self.get_argument("action")
         try:
-            name = self.get_argument("name", '')
-            limit = self.get_argument("limit", "20")
-            self.set_header("Content-Type", "application/json")
-            self.write(database.get_history(name, limit))
+            if action == 'history':
+                    name = self.get_argument("name", '')
+                    limit = self.get_argument("limit", "20")
+                    self.set_header("Content-Type", "application/json")
+                    self.write(database.get_history(name, limit))
+            elif action == 'diff':
+                    name = self.get_argument("name")
+                    first = self.get_argument("first")
+                    second = self.get_argument("second")
+                    self.set_header("Content-Type", "application/json")
+                    self.write(database.get_diff(name, first, second))
+            else:
+                raise InvalidInput('Invalid action')
         except InvalidInput, e:
             self.set_status(400)
             self.write(str(e))
@@ -173,16 +167,27 @@ class HistoryHandler(tornado.web.RequestHandler):
         except Exception, e:
             internal_error(self, e)
 
-class DiffHandler(tornado.web.RequestHandler):
-    def get(self, path):
-        try:
-            name = self.get_argument("name")
-            first = self.get_argument("first")
-            second = self.get_argument("second")
-            self.set_header("Content-Type", "application/json")
-            self.write(database.get_diff(name, first, second))
-        except Exception, e:
-            internal_error(self, e)
+    def post(self):
+        action = self.get_argument("action")
+        name = self.get_argument('name', '')
+        content = self.get_argument('content', '')
+        ip = self.request.remote_ip
+        username = self.get_secure_cookie(config.xsrf_cookie)
+        if action == 'save':
+            try:
+                database.save_page(name, content, ip, username)
+                self.write('The page has been saved successfully')
+
+            except NoRights as e:
+                self.set_status(400)
+                self.write(str(e))
+            except InvalidInput as e:
+                self.set_status(400)
+                self.write(str(e))
+            except Exception, e:
+                internal_error(self, e)
+        else:
+            raise InvalidInput('Invalid action')
 
 settings = {
     'default_handler_class': ErrorHandler,
@@ -200,8 +205,7 @@ application = tornado.web.Application([
     (r"/create", CreateHandler),
     (r"/sign-up", SignupHandler),
     (r"/api/save", SaveHandler),
-    (r"/api/history(.*)", HistoryHandler),
-    (r"/api/diff(.*)", DiffHandler),
+    (r"/api", ApiHandler),
     (r"/code/(.*)", CodeHandler),
     (r"/assets/(.*)",tornado.web.StaticFileHandler, {"path": "./assets"},),
     (r"/(.*)", MainHandler),

@@ -170,3 +170,10 @@ cemeEnv.ResetTransform = function (x, y) {
 cemeEnv.GlobalAlpha = function (alpha) {
     ctx.alpha = alpha;
 }
+
+cemeEnv.SaveTransform = function () {
+    ctx.save();
+}
+cemeEnv.RestoreTransform = function () {
+    ctx.restore();
+}

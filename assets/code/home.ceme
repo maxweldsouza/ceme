@@ -533,7 +533,7 @@ div
                     'panel'
             Formatter
                 '''
-                <form action="/api/save" method="post" id="submit-form">
+                <form action="/api/" method="post" id="submit-form">
                 <div class="btn-group pull-right" role="group">
                     <div class="btn btn-default" id="ceme-run">Run</div>
                     <button id="ceme-save" class="btn btn-default" type="submit">Save</button>
@@ -542,6 +542,7 @@ div
                 <h2>Code</h2>
                 <div style="width:100%;margin-top:20px;">
                 <textarea name="content" style="width:100%" id="ceme-input" ></textarea>
+                <input type="hidden" name="action" value="save">
                 <input type="hidden" name="name" id="ceme-page-name">
                 </div>
                 </form>
