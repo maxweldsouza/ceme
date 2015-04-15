@@ -158,7 +158,7 @@ class ApiHandler(tornado.web.RequestHandler):
                 self.write(database.get_diff(name, first, second))
             elif action == 'search':
                 query = self.get_argument('query')
-                self.write(database.search('%' + query + '%'))
+                self.write(database.search(query))
             else:
                 raise InvalidInput('Invalid action')
         except InvalidInput, e:

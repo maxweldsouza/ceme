@@ -218,12 +218,12 @@ var ceme = function () {
                 if (cemeEnv.IsAtom(tree[1])) { // single variable
                     cemeEnv[unsymbol(tree[1])] = "";
                     return wrapdefines(_global(tree[1], tree[2]));
-                } else {
-                    cemeEnv[unsymbol(tree[1][0])] = "";
-                    return wrapdefines(_globalfunction (tree[1][0],
-                                tree[1].slice(1,tree[1].length),
-                                compile(tree[2])));
                 }
+                // function definition
+                cemeEnv[unsymbol(tree[1][0])] = "";
+                return wrapdefines(_globalfunction (tree[1][0],
+                            tree[1].slice(1,tree[1].length),
+                            compile(tree[2])));
             } else if (x === 'import') {
                 return new Box('""', '');
             } else if (x === 'macro') {
@@ -233,14 +233,21 @@ var ceme = function () {
             } else if (x === 'list') {
                 return _array(tree.slice(1, tree.length));
             } else if (x === 'function') {
-                var pms, bdy;
-                if (tree[1].length > 1) {
-                    pms = tree[1].slice(1,tree[1].length);
-                } else {
-                    pms = false;
+                if (tree[1][0].name === 'unnamed') {
+                    var pms, bdy;
+                    if (tree[1].length > 1) {
+                        pms = tree[1].slice(1,tree[1].length);
+                    } else {
+                        pms = false;
+                    }
+                    bdy = compile(tree[2]);
+                    return _lambda (pms, bdy);
                 }
-                bdy = compile(tree[2]);
-                return _lambda (pms, bdy);
+                // TODO remove duplicate function definition
+                cemeEnv[unsymbol(tree[1][0])] = "";
+                return wrapdefines(_globalfunction (tree[1][0],
+                            tree[1].slice(1,tree[1].length),
+                            compile(tree[2])));
             } else if (x === 'if') {
                 for (i = 1; i < tree.length; i++) {
                     tree[i] = compile(tree[i]);
