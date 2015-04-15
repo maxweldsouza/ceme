@@ -162,7 +162,7 @@ var Router = function () {
             mode: "text/html",
             tabSize: 4,
             indentUnit: 4,
-            vimMode: true,
+            vimMode: false,
             extraKeys: {
                 "Tab": "indentMore",
                 "Shift-Tab": "indentLess",

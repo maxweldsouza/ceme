@@ -1,6 +1,6 @@
 import
     'css'
-define
+function
     Example
         x
     +
@@ -15,7 +15,7 @@ define
             code
                 EvalString
                     x
-define
+function
     Code
         x
     +
@@ -24,7 +24,7 @@ define
         pre
             code
                 x
-define
+function
     Link
         url
         name
@@ -34,7 +34,7 @@ define
                 href
                     url
             name
-define
+function
     Alert
         x
         y
@@ -110,7 +110,7 @@ define
 define
     DANGER_COLOR_DARK
     '#ce3323'
-define
+function
     ButtonStyling
         btnclass
         base
@@ -369,7 +369,7 @@ define
                 '.bulleted-list > li'
                 'margin-bottom: 0.75em;list-style-type:disc;'
             #DEBUG_CSS
-define
+function
     Panel
         x
     div
@@ -553,7 +553,7 @@ div
     <form action="/logout" method="post" id="logout-form">
     </form>
     '''
-define
+function
     FooterLink
         x
         y
@@ -566,7 +566,7 @@ define
                 href
                     x
             y
-define
+function
     FooterSocial
         x
         y
