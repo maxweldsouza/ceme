@@ -229,6 +229,8 @@ var ceme = function () {
                 return wrapdefines(_globalfunction (tree[1][0],
                             tree[1].slice(1,tree[1].length),
                             compile(tree[2])));
+            } else if (x === 'program') {
+                return _program(tree.slice(1, tree.length));
             } else if (x === 'set') {
                 return _set(tree[1], tree[2]);
             } else if (x === 'while') {
@@ -610,6 +612,23 @@ var ceme = function () {
     }
 
     var _while = function (tree) {
+    }
+
+    var _program = function (tree) {
+        var i;
+        var value = '';
+        var hoist = '';
+        for (i = 0; i < tree.length; i++) {
+            tree[i] = compile(tree[i]);
+            if (i === tree.length - 1) {
+                value += tree[i].value;
+            } else {
+                hoist += _statement(tree[i].value);
+                hoist += '\n';
+            }
+            hoist += tree[i].hoist;
+        }
+        return new Box(value, hoist);
     }
 
     var _if  = function (name, tree) {
