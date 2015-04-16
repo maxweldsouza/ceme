@@ -224,10 +224,18 @@ var ceme = function () {
                     return wrapdefines(_global(tree[1], tree[2]));
                 }
                 // function definition
+                console.log('function definition using define deprecated at line ' + lineno);
                 cemeEnv[unsymbol(tree[1][0])] = "";
                 return wrapdefines(_globalfunction (tree[1][0],
                             tree[1].slice(1,tree[1].length),
                             compile(tree[2])));
+            } else if (x === 'set') {
+                return _set(tree[1], tree[2]);
+            } else if (x === 'while') {
+                for (i = 1; i < tree.length; i++) {
+                    tree[i] = compile(tree[i]);
+                }
+                return _while (tree);
             } else if (x === 'import') {
                 return new Box('""', '');
             } else if (x === 'macro') {
@@ -240,7 +248,10 @@ var ceme = function () {
                 if (typeof tree[1][0] === 'undefined') {
                     throw new CustomException ('Function parameters not defined at line ' + lineno);
                 }
-                if (tree[1][0].name === 'unnamed') {
+                if (tree[1][0].name === 'params') {
+                    console.log('lambda usings params at line ' + lineno);
+                }
+                if (tree[1][0].name === 'unnamed' || tree[1][0].name === 'params') {
                     var pms, bdy;
                     if (tree[1].length > 1) {
                         pms = tree[1].slice(1,tree[1].length);
@@ -573,6 +584,15 @@ var ceme = function () {
         return new Box(result, val.hoist);
     }
 
+    var _set = function (name, value) {
+        var result = '';
+        var val = compile(value);
+        result += unsymbol(name);
+        result += " = ";
+        result += val.value;
+        return new Box(result, val.hoist);
+    }
+
     var _let  = function (tree) {
         var value = '';
         var hoist = '';
@@ -587,6 +607,9 @@ var ceme = function () {
         var last = compile(tree[nooflets - 1]);
         hoist += last.hoist;
         return new Box(last.value , hoist);
+    }
+
+    var _while = function (tree) {
     }
 
     var _if  = function (name, tree) {
@@ -901,23 +924,30 @@ var ceme = function () {
         for (i = 0; i < this.children.length; i++) {
             this.children[i].importAll();
         }
+        // TODO special code for importing
         compileText(this.code);
     }
 
-    var asyncCompiler = function (filename, callback, code) {
+    var asyncCompiler = function (filename, params) {
+        // This function has two callbacks
+        // first one will run just before compilation
+        // second one will run just after compilation
         var mainFile = new FileImports(filename, function () {
             if (mainFile.checkAllDone() && !mainFile.executed) {
+                if (params.callbackbeforecompile) {
+                    params.callbackbeforecompile(mainFile.code);
+                }
                 mainFile.importAll();
                 var output = compileTree(mainFile.tree);
-                callback(mainFile.code, output);
+                params.callback(mainFile.code, output);
                 mainFile.executed = true;
             }
         });
-        if (typeof code !== 'undefined') {
-            var tree = textToParseTree(code);
+        if (typeof params.code !== 'undefined') {
+            var tree = textToParseTree(params.code);
             var imports = getImports(tree);
             var i;
-            mainFile.code = code;
+            mainFile.code = params.code;
             mainFile.done = true;
             mainFile.tree = tree;
             for (i = 0; i < imports.length; i++) {

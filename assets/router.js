@@ -63,12 +63,15 @@ var Router = function () {
         var outputelem = $('#ceme-output');
         outputelem.empty();
 
-        ceme.asyncCompiler('', function (code, output) {
-            outputelem.html(output).fadeIn(300);
-            if (currentMode === 'edit') {
-                changeMode('view');
-            }
-        }, text);
+        ceme.asyncCompiler('', {
+            callback: function (code, output) {
+                outputelem.html(output).fadeIn(300);
+                if (currentMode === 'edit') {
+                    changeMode('view');
+                }
+            },
+            code: text,
+        });
 
         try {
         } catch (err) {
@@ -199,16 +202,18 @@ var Router = function () {
     var editor;
 
     var firstLoad = function() {
-        ceme.asyncCompiler('/assets/code/home.ceme', function (code, output) {
-            $('body').show();
-            $('#page-container').hide().html(output).fadeIn(300);
+        ceme.asyncCompiler('/assets/code/home.ceme', {
+            callback: function (code, output) {
+                $('body').show();
+                $('#page-container').hide().html(output).fadeIn(300);
 
-            var mainarea = document.getElementById("ceme-input");
-            editor = makeEditor(mainarea);
+                var mainarea = document.getElementById("ceme-input");
+                editor = makeEditor(mainarea);
 
-            $("#mobile-menu").mmenu();
+                $("#mobile-menu").mmenu();
 
-            Router.route(window.location.pathname + window.location.search);
+                Router.route(window.location.pathname + window.location.search);
+            }
         });
     }
 
@@ -224,17 +229,21 @@ var Router = function () {
         }
 
         $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
-        ceme.asyncCompiler('/code/' + pagename, function (code, output) {
+        ceme.asyncCompiler('/code/' + pagename, {
+            callback: function (code, output) {
 
-            editor.setValue(code);
-            changeMode('view');
+                runCode();
 
-            runCode();
-
-            if (document.cookie.indexOf('sodfksoihasg') > 0) {
-                $('.login-logout').html('<li><a href="#" id="logout" >Log Out</a></li>');
-            } else {
-                $('.login-logout').html('<li><a href="/login">Login</a></li><li><a href="/sign-up">Sign Up</a></li>');
+                if (document.cookie.indexOf('sodfksoihasg') > 0) {
+                    $('.login-logout').html('<li><a href="#" id="logout" >Log Out</a></li>');
+                } else {
+                    $('.login-logout').html('<li><a href="/login">Login</a></li><li><a href="/sign-up">Sign Up</a></li>');
+                }
+            },
+            callbackbeforecompile: function (code) {
+                // runs before compilation
+                editor.setValue(code);
+                changeMode('view');
             }
         });
 

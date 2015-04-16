@@ -317,7 +317,7 @@ var cemeEnv = function() {
 
             'Formatter': Formatter,
             'Print': function (a) {
-                //console.log(a);
+                console.log(a);
                 return '';
             },
 
