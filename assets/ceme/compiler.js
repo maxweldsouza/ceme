@@ -213,12 +213,6 @@ var ceme = function () {
                 } else {
                     throw new CustomException ('Syntax error in define at line ' + lineno);
                 }
-                // TODO remove function definition
-                console.log('function definition using define deprecated at line ' + lineno);
-                cemeEnv[unsymbol(tree[1][0])] = "";
-                return wrapdefines(_globalfunction (tree[1][0],
-                            tree[1].slice(1,tree[1].length),
-                            compile(tree[2])));
             } else if (x === 'group') {
                 return _group(tree.slice(1, tree.length));
             } else if (x === '=') {
