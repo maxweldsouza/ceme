@@ -45,16 +45,6 @@ var ceme = function () {
     } else {
     }
 
-    // TODO remove
-    var evalInEnv = function (env, src) {
-        if (platform() === 'nodejs') {
-            return eval(src);
-        } else {
-            src.replace('\r\n', '\n');
-            return eval(src);
-        }
-    };
-
     // TODO make safe
     var fetchFile = function (fileName) {
         if (platform() === 'nodejs') {
@@ -120,7 +110,7 @@ var ceme = function () {
             try {
                 var code = _expression(_unbox(compile(tree[i])));
                 input += code;
-                tmp = evalInEnv(cemeEnv, code);
+                tmp = eval(code);
                 if (typeof tmp === 'undefined') {
                 } else if (IsArray(tmp)) {
                     output += NestedArrayToString(tmp);
