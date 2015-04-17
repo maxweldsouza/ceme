@@ -210,6 +210,8 @@ var ceme = function () {
                 if (cemeEnv.IsAtom(tree[1])) { // single variable
                     cemeEnv[unsymbol(tree[1])] = "";
                     return wrapdefines(_global(tree[1], tree[2]));
+                } else {
+                    throw new CustomException ('Syntax error in define at line ' + lineno);
                 }
                 // TODO remove function definition
                 console.log('function definition using define deprecated at line ' + lineno);
@@ -232,8 +234,8 @@ var ceme = function () {
             } else if (x === 'list') {
                 return _array(tree.slice(1, tree.length));
             } else if (x === 'function') {
-                if (typeof tree[1][0] === 'undefined') {
-                    throw new CustomException ('Function parameters not defined at line ' + lineno);
+                if (!isSymbol(tree[1][0])) {
+                    throw new CustomException ('Syntax error in function definition at line ' + lineno);
                 }
                 if (tree[1][0].name === 'params') {
                     console.log('lambda usings params at line ' + lineno);
