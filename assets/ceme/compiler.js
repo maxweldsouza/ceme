@@ -402,7 +402,7 @@ var ceme = function () {
 
             // check whether stuck in infinite loop
             if (input.length === length) {
-                error('Check your quotes. Lexer stuck in infinite loop', lineno);
+                error('Check your quotes. Lexer is stuck', lineno);
             } else {
                 length = input.length;
             }

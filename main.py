@@ -99,9 +99,9 @@ def ceme_file(self, path):
         self.set_header('X-Robots-Tag', 'noindex')
         self.set_header('Content-Type', 'text/plain; charset=UTF-8')
         self.write(code)
-    except EntryNotFound:
+    except (EntryNotFound, InvalidInput), e:
         self.set_status(404)
-        self.write('404: No such page exists')
+        self.write('Page not found 404')
     except Exception, e:
         internal_error(self, e)
 
