@@ -496,9 +496,7 @@ var ceme = function () {
         };
 
     var _infix = function (name, a, b) {
-        var result = '';
-        result +='( '
-                + a.value
+        var result = '( ' + a.value
                 + ' '
                 + name
                 + ' '
@@ -552,42 +550,27 @@ var ceme = function () {
 
     var _cemeVar  = function (a) {
         if (a in cemeEnv) {
-            var result = '';
-            result += "cemeEnv['";
-            result += a;
-            result += "']";
-            return result;
+            return "cemeEnv['" + a + "']";
         } else {
             return a;
         }
     }
 
     var _global  = function (name, value) {
-        var result = '';
         var val = compile(value);
-        result += unsymbol(name);
-        result += " = ";
-        result += val.value;
-        result += ';';
+        var result = unsymbol(name) + " = " + val.value + ';';
         return new Box(result, val.hoist);
     }
 
     var _local  = function (name, value) {
-        var result = '';
         var val = compile(value);
-        result += "var ";
-        result += name;
-        result += " = ";
-        result += val.value;
+        var result = "var " + name + " = " + val.value;
         return new Box(result, val.hoist);
     }
 
     var _set = function (name, value) {
-        var result = '';
         var val = compile(value);
-        result += unsymbol(name);
-        result += " = ";
-        result += val.value;
+        var result = unsymbol(name) + " = " + val.value;
         return new Box(result, val.hoist);
     }
 
