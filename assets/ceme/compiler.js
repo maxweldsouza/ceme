@@ -752,11 +752,6 @@ var ceme = function () {
         return result;
     }
 
-    var importFile = function (file) {
-        var text = fetchFile(file);
-        compileText(text);
-    }
-
     /*********************************************************************************************/
     /* Helper
     /*********************************************************************************************/
@@ -961,7 +956,6 @@ var ceme = function () {
         'lexer': lexer,
         'Symbol': Symbol,
         'isSymbol': isSymbol,
-        'importFile': importFile,
         'compileText': compileText,
         'compileFile' : compileFile,
         'asyncCompiler' : asyncCompiler,
@@ -976,7 +970,6 @@ var ceme = function () {
     exports.lexer = ceme.lexer;
     exports.Symbol = ceme.Symbol;
     exports.isSymbol = ceme.isSymbol;
-    exports.importFile = ceme.importFile;
     exports.compileFile = ceme.compileFile;
     exports.compileText = ceme.compileText;
     exports.asyncCompiler = ceme.asyncCompiler;
