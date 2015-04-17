@@ -436,7 +436,7 @@ var ceme = function () {
             'SPACE': /(^ +)|(^\r\n+)|(^\n+)|(^\r+)/,
             'INDENT': /^\(/,
             'DEDENT': /^\)/,
-            'LONGSTRING': /^"""[^"""]*"""|^'''[^''']*'''/,
+            'LONGSTRING': /^"""([^"]|\\")*"""|^'''([^']|\\')*'''/,
             'STRING': reShortString()
         };
         return regs;
