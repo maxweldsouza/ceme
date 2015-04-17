@@ -223,21 +223,18 @@ var ceme = function () {
                     cemeEnv[unsymbol(tree[1])] = "";
                     return wrapdefines(_global(tree[1], tree[2]));
                 }
-                // function definition
+                // TODO remove function definition
                 console.log('function definition using define deprecated at line ' + lineno);
                 cemeEnv[unsymbol(tree[1][0])] = "";
                 return wrapdefines(_globalfunction (tree[1][0],
                             tree[1].slice(1,tree[1].length),
                             compile(tree[2])));
-            } else if (x === 'program') {
-                return _program(tree.slice(1, tree.length));
-            } else if (x === 'set') {
+            } else if (x === 'group') {
+                return _group(tree.slice(1, tree.length));
+            } else if (x === '=') {
                 return _set(tree[1], tree[2]);
             } else if (x === 'while') {
-                for (i = 1; i < tree.length; i++) {
-                    tree[i] = compile(tree[i]);
-                }
-                return _while (tree);
+                return _while(tree.slice(1, tree.length));
             } else if (x === 'import') {
                 return new Box('""', '');
             } else if (x === 'macro') {
@@ -263,7 +260,6 @@ var ceme = function () {
                     bdy = compile(tree[2]);
                     return _lambda (pms, bdy);
                 }
-                // TODO remove duplicate function definition
                 cemeEnv[unsymbol(tree[1][0])] = "";
                 return wrapdefines(_globalfunction (tree[1][0],
                             tree[1].slice(1,tree[1].length),
@@ -612,9 +608,22 @@ var ceme = function () {
     }
 
     var _while = function (tree) {
+        var i;
+        var value = '';
+        var hoist = '';
+        var result;
+        result = 'while (' + compile(tree[0]).value + ') \n';
+        for (i = 1; i < tree.length; i++) {
+            tree[i] = compile(tree[i]);
+            value += _statement(tree[i].value);
+            value += '\n';
+            hoist += tree[i].hoist;
+        }
+        result = result + _block(value);
+        return new Box(result, hoist);
     }
 
-    var _program = function (tree) {
+    var _group = function (tree) {
         var i;
         var value = '';
         var hoist = '';
@@ -666,20 +675,15 @@ var ceme = function () {
 
     var _array  = function (values) {
         var i;
+        var vals = [];
+        var hoists = [];
         for (i = 0; i < values.length; i++) {
-            values[i] = compile(values[i]);
+            vals.push(compile(values[i]));
+            vals[i] = (vals[i].value);
+            hoists.push(values[i].hoist);
         }
-        var result = '';
-        var hoist = ''
-            result += '[';
-        result += values[0].value;
-        hoist += values[0].hoist;
-        for (i = 1; i < values.length; i++) {
-            result += ', ' + values[i].value;
-            hoist += values[i].hoist;
-        }
-        result += ']';
-        return new Box( result, hoist);
+        return new Box('[' + vals.join(', ') + ']',
+                hoists.join(''));
     }
 
     // Non hoisted
@@ -690,12 +694,17 @@ var ceme = function () {
         }
         var i;
         var result = ' ';
-        result += escapeSymbol(params[0]).name;
-        for (i = 1; i < params.length; i++) {
-            result += ', ' + escapeSymbol(params[i]).name;
+        var temp = [];
+        for (i = 0; i < params.length; i++) {
+            temp.push(escapeSymbol(params[i]).name);
         }
-        result += ' ';
-        return result;
+        if (temp[0] === '*args') {
+            // TODO variable arguments
+        } else {
+            result += temp.join(', ');
+            result += ' ';
+            return result;
+        }
     }
 
     // 'param0, param1, param2'
