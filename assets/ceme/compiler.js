@@ -43,7 +43,7 @@ var ceme = function () {
         cemeEnv = lib.cemeEnv;
     }
 
-    // TODO make safe
+    // TODO unused
     var fetchFile = function (fileName) {
         if (platform() === 'nodejs') {
             var fs = require('fs');
@@ -719,12 +719,6 @@ var ceme = function () {
         return indent + result;
     }
 
-    var compileFile = function (sURL) {
-        var text = fetchFile(sURL);
-        var result = compileText(text);
-        return result;
-    }
-
     var textToParseTree = function (text) {
         var tokens = lexer(text);
         tokens.unshift('(');
@@ -945,7 +939,6 @@ var ceme = function () {
         'Symbol': Symbol,
         'isSymbol': isSymbol,
         'compileText': compileText,
-        'compileFile' : compileFile,
         'asyncCompiler' : asyncCompiler,
         'success': success,
         'warning': warning,
@@ -958,7 +951,6 @@ var ceme = function () {
     exports.lexer = ceme.lexer;
     exports.Symbol = ceme.Symbol;
     exports.isSymbol = ceme.isSymbol;
-    exports.compileFile = ceme.compileFile;
     exports.compileText = ceme.compileText;
     exports.asyncCompiler = ceme.asyncCompiler;
     exports.cemeEnv = cemeEnv;
