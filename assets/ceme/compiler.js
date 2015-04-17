@@ -37,12 +37,10 @@ var ceme = function () {
         }
     }
 
-    // TODO move
     var lib;
     if (platform() === 'nodejs') {
         lib = require('./lib');
         cemeEnv = lib.cemeEnv;
-    } else {
     }
 
     // TODO make safe
