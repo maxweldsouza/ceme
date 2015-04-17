@@ -514,17 +514,13 @@ var ceme = function () {
     }
 
     var _globalfunction  = function (name, params, body) {
-        var result = '';
-        result += unsymbol(name);
-        result += ' = ';
+        var result = unsymbol(name) + ' = ';
         result += _lambda(params, body).value;
         return new Box(result, '');
     }
 
     var _function  = function (name, params, body) {
-        var result = '';
-        result += 'function ';
-        result += name;
+        var result = 'function '+ name;
         result += _functionBody(params, body).value;
         return new Box(result, '');
     }
@@ -676,7 +672,6 @@ var ceme = function () {
             return '';
         }
         var i;
-        var result = ' ';
         var temp = [];
         for (i = 0; i < params.length; i++) {
             temp.push(escapeSymbol(params[i]).name);
@@ -684,24 +679,18 @@ var ceme = function () {
         if (temp[0] === '*args') {
             // TODO variable arguments
         } else {
-            result += temp.join(', ');
-            result += ' ';
-            return result;
+            return ' ' +  temp.join(', ') + ' ';
         }
     }
 
     // 'param0, param1, param2'
     var _args  = function (params) {
         var i;
-        var result = ' ';
-        var hoisted = '';
-        result += params[0].value;
-        for (i = 1; i < params.length; i++) {
-            result += ', ' + params[i].value;
-            hoisted += params[i].value;
+        var vals = [];
+        for (i = 0; i < params.length; i++) {
+            vals.push(params[i].value);
         }
-        result += ' ';
-        return result;
+        return vals.join(', ');
     }
 
     // 'return a'
