@@ -401,7 +401,7 @@ var cemeEnv = function() {
                     } else {
                         i = parseInt(x[1]) + 1;
                         if (i >= args.length) {
-                            throw 'Too few arguments for format string';
+                            throw new Error('Too few arguments for format string');
                         }
                         return args[i];
                     }
