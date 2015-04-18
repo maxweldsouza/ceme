@@ -295,6 +295,9 @@ var cemeEnv = function() {
                 }
                 return result;
             },
+            'ReduceRight': function (f, lst) {
+                return cemeEnv.Reduce(f, cemeEnv.Reverse(lst));
+            },
 
             'Filter': function (f, arg) {
                 return arg.filter(f);
@@ -386,6 +389,25 @@ var cemeEnv = function() {
                 return lst.join(delim);
             },
             'Formatter': Formatter,
+            'Format': function () {
+                var args = arguments;
+                var str = arguments[0];
+                var i;
+                str = str.replace(/\{\{|\}\}|\{(\d+)\}/g, function (x, i) {
+                    if (x === '{{') {
+                        return '{';
+                    } else if (x === '}}') {
+                        return '}'
+                    } else {
+                        i = parseInt(x[1]) + 1;
+                        if (i >= args.length) {
+                            throw 'Too few arguments for format string';
+                        }
+                        return args[i];
+                    }
+                });
+                return str;
+            },
 
             'MaxList': function (a) {
                 var temp = cemeEnv['Reduce'](cemeEnv['Max'], a);
