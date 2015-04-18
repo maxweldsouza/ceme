@@ -10,6 +10,25 @@ var platform  = function () {
     }
 }
 
+// Polyfills
+if (!String.prototype.endsWith) {
+    String.prototype.endsWith = function(searchString, position) {
+        var subjectString = this.toString();
+        if (position === undefined || position > subjectString.length) {
+            position = subjectString.length;
+        }
+        position -= searchString.length;
+        var lastIndex = subjectString.indexOf(searchString, position);
+        return lastIndex !== -1 && lastIndex === position;
+    };
+}
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position) {
+        position = position || 0;
+        return this.lastIndexOf(searchString, position) === position;
+    };
+}
+
 var cemeEnv = function() {
     // Arrays
     var First = function (list) {
@@ -339,26 +358,34 @@ var cemeEnv = function() {
 
             //////// Strings
 
+            'StartsWith': function (str, searchString) {
+                return str.startsWith(searchString);
+            },
+            'EndsWith': function (str, searchString) {
+                return str.endsWith(searchString);
+            },
+            'FindString': function (x, y) {
+                return x.indexOf(y);
+            },
+            'FindStringReverse': function (x, y) {
+                return x.lastIndexOf(y);
+            },
             'Split': function (str, chr) {
                 return str.split(chr);
             },
-            'RemoveAll': function (str, chr) {
-                return str.replace(new RegExp(ch, 'g'),'');
+            'LowerCase': function (str) {
+                return str.toLowerCase();
             },
-
-            'Formatter': Formatter,
-            'Print': function (a) {
-                console.log(a);
-                return '';
+            'UpperCase': function (str) {
+                return str.toUpperCase();
             },
-
+            'Trim': function (str) {
+                return str.trim();
+            },
             'Join': function(lst, delim) {
                 return lst.join(delim);
             },
-            // TODO add to String.prototype
-            'StringStartsWith': function (x, start) {
-                return (this.indexOf(start) > -1);
-            },
+            'Formatter': Formatter,
 
             'MaxList': function (a) {
                 var temp = cemeEnv['Reduce'](cemeEnv['Max'], a);
@@ -368,6 +395,11 @@ var cemeEnv = function() {
                 var temp = cemeEnv['Reduce'](cemeEnv['Min'], a);
                 return temp;
             },
+            'Print': function (a) {
+                console.log(a);
+                return '';
+            },
+
 
             /* MapCar takes a function and a list of lists
             and applies the function successively to the nth element
