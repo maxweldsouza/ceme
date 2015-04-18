@@ -177,9 +177,9 @@ var cemeEnv = function() {
                 return result;
             },
             'Abs': Math.abs,
-            'Acos': Math.acos,
-            'Asin': Math.asin,
-            'Atan': Math.atan,
+            'ArcCos': Math.acos,
+            'ArcSin': Math.asin,
+            'ArcTan': Math.atan,
             'Ceiling': Math.ceil,
             'Exp': Math.exp,
             'Floor': Math.floor,
@@ -193,7 +193,7 @@ var cemeEnv = function() {
             'Tan': Math.tan,
 
 
-            'Sine': function (x) {
+            'Sin': function (x) {
                 var x = x - Math.floor(x);
                 if (x > 0.75) {
                     x -= 1;
@@ -205,7 +205,7 @@ var cemeEnv = function() {
                 }
                 return Math.sin(2 * Math.PI * x);
             },
-            'Cosine': function (x) {
+            'Cos': function (x) {
                 return cemeEnv.Sine(x + 0.25);
             },
 
@@ -352,18 +352,8 @@ var cemeEnv = function() {
                 return '';
             },
 
-            'join': function(a, b) {
-                return a.concat(b);
-            },
             'Join': function(lst, delim) {
-                var i;
-                var result = '';
-                result = lst[0];
-                for (i = 1; i < lst.length; i++) {
-                    result += delim;
-                    result += lst[i];
-                }
-                return result;
+                return lst.join(delim);
             },
             // TODO add to String.prototype
             'StringStartsWith': function (x, start) {
