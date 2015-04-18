@@ -176,6 +176,38 @@ var cemeEnv = function() {
                 }
                 return result;
             },
+            'Abs': Math.abs,
+            'Acos': Math.acos,
+            'Asin': Math.asin,
+            'Atan': Math.atan,
+            'Ceiling': Math.ceil,
+            'Exp': Math.exp,
+            'Floor': Math.floor,
+            'Ln': Math.log,
+            'Max': Math.max,
+            'Min': Math.min,
+            'Power': Math.pow,
+            'Random': Math.random,
+            'Round': Math.round,
+            'Sqrt': Math.sqrt,
+            'Tan': Math.tan,
+
+
+            'Sine': function (x) {
+                var x = x - Math.floor(x);
+                if (x > 0.75) {
+                    x -= 1;
+                } else if (x > 0.5) {
+                    x -= 0.5;
+                    x *= -1;
+                } else if (x > 0.25) {
+                    x -= 0.5;
+                }
+                return Math.sin(2 * Math.PI * x);
+            },
+            'Cosine': function (x) {
+                return cemeEnv.Sine(x + 0.25);
+            },
 
             //////// Arrays
 
@@ -301,7 +333,6 @@ var cemeEnv = function() {
             'ParseInt': function (a) {
                 return parseInt(a);
             },
-            'Floor' : Math.floor,
             '%': function (a, b) {
                 return a % b;
             },
