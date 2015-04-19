@@ -8,6 +8,9 @@ function
             'Example'
         pre
             code
+                attrib
+                    class
+                        "html"
                 x
         h3
             'Output'
