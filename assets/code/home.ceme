@@ -13,8 +13,9 @@ function
             'Output'
         pre
             code
-                EvalString
-                    x
+                EscapeHtml
+                    EvalString
+                        x
 function
     Code
         x

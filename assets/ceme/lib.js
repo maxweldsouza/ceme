@@ -421,7 +421,14 @@ var cemeEnv = function() {
                 console.log(a);
                 return '';
             },
-
+            'EscapeHtml': function (unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            },
 
             /* MapCar takes a function and a list of lists
             and applies the function successively to the nth element
