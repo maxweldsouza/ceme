@@ -103,7 +103,7 @@ var cemeEnv = function() {
     }
 
     var Formatter = function () {
-        // TODO check if typeof string
+        console.log('Dont use formatter, use format instead');
         var str = arguments[0];
         var i;
         for (i = 1; i < arguments.length; i++) {

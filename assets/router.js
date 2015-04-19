@@ -210,7 +210,11 @@ var Router = function () {
                 var mainarea = document.getElementById("ceme-input");
                 editor = makeEditor(mainarea);
 
-                $("#mobile-menu").mmenu();
+                $("#mobile-menu").mmenu({
+                    onClick: {
+                        close: true
+                    }
+                });
 
                 Router.route(window.location.pathname + window.location.search);
             }
