@@ -156,10 +156,15 @@ var Router = function () {
                 }, 0);
             }
         });
+
+        $(document).on("click"), "#ceme-save", function () {
+            $("#ceme-input").val(editor.getSession().getValue());
+        }
     }
 
     var makeEditor = function (elem) {
         var editor;
+        /*
         var myCodeMirror = CodeMirror.fromTextArea(elem, {
             lineNumbers: true,
             mode: "text/html",
@@ -173,6 +178,7 @@ var Router = function () {
                 "Shift-Ctrl-Down": "swapLineDown"
             }
         });
+        */
         //myCodeMirror.setSize(550, 700);
         return myCodeMirror;
     }
@@ -183,7 +189,7 @@ var Router = function () {
         $('.ceme-btn-page').removeClass('active');
         $('.ceme-btn-code').removeClass('active');
         $('.ceme-btn-both').removeClass('active');
-        editor.refresh();
+        //editor.refresh();
         if (mode === 'view') {
             $('.ceme-btn-page').addClass('active');
             $('#ceme-code').hide();
@@ -197,6 +203,7 @@ var Router = function () {
             $('#ceme-output').fadeIn();
             $('#ceme-code').fadeIn();
         }
+        editor.resize();
     }
 
     var editor;
@@ -207,8 +214,11 @@ var Router = function () {
                 $('body').show();
                 $('#page-container').hide().html(output).fadeIn(300);
 
+                /*
                 var mainarea = document.getElementById("ceme-input");
                 editor = makeEditor(mainarea);
+                */
+                editor = ace.edit("ceme-input");
 
                 $("#mobile-menu").mmenu({
                     onClick: {
@@ -246,6 +256,12 @@ var Router = function () {
             },
             callbackbeforecompile: function (code) {
                 // runs before compilation
+                //editor.setValue(code);
+                editor.getSession().setMode("ace/mode/javascript");
+                editor.setOption('maxLines', 30);
+                editor.setOption('minLines', 3);
+                editor.setFontSize(18);
+                editor.setTheme("ace/theme/twilight");
                 editor.setValue(code);
                 changeMode('view');
             }

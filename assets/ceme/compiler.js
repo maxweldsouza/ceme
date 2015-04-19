@@ -285,6 +285,11 @@ var ceme = function () {
                     // binary operator
                     return _infix(infixOps[x], unsymbol(called[0]), unsymbol(called[1]));
                 } else {
+                    for (i = 0; i < called.length; i++) {
+                        if (typeof called[i] === 'undefined') {
+                            throw new CustomException ('Syntax error in function call at ' + lineno);
+                        }
+                    }
                     return _call(x, called);
                 }
             }
