@@ -432,9 +432,10 @@ Css
         CssSelector
             '.btn-mobile-tab'
             +
-                'padding:20px 15px;'
+                'padding:10px 15px;'
                 BackgroundColor
                     GRAY_LIGHT
+                'border-bottom: solid 1px #eee;'
         CssSelector
             '.btn-desktop-tab'
             'padding:7px 15px;'
