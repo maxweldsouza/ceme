@@ -192,6 +192,8 @@ var Router = function () {
             $('.ceme-btn-page').addClass('active');
             $('#ceme-code').hide();
             $('#ceme-output').fadeIn();
+            $('#ceme-code').hide();
+            $('#ceme-output').fadeIn();
         } else if (mode === 'edit') {
             $('.ceme-btn-code').addClass('active');
             $('#ceme-output').hide();
@@ -267,7 +269,7 @@ var Router = function () {
                 editor.setOption('maxLines', 40);
                 editor.setOption('minLines', 3);
                 editor.setFontSize(18);
-                editor.setTheme("ace/theme/clouds");
+                editor.setTheme("ace/theme/github");
                 editor.setValue(code);
                 editor.$blockScrolling = Infinity;
                 changeMode('view');

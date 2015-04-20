@@ -265,7 +265,7 @@ define
                     DARK_COLOR
                 'text-decoration:none;'
         CssSelector
-            '.navbar-fixed-top'
+            '.navbar-static-top'
             'border-bottom: solid 1px #eee;'
         CssSelector
             '.footer'
@@ -388,7 +388,7 @@ function
                     'panel-body'
             x
 '''
-<nav class="navbar navbar-fixed-top FixedTop">
+<nav class="navbar navbar-static-top FixedTop">
 <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-nav mobile-menu">
@@ -431,7 +431,7 @@ Css
             '#ceme-output'
             'max-width:800px;'
         CssSelector
-            '.navbar-fixed-top, .btn-mobile-tab'
+            '.navbar-static-top, .btn-mobile-tab'
             'background:#fff;z-index:10000;'
         CssSelector
             '.navbar-nav'
@@ -458,7 +458,7 @@ Css
                     'display:initial;'
                 CssSelector
                     '.btn-mobile-tab'
-                    'display:block;position:fixed;left:0px;top:50px;width:100%;'
+                    'display:block;position:absolute;left:0px;top:50px;width:100%;'
                 CssSelector
                     '.btn-desktop-tab'
                     'display:none;'
@@ -468,9 +468,6 @@ Css
                 CssSelector
                     '.ceme-btn-page, .ceme-btn-code, .ceme-btn-both'
                     'width:33.33333%;'
-                CssSelector
-                    '#page-container'
-                    'margin-top:50px;'
                 CssSelector
                     '.spacer'
                     'margin-top:100px;'
@@ -503,7 +500,7 @@ Css
                     'width:33.333333%;'
                 CssSelector
                     '.spacer'
-                    'margin-top:100px;'
+                    'margin-top:50px;'
 div
     attrib
         class
