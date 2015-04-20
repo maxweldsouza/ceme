@@ -24,6 +24,10 @@ var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightR
 
 var ExampleHighlightRules = function() {
 
+    var htmlTags = cemeEnv.CemeLanguage.HtmlTags.join('|');
+    var keywords = cemeEnv.CemeLanguage.Keywords.join('|');
+    var constants = 'true|false';
+
     // regexp must not have capturing parentheses. Use (?:) instead.
     // regexps are ordered -> the first match is used
    this.$rules = {
@@ -34,7 +38,7 @@ var ExampleHighlightRules = function() {
             },
             {
                 token: "keyword",
-                regex: "function|define|list",
+                regex: keywords,
             },
             {
                 token: "string",
@@ -60,11 +64,11 @@ var ExampleHighlightRules = function() {
             },
             {
                 token: "constant.language",
-                regex: 'true|false',
+                regex: constants,
             },
             {
                 token: "support.function",
-                regex: 'h1|h2|h3|h4|h5|h6|p|ul|li',
+                regex: htmlTags,
             },
             {
                 token: "identifier",

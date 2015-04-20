@@ -447,6 +447,19 @@ var cemeEnv = function() {
                 return result;
             },
             ////// Language
+            'CemeLanguage': {
+                // Open close tags
+                // Order of tags is important for syntax
+                // highlighting to work properly
+                // pre should come before p
+                'HtmlTags': ('div,ol,ul,li,span,script,button,' +
+                    'table,thead,tbody,h1,h2,h3,h4,h5,h6,' +
+                    'tr,td,th,form,noscript,strong,em,' +
+                    'blockquote,cite,pre,code,body,q,p,a').split(','),
+                'Keywords': ('define,function,unnamed,while,' +
+                    'import,let,list,function,if,apply').split(',')
+            },
+
             'EvalString': function (str) {
                 return ceme.compileText(str);
             },
@@ -635,7 +648,9 @@ var cemeEnv = function() {
     // Attributes
     cemeEnv['type'] = attribute('type');
 
-    var attributes = [ 'src', 'class', 'value', 'id', 'style', 'href', 'title', 'target' ];
+    var attributes = ('src,class,value,id,style,' +
+            'href,title,target').split(',');
+
     var i;
     for (i = 0; i < attributes.length; i++) {
         cemeEnv[attributes[i]] = attribute(attributes[i]);
@@ -646,10 +661,7 @@ var cemeEnv = function() {
     cemeEnv['br'] = sctag('br');
     cemeEnv['img'] = sctagWithAttrib('img');
 
-    // Open close tags
-    var tags = [ 'div', 'p', 'a', 'ol', 'ul', 'li', 'span', 'script', 'button', 'table', 'thead', 'tbody',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'tr', 'td', 'th', 'form', 'noscript', 'strong',
-        'em', 'blockquote', 'cite', 'q', 'pre', 'code', 'body' ];
+    var tags = cemeEnv.CemeLanguage.HtmlTags;
     for (i = 0; i < tags.length; i++) {
         cemeEnv[tags[i]] = tag(tags[i]);
     }

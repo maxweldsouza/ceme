@@ -544,7 +544,8 @@ div
             </div>
             <h2>Code</h2>
             <div style="width:100%;margin-top:20px;">
-            <textarea name="content" style="width:100%" id="ceme-input" ></textarea>
+            <div id="ceme-ace-editor"></div>
+            <input name="content" type="hidden" id="ceme-input" ></textarea>
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="name" id="ceme-page-name">
             </div>

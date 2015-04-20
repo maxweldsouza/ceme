@@ -88,6 +88,8 @@ var Router = function () {
 
     if (clientSide) {
         $(document).on('submit', 'form', function (e) {
+            $("#ceme-input").val(editor.getSession().getValue());
+
             // TODO not for GET forms
             var url = $(this).attr('action');
             if ($(this).attr('method') === 'post') {
@@ -156,10 +158,6 @@ var Router = function () {
                 }, 0);
             }
         });
-
-        $(document).on("click"), "#ceme-save", function () {
-            $("#ceme-input").val(editor.getSession().getValue());
-        }
     }
 
     var makeEditor = function (elem) {
@@ -218,7 +216,7 @@ var Router = function () {
                 var mainarea = document.getElementById("ceme-input");
                 editor = makeEditor(mainarea);
                 */
-                editor = ace.edit("ceme-input");
+                editor = ace.edit("ceme-ace-editor");
 
                 $("#mobile-menu").mmenu({
                     onClick: {
@@ -258,7 +256,7 @@ var Router = function () {
                 // runs before compilation
                 //editor.setValue(code);
                 editor.getSession().setMode("ace/mode/ceme");
-                editor.setOption('maxLines', 30);
+                editor.setOption('maxLines', 40);
                 editor.setOption('minLines', 3);
                 editor.setFontSize(18);
                 editor.setTheme("ace/theme/clouds");
