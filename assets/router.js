@@ -257,11 +257,11 @@ var Router = function () {
             callbackbeforecompile: function (code) {
                 // runs before compilation
                 //editor.setValue(code);
-                editor.getSession().setMode("ace/mode/javascript");
+                editor.getSession().setMode("ace/mode/ceme");
                 editor.setOption('maxLines', 30);
                 editor.setOption('minLines', 3);
                 editor.setFontSize(18);
-                editor.setTheme("ace/theme/twilight");
+                editor.setTheme("ace/theme/clouds");
                 editor.setValue(code);
                 changeMode('view');
             }
