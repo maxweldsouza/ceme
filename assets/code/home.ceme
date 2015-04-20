@@ -10,12 +10,15 @@ function
             code
                 attrib
                     class
-                        "html"
+                        "ceme"
                 x
         h3
             'Output'
         pre
             code
+                attrib
+                    class
+                        "nohighlight"
                 EscapeHtml
                     EvalString
                         x

@@ -455,9 +455,10 @@ var cemeEnv = function() {
                 'HtmlTags': ('div,ol,ul,li,span,script,button,' +
                     'table,thead,tbody,h1,h2,h3,h4,h5,h6,' +
                     'tr,td,th,form,noscript,strong,em,' +
-                    'blockquote,cite,pre,code,body,q,p,a').split(','),
+                    'blockquote,cite,pre,code,body,q,p,a'),
                 'Keywords': ('define,function,unnamed,while,' +
-                    'import,let,list,function,if,apply').split(',')
+                    'import,let,list,function,if,apply'),
+                'Literals': 'true,false'
             },
 
             'EvalString': function (str) {
@@ -661,7 +662,7 @@ var cemeEnv = function() {
     cemeEnv['br'] = sctag('br');
     cemeEnv['img'] = sctagWithAttrib('img');
 
-    var tags = cemeEnv.CemeLanguage.HtmlTags;
+    var tags = cemeEnv.CemeLanguage.HtmlTags.split(',');
     for (i = 0; i < tags.length; i++) {
         cemeEnv[tags[i]] = tag(tags[i]);
     }

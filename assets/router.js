@@ -225,6 +225,7 @@ var Router = function () {
                 });
 
                 Router.route(window.location.pathname + window.location.search);
+
             }
         });
     }
@@ -246,6 +247,13 @@ var Router = function () {
 
                 runCode();
 
+                hljs.configure({
+                    languages: ['ceme']
+                });
+                $('pre code').each(function(i, block) {
+                    hljs.highlightBlock(block);
+                });
+
                 if (document.cookie.indexOf('sodfksoihasg') > 0) {
                     $('.login-logout').html('<li><a href="#" id="logout" >Log Out</a></li>');
                 } else {
@@ -261,6 +269,7 @@ var Router = function () {
                 editor.setFontSize(18);
                 editor.setTheme("ace/theme/clouds");
                 editor.setValue(code);
+                editor.$blockScrolling = Infinity;
                 changeMode('view');
             }
         });

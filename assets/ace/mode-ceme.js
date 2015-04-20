@@ -24,8 +24,8 @@ var TextHighlightRules = require("ace/mode/text_highlight_rules").TextHighlightR
 
 var ExampleHighlightRules = function() {
 
-    var htmlTags = cemeEnv.CemeLanguage.HtmlTags.join('|');
-    var keywords = cemeEnv.CemeLanguage.Keywords.join('|');
+    var htmlTags = cemeEnv.CemeLanguage.HtmlTags.split(',').join('|');
+    var keywords = cemeEnv.CemeLanguage.Keywords.split(',').join('|');
     var constants = 'true|false';
 
     // regexp must not have capturing parentheses. Use (?:) instead.
