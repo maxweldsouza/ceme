@@ -123,7 +123,13 @@ var ceme = function () {
                 var x = unsymbol(escapeSymbol(tree[i][0]));
                 if (x === 'import') {
                     var filename = removeOneQuote(tree[i][1]);
-                    imports.push('/code/' + filename);
+                    // If the url begins with http
+                    // or // consider it to be external
+                    if (/^(http|\/\/)/.test(filename)) {
+                        imports.push(filename);
+                    } else {
+                        imports.push('/code/' + filename);
+                    }
                 }
             }
         }
@@ -791,13 +797,13 @@ var ceme = function () {
         }
     }
 
-    var FileImports = function (name, callback) {
+    var FileImports = function (name, checkdone) {
         this.name = name;
         this.done = false;
         this.executed = false;
         this.code;
         this.children = [];
-        this.callback = callback;
+        this.checkdone = checkdone;
         if (this.name.endsWith('.js')) {
             this.type = 'js';
         } else if (this.name.endsWith('.css')) {
@@ -816,7 +822,7 @@ var ceme = function () {
     }
 
     FileImports.prototype.addToList = function (child) {
-        var childobj = new FileImports(child, this.callback);
+        var childobj = new FileImports(child, this.checkdone);
         this.children.push(childobj);
     }
 
@@ -854,7 +860,7 @@ var ceme = function () {
                             fileobj.addToList(imports[i]);
                         }
                         fileobj.requestAll();
-                        fileobj.callback();
+                        fileobj.checkdone();
                     },
                     error : function (request, e) {
                         if (request.status === 0) {
@@ -877,7 +883,13 @@ var ceme = function () {
                         var i;
                         fileobj.code = data;
                         fileobj.done = true;
-                        fileobj.callback();
+                        var fileid = 'id="ceme-import-' + fileobj.name + '"';
+                        $('head').append('<link rel="stylesheet"'
+                                + fileid
+                                + 'href="'
+                                + fileobj.name
+                                + '" type="text/css" />')
+                        fileobj.checkdone();
                     },
                     error : function (request, e) {
                         if (request.status === 0) {
@@ -892,9 +904,13 @@ var ceme = function () {
 
     FileImports.prototype.requestAll = function () {
         if (!this.code) {
-            this.request();
+            if (this.type === 'ceme') {
+                this.request();
+            } else {
+                this.requestStatic();
+            }
         }
-        this.callback();
+        this.checkdone();
         var i;
         for (i = 0; i < this.children.length; i++) {
             var child = this.children[i];
@@ -904,8 +920,10 @@ var ceme = function () {
 
     FileImports.prototype.importChildren = function () {
         var i;
-        for (i = 0; i < this.children.length; i++) {
-            this.children[i].importAll();
+        if (this.type === 'ceme') {
+            for (i = 0; i < this.children.length; i++) {
+                this.children[i].importAll();
+            }
         }
     }
 
@@ -919,16 +937,11 @@ var ceme = function () {
             compileText(this.code);
         } else if (this.type === 'js') {
         } else if (this.type === 'css') {
-            var fileid = 'id="ceme-import-' + this.name + '"';
-            $('head').append('<link rel="stylesheet"'
-                    + fileid
-                    + 'href="'
-                    + this.name
-                    + '" type="text/css" />')
         }
     }
 
     var asyncCompiler = function (filename, params) {
+        console.log('asyncCompiler: ' + filename);
         // This function has two callbacks
         // first one will run just before compilation
         // second one will run just after compilation
@@ -947,19 +960,17 @@ var ceme = function () {
                 }
             }
         });
-        if (filename.endsWith('.js') || filename.endsWith('.css')) {
-            mainFile.requestStatic();
-            return;
-        }
-        if (typeof params.code !== 'undefined') {
-            var tree = textToParseTree(params.code);
-            var imports = getImports(tree);
-            var i;
-            mainFile.code = params.code;
-            mainFile.done = true;
-            mainFile.tree = tree;
-            for (i = 0; i < imports.length; i++) {
-                mainFile.addToList(imports[i]);
+        if (mainFile.type === 'ceme') {
+            if (typeof params.code !== 'undefined') {
+                var tree = textToParseTree(params.code);
+                var imports = getImports(tree);
+                var i;
+                mainFile.code = params.code;
+                mainFile.done = true;
+                mainFile.tree = tree;
+                for (i = 0; i < imports.length; i++) {
+                    mainFile.addToList(imports[i]);
+                }
             }
         }
         mainFile.requestAll();
