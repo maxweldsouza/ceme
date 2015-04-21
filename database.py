@@ -3,16 +3,16 @@ import json
 import hashlib, uuid
 import re
 
-import settings
+import config
 from custom_exceptions import *
 
 class DatabaseConnection:
     def connect(self):
         try:
-            self.connection = MySQLdb.connect(host=settings.db_host,
-                    user=settings.db_user,
-                    passwd=settings.db_password,
-                    db=settings.db_name)
+            self.connection = MySQLdb.connect(host=config.db_host,
+                    user=config.db_user,
+                    passwd=config.db_password,
+                    db=config.db_name)
 
             self.cur = self.connection.cursor()
             return self.cur
@@ -73,7 +73,7 @@ def hash_password(password, salt):
 """ Validation """
 # TODO make someone read rfc3986 and fix this
 def validate_name(name):
-    reg = re.compile('^[a-zA-Z0-9-]+$')
+    reg = re.compile('^[a-zA-Z0-9-\.]+$')
     if name == '':
         raise InvalidInput('Page name is empty')
     if not reg.match(name):
@@ -132,7 +132,7 @@ def create_user(username, email, password):
     hash = hash_password(password, salt)
     db.put('INSERT INTO users (user_name, user_hash, user_salt, user_email, user_group)'
             ' VALUES (%s, %s, %s, %s, %s) '
-            , (username, hash, salt, email, settings.default_level))
+            , (username, hash, salt, email, config.default_level))
 
 def authenticate_user(username, password):
     salt = db.get_one('SELECT user_salt FROM users'
@@ -161,7 +161,7 @@ def create_page(name, content, ip, username):
         db.put('INSERT INTO pages '
                 '(page_name, page_content, page_group, page_username, page_ip)'
                 ' VALUES (%s, %s, %s, %s, %s) ',
-                (name, content, settings.default_level, username, ip))
+                (name, content, config.default_level, username, ip))
 
 def save_page(name, content, ip, username):
     validate_name(name)
@@ -191,7 +191,7 @@ def save_page(name, content, ip, username):
     content = validate_content(content)
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
-            , (name, content, settings.default_level, username, ip))
+            , (name, content, config.default_level, username, ip))
 
 def read_page(name):
     validate_name(name)
