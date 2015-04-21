@@ -136,14 +136,6 @@ class CreateHandler(tornado.web.RequestHandler):
         except Exception, e:
             internal_error(self, e)
 
-class SaveHandler(tornado.web.RequestHandler):
-    def get(self, path):
-        self.xsrf_token
-        self.render('index.html')
-
-    def post(self):
-        """ post using ajax """
-
 class ApiHandler(tornado.web.RequestHandler):
     def get(self):
         action = self.get_argument('action')
