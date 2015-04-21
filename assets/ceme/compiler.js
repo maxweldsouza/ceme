@@ -917,6 +917,14 @@ var ceme = function () {
     FileImports.prototype.importSingle = function () {
         if (this.type === 'ceme') {
             compileText(this.code);
+        } else if (this.type === 'js') {
+        } else if (this.type === 'css') {
+            var fileid = 'id="ceme-import-' + this.name + '"';
+            $('head').append('<link rel="stylesheet"'
+                    + fileid
+                    + 'href="'
+                    + this.name
+                    + '" type="text/css" />')
         }
     }
 

@@ -93,25 +93,22 @@ class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
         self.write('An error occurred')
 
-def ceme_file(self, path):
-    try:
-        code = database.read_page(path)
-        self.set_header('X-Robots-Tag', 'noindex')
-        if path.endswith('.js'):
-            self.set_header('Content-Type', 'application/javascript; charset=UTF-8')
-        else:
-            self.set_header('Content-Type', 'text/ceme; charset=UTF-8')
-        self.write(code)
-    except (EntryNotFound, InvalidInput), e:
-        self.set_status(404)
-        self.write('Page not found 404')
-    except Exception, e:
-        internal_error(self, e)
-
 """ Ceme code """
 class CodeHandler(tornado.web.RequestHandler):
     def get(self, path):
-        ceme_file(self, path)
+        try:
+            code = database.read_page(path)
+            self.set_header('X-Robots-Tag', 'noindex')
+            if path.endswith('.js'):
+                self.set_header('Content-Type', 'application/javascript; charset=UTF-8')
+            else:
+                self.set_header('Content-Type', 'text/ceme; charset=UTF-8')
+            self.write(code)
+        except (EntryNotFound, InvalidInput), e:
+            self.set_status(404)
+            self.write('Page not found 404')
+        except Exception, e:
+            internal_error(self, e)
 
 class CreateHandler(tornado.web.RequestHandler):
     def get(self):
