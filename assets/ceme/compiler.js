@@ -888,12 +888,18 @@ var ceme = function () {
         }
     }
 
+    FileImports.prototype.importChildren = function () {
+        var i;
+        for (i = 0; i < this.children.length; i++) {
+            this.children[i].importAll();
+        }
+    }
+
     FileImports.prototype.importAll = function () {
         var i;
         for (i = 0; i < this.children.length; i++) {
             this.children[i].importAll();
         }
-        // TODO special code for importing
         compileText(this.code);
     }
 
@@ -906,7 +912,7 @@ var ceme = function () {
                 if (params.callbackbeforecompile) {
                     params.callbackbeforecompile(mainFile.code);
                 }
-                mainFile.importAll();
+                mainFile.importChildren();
                 var output = compileTree(mainFile.tree);
                 params.callback(mainFile.code, output);
                 mainFile.executed = true;

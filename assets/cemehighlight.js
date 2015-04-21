@@ -21,6 +21,10 @@ hljs.registerLanguage('ceme', function (hljs) {
                 className: 'string',
                 begin: /"""([^"]|\\")*"""|'''([^']|\\')*'''/
             },
+            {
+                className: 'built_in',
+                begin: /\+ \- \* \//
+            },
             hljs.APOS_STRING_MODE,
             hljs.QUOTE_STRING_MODE,
         ]

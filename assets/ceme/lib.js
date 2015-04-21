@@ -456,6 +456,7 @@ var cemeEnv = function() {
                     'table,thead,tbody,h1,h2,h3,h4,h5,h6,' +
                     'tr,td,th,form,noscript,strong,em,' +
                     'blockquote,cite,pre,code,body,q,p,a'),
+                'Builtin': '+,-,*,/',
                 'Keywords': ('define,function,unnamed,while,' +
                     'import,let,list,function,if,apply'),
                 'Literals': 'true,false'
