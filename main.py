@@ -101,6 +101,8 @@ class CodeHandler(tornado.web.RequestHandler):
             self.set_header('X-Robots-Tag', 'noindex')
             if path.endswith('.js'):
                 self.set_header('Content-Type', 'application/javascript; charset=UTF-8')
+            elif path.endswith('.css'):
+                self.set_header('Content-Type', 'text/css; charset=UTF-8')
             else:
                 self.set_header('Content-Type', 'text/ceme; charset=UTF-8')
             self.write(code)

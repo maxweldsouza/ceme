@@ -867,7 +867,7 @@ var ceme = function () {
         }
     }
 
-    FileImports.prototype.requestJs = function () {
+    FileImports.prototype.requestStatic = function () {
         var fileobj = this;
         if (!fileobj.done) {
             $.ajax({
@@ -937,16 +937,18 @@ var ceme = function () {
                 if (params.callbackbeforecompile) {
                     params.callbackbeforecompile(mainFile.code);
                 }
-                if (!filename.endsWith('.js')) {
+                if (mainFile.type === 'ceme') {
                     mainFile.importChildren();
                     var output = compileTree(mainFile.tree);
                     params.callback(mainFile.code, output);
                     mainFile.executed = true;
+                } else {
+                    mainFile.importSingle();
                 }
             }
         });
-        if (filename.endsWith('.js')) {
-            mainFile.requestJs();
+        if (filename.endsWith('.js') || filename.endsWith('.css')) {
+            mainFile.requestStatic();
             return;
         }
         if (typeof params.code !== 'undefined') {
