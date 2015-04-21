@@ -798,6 +798,13 @@ var ceme = function () {
         this.code;
         this.children = [];
         this.callback = callback;
+        if (this.name.endsWith('.js')) {
+            this.type = 'js';
+        } else if (this.name.endsWith('.css')) {
+            this.type = 'css';
+        } else {
+            this.type = 'ceme';
+        }
     }
 
     FileImports.prototype.toString = function () {
@@ -903,11 +910,14 @@ var ceme = function () {
     }
 
     FileImports.prototype.importAll = function () {
-        var i;
-        for (i = 0; i < this.children.length; i++) {
-            this.children[i].importAll();
+        this.importChildren();
+        this.importSingle();
+    }
+
+    FileImports.prototype.importSingle = function () {
+        if (this.type === 'ceme') {
+            compileText(this.code);
         }
-        compileText(this.code);
     }
 
     var asyncCompiler = function (filename, params) {
