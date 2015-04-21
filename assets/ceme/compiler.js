@@ -43,22 +43,6 @@ var ceme = function () {
         cemeEnv = lib.cemeEnv;
     }
 
-    // TODO unused
-    var fetchFile = function (fileName) {
-        if (platform() === 'nodejs') {
-            var fs = require('fs');
-            // transform root-relative web path to os path
-            if (fileName.indexOf('/api') === 0 || fileName.indexOf('/data') === 0) {
-                fileName = '..' + fileName;
-            } else {
-                fileName = '.' + fileName;
-            }
-            return fs.readFileSync(fileName, {encoding: 'utf8'});
-        } else {
-            return ajaxRequest(fileName);
-        }
-    }
-
     /*********************************************************************************************/
     /* Errors                                                                                    */
     /*********************************************************************************************/
