@@ -860,6 +860,29 @@ var ceme = function () {
         }
     }
 
+    FileImports.prototype.requestJs = function () {
+        var fileobj = this;
+        if (!fileobj.done) {
+            $.ajax({
+                    url : this.name,
+                    type : 'GET',
+                    success : function (data) {
+                        var i;
+                        fileobj.code = data;
+                        fileobj.done = true;
+                        fileobj.callback();
+                    },
+                    error : function (request, e) {
+                        if (request.status === 0) {
+                            ceme.error('No internet connection');
+                        } else {
+                            error(request.responseText);
+                        }
+                    }
+            });
+        }
+    }
+
     FileImports.prototype.requestAll = function () {
         if (!this.code) {
             this.request();
@@ -896,12 +919,18 @@ var ceme = function () {
                 if (params.callbackbeforecompile) {
                     params.callbackbeforecompile(mainFile.code);
                 }
-                mainFile.importChildren();
-                var output = compileTree(mainFile.tree);
-                params.callback(mainFile.code, output);
-                mainFile.executed = true;
+                if (!filename.endsWith('.js')) {
+                    mainFile.importChildren();
+                    var output = compileTree(mainFile.tree);
+                    params.callback(mainFile.code, output);
+                    mainFile.executed = true;
+                }
             }
         });
+        if (filename.endsWith('.js')) {
+            mainFile.requestJs();
+            return;
+        }
         if (typeof params.code !== 'undefined') {
             var tree = textToParseTree(params.code);
             var imports = getImports(tree);
