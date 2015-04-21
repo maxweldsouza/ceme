@@ -97,7 +97,10 @@ def ceme_file(self, path):
     try:
         code = database.read_page(path)
         self.set_header('X-Robots-Tag', 'noindex')
-        self.set_header('Content-Type', 'text/plain; charset=UTF-8')
+        if path.endswith('.js'):
+            self.set_header('Content-Type', 'application/javascript; charset=UTF-8')
+        else:
+            self.set_header('Content-Type', 'text/ceme; charset=UTF-8')
         self.write(code)
     except (EntryNotFound, InvalidInput), e:
         self.set_status(404)
@@ -202,6 +205,13 @@ settings = {
     'xsrf_cookies': True
 }
 
+class CemeStaticHandler(tornado.web.StaticFileHandler):
+    def get_content_type(self):
+        name, extension = os.path.splitext(self.absolute_path)
+        if extension and extension.lower() == '.ceme':
+            return 'text/ceme'
+        return super(CemeStaticHandler, self).get_content_type()
+
 # Urls starting with api are for ajax requests.
 application = tornado.web.Application([
     (r'/login', LoginHandler),
@@ -210,7 +220,7 @@ application = tornado.web.Application([
     (r'/sign-up', SignupHandler),
     (r'/api', ApiHandler),
     (r'/code/(.*)', CodeHandler),
-    (r'/assets/(.*)',tornado.web.StaticFileHandler, {'path': './assets'},),
+    (r'/assets/(.*)', CemeStaticHandler, {'path': './assets'},),
     (r'/(.*)', MainHandler),
     ], **settings)
 
