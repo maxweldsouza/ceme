@@ -873,6 +873,36 @@ var ceme = function () {
         }
     }
 
+    var importStatic = function (filename, extension) {
+        var escapeSelector = function (id) {
+            var temp = id.replace( /(:|\.|\[|\]|,)/g, "\\$1" );
+            temp = temp.replace(new RegExp('/', 'g'), '\\/');
+            return temp;
+        }
+        var addJsToDom = function (id, href) {
+        }
+        var addCssToDom = function (id, href) {
+            $('head').append('<link rel="stylesheet" id="'
+                    + fileid
+                    + '" href="'
+                    + filename
+                    + '" type="text/css" />')
+        }
+
+        var selector = '#ceme-import-' + escapeSelector(filename);
+        var fileid = 'ceme-import-' + filename;
+
+        // Add the file to dom only if it isn't already
+        // present
+        if (!$(selector).length) {
+            if (extension === 'css') {
+                addCssToDom(fileid, filename);
+            } else if (extension === 'js') {
+                addJsToDom(fileid, filename);
+            }
+        }
+    }
+
     FileImports.prototype.requestStatic = function () {
         var fileobj = this;
         if (!fileobj.done) {
@@ -883,12 +913,7 @@ var ceme = function () {
                         var i;
                         fileobj.code = data;
                         fileobj.done = true;
-                        var fileid = 'id="ceme-import-' + fileobj.name + '"';
-                        $('head').append('<link rel="stylesheet"'
-                                + fileid
-                                + 'href="'
-                                + fileobj.name
-                                + '" type="text/css" />')
+                        importStatic(fileobj.name, fileobj.type);
                         fileobj.checkdone();
                     },
                     error : function (request, e) {
