@@ -47,13 +47,6 @@ var ceme = function () {
     /* Errors                                                                                    */
     /*********************************************************************************************/
 
-    Array.prototype.swap = function (a, b) {
-        var temp = this[a];
-        this[a] = this[b];
-        this[b] = temp;
-        return this;
-    }
-
     var IsArray = Array.isArray || function (a) {
         return Object.prototype.toString.call(a) === '[object Array]';
     }
