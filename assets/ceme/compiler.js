@@ -11,7 +11,7 @@ var ceme;
         compile,
         unique;
 
-    ceme = function () {
+    ceme = (function () {
 
         function SyntaxError(message) {
             this.message = message;
@@ -86,13 +86,6 @@ var ceme;
             // do everything
             str = str.replace(/\n/g, '\\n');
             return str;
-        }
-
-        function removeQuotes(text) {
-            if (text[0] === '"' || text[0] === "'") {
-                return text.slice(3, text.length - 3);
-            }
-            return text;
         }
 
         function removeOneQuote(text) {
@@ -265,13 +258,6 @@ var ceme;
             var result = 'function ' + name;
             result += _functionBody(params, body).value;
             return new Box(result, '');
-        }
-
-        function _cemeVar(a) {
-            if (cemeEnv.hasOwnProperty(a)) {
-                return "cemeEnv['" + a + "']";
-            }
-            return a;
         }
 
         function _global(name, value) {
@@ -890,9 +876,11 @@ var ceme;
                 temp = temp.replace(new RegExp('/', 'g'), '\\/');
                 return temp;
             }
+
             function addJsToDom(fileid, filename) {
                 $('head').append('<script id="' + fileid + '" src="' + filename + '" type="text/javascript" />');
             }
+
             function addCssToDom(fileid, filename) {
                 $('head').append('<link rel="stylesheet" id="' + fileid + '" href="' + filename + '" type="text/css" />');
             }
@@ -1020,16 +1008,16 @@ var ceme;
             'warning': warning,
             'error': error
         };
-    }();
+    }());
+
+    (function (exports) {
+
+        exports.lexer = ceme.lexer;
+        exports.Symbol = ceme.Symbol;
+        exports.isSymbol = ceme.isSymbol;
+        exports.compileText = ceme.compileText;
+        exports.asyncCompiler = ceme.asyncCompiler;
+        exports.cemeEnv = cemeEnv;
+
+    }(exports === undefined ? {} : exports));
 }());
-
-(function (exports) {
-
-    exports.lexer = ceme.lexer;
-    exports.Symbol = ceme.Symbol;
-    exports.isSymbol = ceme.isSymbol;
-    exports.compileText = ceme.compileText;
-    exports.asyncCompiler = ceme.asyncCompiler;
-    exports.cemeEnv = cemeEnv;
-
-})(exports === undefined ? {} : exports);
