@@ -13,16 +13,19 @@ var ceme;
 
     ceme = function () {
 
-        function SyntaxError (message) {
+        function SyntaxError(message) {
             this.message = message;
         }
-        function success (message) {
+
+        function success(message) {
             $('#alert').hide().html(cemeEnv.Alert(message, 'success')).fadeIn(200);
         }
-        function warning (message) {
+
+        function warning(message) {
             $('#alert').hide().html(cemeEnv.Alert(message, 'warning')).fadeIn(200);
         }
-        function error (msg, lineno) {
+
+        function error(msg, lineno) {
             var message = msg;
             if (lineno !== undefined) {
                 message += ' at line ' + lineno;
@@ -36,7 +39,7 @@ var ceme;
         /* General */
 
         // TODO move
-        var platform  = function () {
+        var platform = function () {
             if (XMLHttpRequest !== undefined) {
                 return 'browser';
             }
@@ -52,12 +55,12 @@ var ceme;
 
         /* Helper */
 
-        function Symbol (name, lineno) {
+        function Symbol(name, lineno) {
             this.name = name;
             this.lineno = lineno;
         }
 
-        function isSymbol (a) {
+        function isSymbol(a) {
             if (a === undefined) {
                 return false;
             }
@@ -78,28 +81,28 @@ var ceme;
             };
         }());
 
-        function toStringLiteral  (str) {
+        function toStringLiteral(str) {
             // TODO not just line break
             // do everything
             str = str.replace(/\n/g, '\\n');
             return str;
         }
 
-        function removeQuotes (text) {
+        function removeQuotes(text) {
             if (text[0] === '"' || text[0] === "'") {
                 return text.slice(3, text.length - 3);
             }
             return text;
         }
 
-        function removeOneQuote (text) {
+        function removeOneQuote(text) {
             if (text[0] === '"' || text[0] === "'") {
                 return text.slice(1, text.length - 1);
             }
             return text;
         }
 
-        function escapeSymbol (a) {
+        function escapeSymbol(a) {
             if (cemeEnv.hasOwnProperty(a.name)) {
                 return a;
             }
@@ -126,7 +129,7 @@ var ceme;
             'and': '&&'
         };
 
-        function unsymbol (a) {
+        function unsymbol(a) {
             if (cemeEnv.hasOwnProperty(a.name)) {
                 return "cemeEnv['" + a.name + "']";
             }
@@ -140,60 +143,60 @@ var ceme;
         /* Grammar                                                                               */
         /*********************************************************************************************/
 
-        function Box (value, hoist) {
+        function Box(value, hoist) {
             this.value = value;
             this.hoist = hoist;
         }
 
-        function _unbox (box) {
+        function _unbox(box) {
             return box.hoist + box.value;
         }
 
-        function isCurryDot (a) {
+        function isCurryDot(a) {
             return a instanceof Box && a.value === '.';
         }
 
         // 'return a'
-        function _return  (a) {
+        function _return(a) {
             return 'return ' + a;
         }
 
         // 'some code;'
-        function _statement  (a) {
+        function _statement(a) {
             return a + ';';
         }
 
         // 'some code;
         // '
-        function _expression  (a) {
+        function _expression(a) {
             return _statement(a) + '\n';
         }
 
         // '{
         //  some code
         //  }'
-        function _block  (a) {
+        function _block(a) {
             return '{\n' + a + '\n}';
         }
 
         // 'var name'
-        function _var  (name) {
+        function _var(name) {
             return _expression('var ' + name);
         }
 
         // 'name = a'
-        function _assign  (name, a) {
+        function _assign(name, a) {
             return name + ' = ' + a;
         }
 
-        function _indent  (block) {
+        function _indent(block) {
             var result = block.replace(/\n/g, '\n' + indent);
             return indent + result;
         }
 
         // Non hoisted
 
-        function _parameters  (params) {
+        function _parameters(params) {
             var temp = [],
                 i;
             if (!params) {
@@ -202,15 +205,15 @@ var ceme;
             for (i = 0; i < params.length; i += 1) {
                 temp.push(escapeSymbol(params[i]).name);
             }
+            return ' ' + temp.join(', ') + ' ';
+            /*
             if (temp[0] === '*args') {
-                // TODO variable arguments
-            } else {
-                return ' ' +  temp.join(', ') + ' ';
             }
+            */
         }
 
         // 'param0, param1, param2'
-        function _args  (params) {
+        function _args(params) {
             var vals = [],
                 i;
             for (i = 0; i < params.length; i += 1) {
@@ -221,25 +224,20 @@ var ceme;
 
         // Hoisted
 
-        function _infix (name, a, b) {
-            var result = '( ' + a.value
-                    + ' '
-                    + name
-                    + ' '
-                    + b.value
-                    + ' )';
+        function _infix(name, a, b) {
+            var result = '( ' + a.value + ' ' + name + ' ' + b.value + ' )';
             return new Box(result, a.hoist + b.hoist);
         }
 
-        function wrapdefines  (body) {
+        function wrapdefines(body) {
             var result = '';
             result += '(function () {\n';
-                result += _indent(body.hoist + body.value + '\nreturn;');
-                result += '\n})()';
+            result += _indent(body.hoist + body.value + '\nreturn;');
+            result += '\n})()';
             return new Box(result, '');
         }
 
-        function _functionBody  (params, body) {
+        function _functionBody(params, body) {
             var result = ' (';
             result += _parameters(params);
             result += ') {\n';
@@ -250,51 +248,51 @@ var ceme;
             return new Box(result, '');
         }
 
-        function _lambda  (params, body) {
+        function _lambda(params, body) {
             var result = '';
             result += 'function ';
             result += _functionBody(params, body).value;
             return new Box(result, '');
         }
 
-        function _globalfunction  (name, params, body) {
+        function _globalfunction(name, params, body) {
             var result = unsymbol(name) + ' = ';
             result += _lambda(params, body).value;
             return new Box(result, '');
         }
 
-        function _function  (name, params, body) {
-            var result = 'function '+ name;
+        function _function(name, params, body) {
+            var result = 'function ' + name;
             result += _functionBody(params, body).value;
             return new Box(result, '');
         }
 
-        function _cemeVar  (a) {
+        function _cemeVar(a) {
             if (cemeEnv.hasOwnProperty(a)) {
                 return "cemeEnv['" + a + "']";
             }
             return a;
         }
 
-        function _global  (name, value) {
+        function _global(name, value) {
             var val = compile(value),
                 result = unsymbol(name) + " = " + val.value + ';';
             return new Box(result, val.hoist);
         }
 
-        function _local  (name, value) {
+        function _local(name, value) {
             var val = compile(value),
                 result = "var " + name + " = " + val.value;
             return new Box(result, val.hoist);
         }
 
-        function _set (name, value) {
+        function _set(name, value) {
             var val = compile(value),
                 result = unsymbol(name) + " = " + val.value;
             return new Box(result, val.hoist);
         }
 
-        function _let  (tree) {
+        function _let(tree) {
             var hoist = '',
                 i,
                 nooflets = tree.length,
@@ -302,16 +300,16 @@ var ceme;
                 result;
 
             for (i = 1; i < nooflets - 1; i = i + 2) {
-                result = _local(unsymbol(tree[i]), tree[i+1]);
+                result = _local(unsymbol(tree[i]), tree[i + 1]);
                 hoist += result.hoist;
                 hoist += _expression(result.value);
             }
             last = compile(tree[nooflets - 1]);
             hoist += last.hoist;
-            return new Box(last.value , hoist);
+            return new Box(last.value, hoist);
         }
 
-        function _while (tree) {
+        function _while(tree) {
             var i,
                 value = '',
                 hoist = '',
@@ -327,7 +325,7 @@ var ceme;
             return new Box(result, hoist);
         }
 
-        function _group (tree) {
+        function _group(tree) {
             var i,
                 value = '',
                 hoist = '';
@@ -344,7 +342,7 @@ var ceme;
             return new Box(value, hoist);
         }
 
-        function _if  (name, tree) {
+        function _if(name, tree) {
             var result = '',
                 hoist = '',
                 box,
@@ -356,29 +354,29 @@ var ceme;
             hoist += tree[1].hoist;
             result += ' ) ';
             result += _block(_indent(_statement(tree[2].hoist + _assign(name, tree[2].value))));
-            for (i = 3; i < tree.length; i=i+2) {
+            for (i = 3; i < tree.length; i = i + 2) {
                 result += ' else if ';
                 result += '( ';
                 result += tree[i].value;
                 hoist += tree[i].hoist;
                 result += ' ) ';
-                result += _block(_indent(_statement(tree[i+1].hoist + _assign(name, tree[i+1].value))));
+                result += _block(_indent(_statement(tree[i + 1].hoist + _assign(name, tree[i + 1].value))));
             }
             result += '\n';
             box = new Box(name, hoist + result);
             return box;
         }
 
-        function _call  (name, args) {
+        function _call(name, args) {
             var i,
                 hoisted = '';
             for (i = 0; i < args.length; i += 1) {
                 hoisted += args[i].hoist;
             }
-            return new Box(name + ' (' + _args(args) +')', hoisted);
+            return new Box(name + ' (' + _args(args) + ')', hoisted);
         }
 
-        function _array  (values) {
+        function _array(values) {
             var i,
                 vals = [],
                 hoists = [];
@@ -388,7 +386,7 @@ var ceme;
                 hoists.push(values[i].hoist);
             }
             return new Box('[' + vals.join(', ') + ']',
-                    hoists.join(''));
+                hoists.join(''));
         }
 
         /*********************************************************************************************/
@@ -401,7 +399,7 @@ var ceme;
             };
         }
 
-        function nestedArrayToString (a) {
+        function nestedArrayToString(a) {
             var i,
                 result = '';
             if (isArray(a[0])) {
@@ -423,7 +421,7 @@ var ceme;
         /* Compiler                                                                               */
         /*********************************************************************************************/
 
-        function replace (tree, old, nu) {
+        function replace(tree, old, nu) {
             var i;
             for (i = 0; i < tree.length; i += 1) {
                 if (cemeEnv.IsAtom(tree[i])) {
@@ -439,14 +437,14 @@ var ceme;
             return tree;
         }
 
-        function addMacro (name, params, body) {
+        function addMacro(name, params, body) {
             var obj = {};
             obj.params = params;
             obj.body = body;
             macroTable[name] = obj;
         }
 
-        function processMacros (tree) {
+        function processMacros(tree) {
             var params,
                 name,
                 body,
@@ -473,9 +471,8 @@ var ceme;
             return tree;
         }
 
-        function compileTree (tree) {
-            var input = '',
-                output = '',
+        function compileTree(tree) {
+            var output = '',
                 tmp,
                 i,
                 code;
@@ -485,7 +482,6 @@ var ceme;
             for (i = 0; i < tree.length; i += 1) {
                 try {
                     code = _expression(_unbox(compile(tree[i])));
-                    input += code;
                     tmp = eval(code);
                     if (isArray(tmp)) {
                         output += nestedArrayToString(tmp);
@@ -499,7 +495,7 @@ var ceme;
             return output;
         }
 
-        function getImports (tree) {
+        function getImports(tree) {
             var i,
                 x,
                 filename,
@@ -522,7 +518,7 @@ var ceme;
             return imports;
         }
 
-        function compile (tree) {
+        function compile(tree) {
             var i,
                 x,
                 lineno,
@@ -549,99 +545,99 @@ var ceme;
                 lineno = tree[0].lineno;
 
                 switch (x) {
-                    case 'define':
-                        if (cemeEnv.IsAtom(tree[1])) { // single variable
-                            cemeEnv[unsymbol(tree[1])] = "";
-                            return wrapdefines(_global(tree[1], tree[2]));
+                case 'define':
+                    if (cemeEnv.IsAtom(tree[1])) { // single variable
+                        cemeEnv[unsymbol(tree[1])] = "";
+                        return wrapdefines(_global(tree[1], tree[2]));
+                    }
+                    throw new SyntaxError('Syntax error in define at line ' + lineno);
+                case 'group':
+                    return _group(tree.slice(1, tree.length));
+                case '=':
+                    return _set(tree[1], tree[2]);
+                case 'while':
+                    return _while(tree.slice(1, tree.length));
+                case 'import':
+                    return new Box('""', '');
+                case 'macro':
+                    return new Box('""', '');
+                case 'let':
+                    return _let(tree);
+                case 'list':
+                    return _array(tree.slice(1, tree.length));
+                case 'function':
+                    if (!isSymbol(tree[1][0])) {
+                        throw new SyntaxError('Syntax error in function definition at line ' + lineno);
+                    }
+                    if (tree[1][0].name === 'params') {
+                        console.log('lambda usings params at line ' + lineno);
+                    }
+                    if (tree[1][0].name === 'unnamed' || tree[1][0].name === 'params') {
+                        if (tree[1].length > 1) {
+                            pms = tree[1].slice(1, tree[1].length);
+                        } else {
+                            pms = false;
                         }
-                        throw new SyntaxError ('Syntax error in define at line ' + lineno);
-                    case 'group':
-                        return _group(tree.slice(1, tree.length));
-                    case '=':
-                        return _set(tree[1], tree[2]);
-                    case 'while':
-                        return _while(tree.slice(1, tree.length));
-                    case 'import':
-                        return new Box('""', '');
-                    case 'macro':
-                        return new Box('""', '');
-                    case 'let':
-                        return _let(tree);
-                    case 'list':
-                        return _array(tree.slice(1, tree.length));
-                    case 'function':
-                        if (!isSymbol(tree[1][0])) {
-                            throw new SyntaxError ('Syntax error in function definition at line ' + lineno);
+                        bdy = compile(tree[2]);
+                        return _lambda(pms, bdy);
+                    }
+                    cemeEnv[unsymbol(tree[1][0])] = "";
+                    return wrapdefines(_globalfunction(tree[1][0],
+                        tree[1].slice(1, tree[1].length),
+                        compile(tree[2])));
+                case 'if':
+                    for (i = 1; i < tree.length; i += 1) {
+                        tree[i] = compile(tree[i]);
+                    }
+                    return _if(unique(), tree);
+                default:
+                    // function call
+                    curry = false;
+                    called = tree.slice(1, tree.length);
+                    params = [];
+                    curryname = compile(tree[0]).value;
+                    for (i = 0; i < called.length; i += 1) {
+                        called[i] = compile(called[i]);
+                        if (isCurryDot(called[i])) {
+                            curry = true;
+                            temp = new Symbol(unique(), 0);
+                            params.push(temp);
+                            called[i] = compile(temp);
                         }
-                        if (tree[1][0].name === 'params') {
-                            console.log('lambda usings params at line ' + lineno);
-                        }
-                        if (tree[1][0].name === 'unnamed' || tree[1][0].name === 'params') {
-                            if (tree[1].length > 1) {
-                                pms = tree[1].slice(1,tree[1].length);
-                            } else {
-                                pms = false;
-                            }
-                            bdy = compile(tree[2]);
-                            return _lambda (pms, bdy);
-                        }
-                        cemeEnv[unsymbol(tree[1][0])] = "";
-                        return wrapdefines(_globalfunction (tree[1][0],
-                                    tree[1].slice(1,tree[1].length),
-                                    compile(tree[2])));
-                    case 'if':
-                        for (i = 1; i < tree.length; i += 1) {
-                            tree[i] = compile(tree[i]);
-                        }
-                        return _if(unique(), tree);
-                    default:
-                        // function call
-                        curry = false;
-                        called = tree.slice(1, tree.length);
-                        params = [];
-                        curryname = compile(tree[0]).value;
-                        for (i = 0; i < called.length; i += 1) {
-                            called[i] = compile(called[i]);
-                            if (isCurryDot(called[i])) {
-                                curry = true;
-                                temp = new Symbol(unique(), 0);
-                                params.push(temp);
-                                called[i] = compile(temp);
-                            }
-                        }
+                    }
 
-                        if (curry) {
-                            // curried call
-                            fname = unique();
-                            body = _call(curryname, called);
-                            currybody = _function (fname, params, body).value;
-                            return new Box(fname, _expression(currybody));
-                        }
+                    if (curry) {
+                        // curried call
+                        fname = unique();
+                        body = _call(curryname, called);
+                        currybody = _function(fname, params, body).value;
+                        return new Box(fname, _expression(currybody));
+                    }
 
-                        if (x === 'apply') {
-                            called[0] = new Box('null', '');
-                            return _call(unsymbol(tree[1]) + '.apply', called);
-                        }
-                        if (infixOps.hasOwnProperty(x)) {
-                            // binary operator
-                            return _infix(infixOps[x], unsymbol(called[0]), unsymbol(called[1]));
-                        }
+                    if (x === 'apply') {
+                        called[0] = new Box('null', '');
+                        return _call(unsymbol(tree[1]) + '.apply', called);
+                    }
+                    if (infixOps.hasOwnProperty(x)) {
+                        // binary operator
+                        return _infix(infixOps[x], unsymbol(called[0]), unsymbol(called[1]));
+                    }
 
-                        for (i = 0; i < called.length; i += 1) {
-                            if (called[i] === undefined) {
-                                throw new SyntaxError ('Syntax error in function call at ' + lineno);
-                            }
+                    for (i = 0; i < called.length; i += 1) {
+                        if (called[i] === undefined) {
+                            throw new SyntaxError('Syntax error in function call at ' + lineno);
                         }
-                        return _call(x, called);
+                    }
+                    return _call(x, called);
                 }
             }
         }
 
-        function makeList  (tokens) {
+        function makeList(tokens) {
             var list = [];
             list.push(tokens.shift());
-            tokens.shift();// Get rid of (
-            while(tokens[0] !== ')') {
+            tokens.shift(); // Get rid of (
+            while (tokens[0] !== ')') {
                 if (tokens[1] === '(') {
                     list.push(makeList(tokens));
                 } else {
@@ -652,7 +648,7 @@ var ceme;
             return list;
         }
 
-        function parser  (tokens) {
+        function parser(tokens) {
             var tree = [],
                 token;
 
@@ -674,34 +670,61 @@ var ceme;
             return tree;
         }
 
-        function lexer  (input) {
-            var lineno = 1;
-            var linenos = [];
+        function reShortString() {
+            var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n\r])*"/,
+                singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n\r])*'/,
+                result = new RegExp(singleQuoted.source +
+                    '|' + doubleQuoted.source);
+            return result;
+        }
 
-            var i;
-            var tokens = [];
-            var indentStack = [];
-            var indentLevel = 1;
+        function regexes() {
+            var regs = {
+                'COMMENT': /^[\r\n]* *#[^\r\n]*/,
+                //'DANGEROUS': /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
+                'NUMBER': /^\-?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][+\-]?[0-9]*)?/,
+                'SYMBOL': /^[^_ '"\r\n#:()][^ '"\r\n#:()]*/,
+                'INDSPACE': /^(\r\n|\n|\r) */,
+                'SPACE': /(^ +)|(^\r\n+)|(^\n+)|(^\r+)/,
+                'INDENT': /^\(/,
+                'DEDENT': /^\)/,
+                'LONGSTRING': /^"""([^"]|\\")*"""|^'''([^']|\\')*'''/,
+                'STRING': reShortString()
+            };
+            return regs;
+        }
 
-            var regs = regexes();
-            var length = input.length;
+        function lexer(input) {
+            var lineno = 1,
+                linenos = [],
+                i,
+                tokens = [],
+                indentStack = [],
+                indentLevel = 1,
+                regs = regexes(),
+                length = input.length,
+                res,
+                spaces,
+                symbol,
+                temp;
 
-            function addLines (no) {
+            function addLines(no) {
                 lineno += no;
                 linenos.push(lineno);
             }
-            function countLines (str) {
+
+            function countLines(str) {
                 return str.split(/\r\n|\r|\n/).length - 1;
             }
 
             while (length > 0) {
                 for (i in regs) {
-                    var res = input.match(regs[i]);
+                    res = input.match(regs[i]);
 
                     if (res !== null) {
                         res = res[0];
                         if (i === 'INDSPACE') {
-                            var spaces = res.length;
+                            spaces = res.length;
                             if (spaces > indentLevel) {
                                 indentStack.push(spaces - indentLevel);
                                 indentLevel = spaces;
@@ -714,7 +737,7 @@ var ceme;
                                 }
                             }
                             addLines(1);
-                        } else  {
+                        } else {
                             if (i === 'SPACE' || i === 'COMMENT') {
                                 addLines(countLines(res));
                             } else if (i === 'NUMBER') {
@@ -728,18 +751,18 @@ var ceme;
                             } else if (res === 'empty-list') {
                                 tokens.push('[]');
                             } else if (i === 'SYMBOL') {
-                                var symbol = new Symbol(res, lineno);
+                                symbol = new Symbol(res, lineno);
                                 tokens.push(symbol);
                             } else if (i === 'STRING') {
                                 tokens.push(res);
                             } else if (i === 'LONGSTRING') {
                                 addLines(countLines(res));
 
-                                var temp = res;
+                                temp = res;
                                 temp = toStringLiteral(removeOneQuote(removeOneQuote(temp)));
                                 tokens.push(temp);
-                            //} else if (i === 'DANGEROUS') {
-                            //    error('Dangerous character');
+                                //} else if (i === 'DANGEROUS') {
+                                //    error('Dangerous character');
                             } else {
                                 tokens.push(res);
                             }
@@ -767,32 +790,7 @@ var ceme;
             return tokens;
         }
 
-        function reShortString  () {
-            var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n\r])*"/,
-                singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n\r])*'/,
-                result = new RegExp(singleQuoted.source +
-                    '|' + doubleQuoted.source);
-            return result;
-        }
-
-        function regexes  () {
-            var regs = {
-                'COMMENT': /^[\r\n]* *#[^\r\n]*/,
-                //'DANGEROUS': /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-                'NUMBER': /^-?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][+-]?[0-9]*)?/,
-                'SYMBOL': /^[^_ '"\r\n#:()][^ '"\r\n#:()]*/,
-                'INDSPACE': /^(\r\n|\n|\r) */,
-                'SPACE': /(^ +)|(^\r\n+)|(^\n+)|(^\r+)/,
-                'INDENT': /^\(/,
-                'DEDENT': /^\)/,
-                'LONGSTRING': /^"""([^"]|\\")*"""|^'''([^']|\\')*'''/,
-                'STRING': reShortString()
-            };
-            return regs;
-        }
-
-
-        function textToParseTree (text) {
+        function textToParseTree(text) {
             var tokens = lexer(text),
                 tree;
             tokens.unshift('(');
@@ -802,13 +800,13 @@ var ceme;
             return tree;
         }
 
-        function compileText (text) {
+        function compileText(text) {
             var tree = textToParseTree(text),
                 result = compileTree(tree);
             return result;
         }
 
-        function FileImports (name, checkdone) {
+        function FileImports(name, checkdone) {
             this.name = name;
             this.done = false;
             this.executed = false;
@@ -857,46 +855,41 @@ var ceme;
             var fileobj = this;
             if (!fileobj.done) {
                 $.ajax({
-                        url : this.name,
-                        type : 'GET',
-                        success : function (data) {
-                            var tree = textToParseTree(data);
-                            var imports = getImports(tree);
-                            var i;
-                            fileobj.code = data;
-                            fileobj.tree = tree;
-                            fileobj.done = true;
-                            for (i = 0; i < imports.length; i += 1) {
-                                fileobj.addToList(imports[i]);
-                            }
-                            fileobj.requestAll();
-                            fileobj.checkdone();
-                        },
-                        error : function (request, e) {
-                            if (request.status === 0) {
-                                ceme.error('No internet connection');
-                            } else {
-                                error(request.responseText);
-                            }
+                    url: this.name,
+                    type: 'GET',
+                    success: function (data) {
+                        var tree = textToParseTree(data);
+                        var imports = getImports(tree);
+                        var i;
+                        fileobj.code = data;
+                        fileobj.tree = tree;
+                        fileobj.done = true;
+                        for (i = 0; i < imports.length; i += 1) {
+                            fileobj.addToList(imports[i]);
                         }
+                        fileobj.requestAll();
+                        fileobj.checkdone();
+                    },
+                    error: function (request, e) {
+                        if (request.status === 0) {
+                            ceme.error('No internet connection');
+                        } else {
+                            error(request.responseText);
+                        }
+                    }
                 });
             }
         }
 
-        function importStatic (filename, extension) {
+        function importStatic(filename, extension) {
             var escapeSelector = function (id) {
-                var temp = id.replace( /(:|\.|\[|\]|,)/g, "\\$1" );
+                var temp = id.replace(/(:|\.|\[|\]|,)/g, "\\$1");
                 temp = temp.replace(new RegExp('/', 'g'), '\\/');
                 return temp;
             }
-            var addJsToDom = function (id, href) {
-            }
+            var addJsToDom = function (id, href) {}
             var addCssToDom = function (id, href) {
-                $('head').append('<link rel="stylesheet" id="'
-                        + fileid
-                        + '" href="'
-                        + filename
-                        + '" type="text/css" />')
+                $('head').append('<link rel="stylesheet" id="' + fileid + '" href="' + filename + '" type="text/css" />')
             }
 
             var selector = '#ceme-import-' + escapeSelector(filename);
@@ -917,22 +910,22 @@ var ceme;
             var fileobj = this;
             if (!fileobj.done) {
                 $.ajax({
-                        url : this.name,
-                        type : 'GET',
-                        success : function (data) {
-                            var i;
-                            fileobj.code = data;
-                            fileobj.done = true;
-                            importStatic(fileobj.name, fileobj.type);
-                            fileobj.checkdone();
-                        },
-                        error : function (request, e) {
-                            if (request.status === 0) {
-                                ceme.error('No internet connection');
-                            } else {
-                                error(request.responseText);
-                            }
+                    url: this.name,
+                    type: 'GET',
+                    success: function (data) {
+                        var i;
+                        fileobj.code = data;
+                        fileobj.done = true;
+                        importStatic(fileobj.name, fileobj.type);
+                        fileobj.checkdone();
+                    },
+                    error: function (request, e) {
+                        if (request.status === 0) {
+                            ceme.error('No internet connection');
+                        } else {
+                            error(request.responseText);
                         }
+                    }
                 });
             }
         }
@@ -970,12 +963,10 @@ var ceme;
         FileImports.prototype.importSingle = function () {
             if (this.type === 'ceme') {
                 compileText(this.code);
-            } else if (this.type === 'js') {
-            } else if (this.type === 'css') {
-            }
+            } else if (this.type === 'js') {} else if (this.type === 'css') {}
         }
 
-        function asyncCompiler (filename, params) {
+        function asyncCompiler(filename, params) {
             console.log('asyncCompiler: ' + filename);
             // This function has two callbacks
             // first one will run just before compilation
@@ -1016,7 +1007,7 @@ var ceme;
             'Symbol': Symbol,
             'isSymbol': isSymbol,
             'compileText': compileText,
-            'asyncCompiler' : asyncCompiler,
+            'asyncCompiler': asyncCompiler,
             'success': success,
             'warning': warning,
             'error': error
@@ -1024,7 +1015,7 @@ var ceme;
     }();
 }());
 
-(function(exports) {
+(function (exports) {
 
     exports.lexer = ceme.lexer;
     exports.Symbol = ceme.Symbol;
