@@ -72,7 +72,7 @@ var ceme;
         };
 
         // Generate a unique variable name on each call
-        // prefixed with ceme
+        // prefixed with _ceme
         unique = (function () {
             var temp = 0;
             return function () {
@@ -637,10 +637,6 @@ var ceme;
         function parser(tokens) {
             var tree = [],
                 token;
-
-            if (tokens.length === 0) {
-                error('No tokens found');
-            }
 
             while (tokens.length) {
                 if (tokens[1] === '(') {
