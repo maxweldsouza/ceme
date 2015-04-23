@@ -823,24 +823,25 @@ var ceme;
 
         FileImports.prototype.toString = function () {
             return 'FileImport: ' + this.name;
-        }
+        };
 
         FileImports.prototype.checkdone = function () {
             return this.done;
-        }
+        };
 
         FileImports.prototype.addToList = function (child) {
             var childobj = new FileImports(child, this.checkdone);
             this.children.push(childobj);
-        }
+        };
 
         FileImports.prototype.checkAllDone = function () {
-            var i;
+            var i,
+                child;
             if (!this.done) {
                 return false;
             }
             for (i = 0; i < this.children.length; i += 1) {
-                var child = this.children[i];
+                child = this.children[i];
                 if (child.done === false) {
                     return false;
                 }
@@ -849,18 +850,20 @@ var ceme;
                 }
             }
             return true;
-        }
+        };
 
         FileImports.prototype.request = function () {
-            var fileobj = this;
+            var fileobj = this,
+                tree,
+                imports,
+                i;
             if (!fileobj.done) {
                 $.ajax({
                     url: this.name,
                     type: 'GET',
                     success: function (data) {
-                        var tree = textToParseTree(data);
-                        var imports = getImports(tree);
-                        var i;
+                        tree = textToParseTree(data);
+                        imports = getImports(tree);
                         fileobj.code = data;
                         fileobj.tree = tree;
                         fileobj.done = true;
@@ -870,7 +873,7 @@ var ceme;
                         fileobj.requestAll();
                         fileobj.checkdone();
                     },
-                    error: function (request, e) {
+                    error: function (request) {
                         if (request.status === 0) {
                             ceme.error('No internet connection');
                         } else {
@@ -879,21 +882,23 @@ var ceme;
                     }
                 });
             }
-        }
+        };
 
         function importStatic(filename, extension) {
-            var escapeSelector = function (id) {
+            function escapeSelector(id) {
                 var temp = id.replace(/(:|\.|\[|\]|,)/g, "\\$1");
                 temp = temp.replace(new RegExp('/', 'g'), '\\/');
                 return temp;
             }
-            var addJsToDom = function (id, href) {}
-            var addCssToDom = function (id, href) {
-                $('head').append('<link rel="stylesheet" id="' + fileid + '" href="' + filename + '" type="text/css" />')
+            function addJsToDom(fileid, filename) {
+                $('head').append('<script id="' + fileid + '" src="' + filename + '" type="text/javascript" />');
+            }
+            function addCssToDom(fileid, filename) {
+                $('head').append('<link rel="stylesheet" id="' + fileid + '" href="' + filename + '" type="text/css" />');
             }
 
-            var selector = '#ceme-import-' + escapeSelector(filename);
-            var fileid = 'ceme-import-' + filename;
+            var selector = '#ceme-import-' + escapeSelector(filename),
+                fileid = 'ceme-import-' + filename;
 
             // Add the file to dom only if it isn't already
             // present
@@ -913,13 +918,12 @@ var ceme;
                     url: this.name,
                     type: 'GET',
                     success: function (data) {
-                        var i;
                         fileobj.code = data;
                         fileobj.done = true;
                         importStatic(fileobj.name, fileobj.type);
                         fileobj.checkdone();
                     },
-                    error: function (request, e) {
+                    error: function (request) {
                         if (request.status === 0) {
                             ceme.error('No internet connection');
                         } else {
@@ -928,9 +932,11 @@ var ceme;
                     }
                 });
             }
-        }
+        };
 
         FileImports.prototype.requestAll = function () {
+            var i,
+                child;
             if (!this.code) {
                 if (this.type === 'ceme') {
                     this.request();
@@ -939,12 +945,11 @@ var ceme;
                 }
             }
             this.checkdone();
-            var i;
             for (i = 0; i < this.children.length; i += 1) {
-                var child = this.children[i];
+                child = this.children[i];
                 child.requestAll();
             }
-        }
+        };
 
         FileImports.prototype.importChildren = function () {
             var i;
@@ -953,32 +958,36 @@ var ceme;
                     this.children[i].importAll();
                 }
             }
-        }
+        };
 
         FileImports.prototype.importAll = function () {
             this.importChildren();
             this.importSingle();
-        }
+        };
 
         FileImports.prototype.importSingle = function () {
             if (this.type === 'ceme') {
                 compileText(this.code);
-            } else if (this.type === 'js') {} else if (this.type === 'css') {}
-        }
+            }
+        };
 
         function asyncCompiler(filename, params) {
-            console.log('asyncCompiler: ' + filename);
+            var tree,
+                imports,
+                i,
+                mainFile;
             // This function has two callbacks
             // first one will run just before compilation
             // second one will run just after compilation
-            var mainFile = new FileImports(filename, function () {
+            mainFile = new FileImports(filename, function () {
+                var output;
                 if (mainFile.checkAllDone() && !mainFile.executed) {
                     if (params.callbackbeforecompile) {
                         params.callbackbeforecompile(mainFile.code);
                     }
                     if (mainFile.type === 'ceme') {
                         mainFile.importChildren();
-                        var output = compileTree(mainFile.tree);
+                        output = compileTree(mainFile.tree);
                         params.callback(mainFile.code, output);
                         mainFile.executed = true;
                     } else {
@@ -988,9 +997,8 @@ var ceme;
             });
             if (mainFile.type === 'ceme') {
                 if (params.code !== undefined) {
-                    var tree = textToParseTree(params.code);
-                    var imports = getImports(tree);
-                    var i;
+                    tree = textToParseTree(params.code);
+                    imports = getImports(tree);
                     mainFile.code = params.code;
                     mainFile.done = true;
                     mainFile.tree = tree;
