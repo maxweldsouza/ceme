@@ -99,15 +99,6 @@ var ceme = function () {
         return output;
     }
 
-    var codeblock  = function (code, output) {
-        var result = '';
-        result += '<h3> Compiled: </h2><pre><code> \n';
-        result += escapeHtml(code);
-        result +='</code></pre><h3> Evaluated: </h2>';
-        result += output;
-        return result;
-    }
-
     var getImports = function (tree) {
         var i;
         var imports = [];
