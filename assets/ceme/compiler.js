@@ -426,15 +426,16 @@ var ceme;
 
         var processMacros = function (tree) {
             var params;
+            var x;
             if (isSymbol(tree[0])) {
-                var x = unsymbol(escapeSymbol(tree[0]));
+                x = unsymbol(escapeSymbol(tree[0]));
             }
             if (x === 'macro') {
                 var name = unsymbol(tree[1][0]);
                 params = tree[1].slice(1);
                 var body = tree[2];
                 addMacro(name, params, body);
-            } else if (x in macroTable) {
+            } else if (macroTable.hasOwnProperty(x)) {
                 params = macroTable[x].params;
                 var body = macroTable[x].body;
                 var called = tree.slice(1);
@@ -524,91 +525,92 @@ var ceme;
                 var x = unsymbol(escapeSymbol(tree[0]));
                 var lineno = tree[0].lineno;
 
-                if (x === 'define') {
-                    if (cemeEnv.IsAtom(tree[1])) { // single variable
-                        cemeEnv[unsymbol(tree[1])] = "";
-                        return wrapdefines(_global(tree[1], tree[2]));
-                    }
-                    throw new SyntaxError ('Syntax error in define at line ' + lineno);
-                } else if (x === 'group') {
-                    return _group(tree.slice(1, tree.length));
-                } else if (x === '=') {
-                    return _set(tree[1], tree[2]);
-                } else if (x === 'while') {
-                    return _while(tree.slice(1, tree.length));
-                } else if (x === 'import') {
-                    return new Box('""', '');
-                } else if (x === 'macro') {
-                    return new Box('""', '');
-                } else if (x === 'let') {
-                    return _let(tree);
-                } else if (x === 'list') {
-                    return _array(tree.slice(1, tree.length));
-                } else if (x === 'function') {
-                    if (!isSymbol(tree[1][0])) {
-                        throw new SyntaxError ('Syntax error in function definition at line ' + lineno);
-                    }
-                    if (tree[1][0].name === 'params') {
-                        console.log('lambda usings params at line ' + lineno);
-                    }
-                    if (tree[1][0].name === 'unnamed' || tree[1][0].name === 'params') {
-                        var pms, bdy;
-                        if (tree[1].length > 1) {
-                            pms = tree[1].slice(1,tree[1].length);
-                        } else {
-                            pms = false;
+                switch (x) {
+                    case 'define':
+                        if (cemeEnv.IsAtom(tree[1])) { // single variable
+                            cemeEnv[unsymbol(tree[1])] = "";
+                            return wrapdefines(_global(tree[1], tree[2]));
                         }
-                        bdy = compile(tree[2]);
-                        return _lambda (pms, bdy);
-                    }
-                    cemeEnv[unsymbol(tree[1][0])] = "";
-                    return wrapdefines(_globalfunction (tree[1][0],
-                                tree[1].slice(1,tree[1].length),
-                                compile(tree[2])));
-                } else if (x === 'if') {
-                    for (i = 1; i < tree.length; i += 1) {
-                        tree[i] = compile(tree[i]);
-                    }
-                    return _if(unique(), tree);
-                } else {
-                    // function call
-                    var curry = false;
-                    var called = tree.slice(1, tree.length);
-                    var params = [];
-                    var curryname = compile(tree[0]).value;
-                    for (i = 0; i < called.length; i += 1) {
-                        called[i] = compile(called[i]);
-                        if (isCurryDot(called[i])) {
-                            curry = true;
-                            var temp = new Symbol(unique(), 0);
-                            params.push(temp);
-                            called[i] = compile(temp);
+                        throw new SyntaxError ('Syntax error in define at line ' + lineno);
+                    case 'group':
+                        return _group(tree.slice(1, tree.length));
+                    case '=':
+                        return _set(tree[1], tree[2]);
+                    case 'while':
+                        return _while(tree.slice(1, tree.length));
+                    case 'import':
+                        return new Box('""', '');
+                    case 'macro':
+                        return new Box('""', '');
+                    case 'let':
+                        return _let(tree);
+                    case 'list':
+                        return _array(tree.slice(1, tree.length));
+                    case 'function':
+                        if (!isSymbol(tree[1][0])) {
+                            throw new SyntaxError ('Syntax error in function definition at line ' + lineno);
                         }
-                    }
-
-                    if (curry) {
-                        // curried call
-                        var fname = unique();
-                        var body = _call(curryname, called);
-                        var currybody = _function (fname, params, body).value;
-                        return new Box(fname, _expression(currybody));
-                    }
-
-                    if (x === 'apply') {
-                        called[0] = new Box('null', '');
-                        return _call(unsymbol(tree[1]) + '.apply', called);
-                    }
-                    if (x in infixOps) {
-                        // binary operator
-                        return _infix(infixOps[x], unsymbol(called[0]), unsymbol(called[1]));
-                    } else {
+                        if (tree[1][0].name === 'params') {
+                            console.log('lambda usings params at line ' + lineno);
+                        }
+                        if (tree[1][0].name === 'unnamed' || tree[1][0].name === 'params') {
+                            var pms, bdy;
+                            if (tree[1].length > 1) {
+                                pms = tree[1].slice(1,tree[1].length);
+                            } else {
+                                pms = false;
+                            }
+                            bdy = compile(tree[2]);
+                            return _lambda (pms, bdy);
+                        }
+                        cemeEnv[unsymbol(tree[1][0])] = "";
+                        return wrapdefines(_globalfunction (tree[1][0],
+                                    tree[1].slice(1,tree[1].length),
+                                    compile(tree[2])));
+                    case 'if':
+                        for (i = 1; i < tree.length; i += 1) {
+                            tree[i] = compile(tree[i]);
+                        }
+                        return _if(unique(), tree);
+                    default:
+                        // function call
+                        var curry = false;
+                        var called = tree.slice(1, tree.length);
+                        var params = [];
+                        var curryname = compile(tree[0]).value;
                         for (i = 0; i < called.length; i += 1) {
-                            if (called[i] === undefined) {
-                                throw new SyntaxError ('Syntax error in function call at ' + lineno);
+                            called[i] = compile(called[i]);
+                            if (isCurryDot(called[i])) {
+                                curry = true;
+                                var temp = new Symbol(unique(), 0);
+                                params.push(temp);
+                                called[i] = compile(temp);
                             }
                         }
-                        return _call(x, called);
-                    }
+
+                        if (curry) {
+                            // curried call
+                            var fname = unique();
+                            var body = _call(curryname, called);
+                            var currybody = _function (fname, params, body).value;
+                            return new Box(fname, _expression(currybody));
+                        }
+
+                        if (x === 'apply') {
+                            called[0] = new Box('null', '');
+                            return _call(unsymbol(tree[1]) + '.apply', called);
+                        }
+                        if (x in infixOps) {
+                            // binary operator
+                            return _infix(infixOps[x], unsymbol(called[0]), unsymbol(called[1]));
+                        } else {
+                            for (i = 0; i < called.length; i += 1) {
+                                if (called[i] === undefined) {
+                                    throw new SyntaxError ('Syntax error in function call at ' + lineno);
+                                }
+                            }
+                            return _call(x, called);
+                        }
                 }
             }
         };
