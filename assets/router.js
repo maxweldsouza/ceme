@@ -29,12 +29,6 @@ cemeEnv.GetPageName = function () {
     return path;
 };
 
-if (clientSide) {
-    window.onpopstate = function () {
-        Router.route(window.location.pathname + window.location.search);
-    };
-}
-
 var queryObj = {};
 
 var Router = function () {
@@ -83,6 +77,26 @@ var Router = function () {
         editor.resize();
     }
 
+    function makeEditor (elem) {
+        /*
+        var myCodeMirror = CodeMirror.fromTextArea(elem, {
+            lineNumbers: true,
+            mode: "text/html",
+            tabSize: 4,
+            indentUnit: 4,
+            vimMode: false,
+            extraKeys: {
+                "Tab": "indentMore",
+                "Shift-Tab": "indentLess",
+                "Shift-Ctrl-Up": "swapLineUp",
+                "Shift-Ctrl-Down": "swapLineDown"
+            }
+        });
+        */
+        //myCodeMirror.setSize(550, 700);
+        return myCodeMirror;
+    }
+
     function runCode () {
         var text,
             textareas,
@@ -100,15 +114,13 @@ var Router = function () {
                     changeMode('view');
                 }
             },
-            code: text,
+            code: text
         });
 
         textareas = document.getElementsByClassName("ceme-editor");
-        i;
         for (i = 0; i < textareas.length; i += 1) {
             makeEditor(textareas[i]);
         }
-
     }
 
     if (clientSide) {
@@ -185,27 +197,7 @@ var Router = function () {
         });
     }
 
-    var makeEditor = function (elem) {
-        /*
-        var myCodeMirror = CodeMirror.fromTextArea(elem, {
-            lineNumbers: true,
-            mode: "text/html",
-            tabSize: 4,
-            indentUnit: 4,
-            vimMode: false,
-            extraKeys: {
-                "Tab": "indentMore",
-                "Shift-Tab": "indentLess",
-                "Shift-Ctrl-Up": "swapLineUp",
-                "Shift-Ctrl-Down": "swapLineDown"
-            }
-        });
-        */
-        //myCodeMirror.setSize(550, 700);
-        return myCodeMirror;
-    }
-
-    var firstLoad = function() {
+    function firstLoad () {
         ceme.asyncCompiler('/assets/code/home.ceme', {
             callback: function (code, output) {
                 $('body').show();
@@ -230,13 +222,15 @@ var Router = function () {
     }
 
 
-    var route = function (url) {
+    function route (url) {
+        var loc,
+            pagename;
         url = url.substr(1);
-        var loc = url.split('?');
+        loc = url.split('?');
         if (loc[1]) {
             queryObj = queryStringToJSON(loc[1]);
         }
-        var pagename = loc[0];
+        pagename = loc[0];
         if (pagename === '') {
             pagename = 'home';
         }
@@ -274,18 +268,19 @@ var Router = function () {
             }
         });
 
-        try {
-        } catch (err) {
-            $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
-        }
-
     }
     return {
         'route': route,
         'firstLoad': firstLoad,
         'runCode': runCode
-    }
+    };
 }();
+
+if (clientSide) {
+    window.onpopstate = function () {
+        Router.route(window.location.pathname + window.location.search);
+    };
+}
 
 (function (exports) {
     exports.route = Router.route;
