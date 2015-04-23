@@ -15,10 +15,9 @@ if (clientSide) {
         var file = window.location.pathname.substr(1);
         if (file === '') {
             return 'home';
-        } else {
-            return file;
         }
-    }
+        return file;
+    };
 }
 
 cemeEnv.GetPageName = function () {
@@ -26,26 +25,29 @@ cemeEnv.GetPageName = function () {
     path = path.substr(1);
     if (path === '') {
         return 'home';
-    } else {
-        return path;
     }
-}
+    return path;
+};
 
 if (clientSide) {
-    window.onpopstate = function (event) {
+    window.onpopstate = function () {
         Router.route(window.location.pathname + window.location.search);
-    }
+    };
 }
 
 var queryObj = {};
 
 var Router = function () {
-    var queryStringToJSON = function (queryString) {
+    var currentMode,
+        editor;
+
+    function queryStringToJSON (queryString) {
+        var result = {},
+            pairs;
         if(queryString.indexOf('?') > -1){
             queryString = queryString.split('?')[1];
         }
-        var pairs = queryString.split('&');
-        var result = {};
+        pairs = queryString.split('&');
         pairs.forEach(function(pair) {
             pair = pair.split('=');
             result[pair[0]] = decodeURIComponent(pair[1] || '');
@@ -53,14 +55,42 @@ var Router = function () {
         return result;
     }
 
-    var xsrfToken = function () {
-        return '&_xsrf=' + cemeEnv.GetCookie('_xsrf')
+    function xsrfToken () {
+        return '&_xsrf=' + cemeEnv.GetCookie('_xsrf');
     }
 
-    var runCode = function () {
-        var text = editor.getValue();
+    function changeMode (mode) {
+        currentMode = mode;
+        $('.ceme-btn-page').removeClass('active');
+        $('.ceme-btn-code').removeClass('active');
+        $('.ceme-btn-both').removeClass('active');
+        //editor.refresh();
+        if (mode === 'view') {
+            $('.ceme-btn-page').addClass('active');
+            $('#ceme-code').hide();
+            $('#ceme-output').fadeIn();
+            $('#ceme-code').hide();
+            $('#ceme-output').fadeIn();
+        } else if (mode === 'edit') {
+            $('.ceme-btn-code').addClass('active');
+            $('#ceme-output').hide();
+            $('#ceme-code').fadeIn();
+        } else if (mode === 'both') {
+            $('.ceme-btn-both').addClass('active');
+            $('#ceme-output').fadeIn();
+            $('#ceme-code').fadeIn();
+        }
+        editor.resize();
+    }
+
+    function runCode () {
+        var text,
+            textareas,
+            i,
+            outputelem;
+        text = editor.getValue();
         $('#alert').hide();
-        var outputelem = $('#ceme-output');
+        outputelem = $('#ceme-output');
         outputelem.empty();
 
         ceme.asyncCompiler('', {
@@ -73,14 +103,9 @@ var Router = function () {
             code: text,
         });
 
-        try {
-        } catch (err) {
-            $('#alert').hide().html(cemeEnv.Alert(err.message, 'danger')).fadeIn(200);
-        }
-
-        var textareas = document.getElementsByClassName("ceme-editor");
-        var i;
-        for (i = 0; i < textareas.length; i++) {
+        textareas = document.getElementsByClassName("ceme-editor");
+        i;
+        for (i = 0; i < textareas.length; i += 1) {
             makeEditor(textareas[i]);
         }
 
@@ -99,14 +124,14 @@ var Router = function () {
                         url: url,
                         type: 'POST',
                         data: $(this).serialize() + xsrfToken(),
-                        error: function (jqXHR, textStatus, errorThrown) {
+                        error: function (jqXHR) {
                             if (jqXHR.status === 0) {
                                 ceme.error('No internet connection');
-                            } else if (jqXHR.status == 500) {
+                            } else if (jqXHR.status === 500) {
                                 ceme.error('Internal server error');
-                            } else if (jqXHR.status == 404) {
+                            } else if (jqXHR.status === 404) {
                                 ceme.error(jqXHR.responseText);
-                            } else if (jqXHR.status == 400) {
+                            } else if (jqXHR.status === 400) {
                                 ceme.error(jqXHR.responseText);
                             } else {
                                 ceme.error('Unexpected error status:' + jqXHR.status);
@@ -161,7 +186,6 @@ var Router = function () {
     }
 
     var makeEditor = function (elem) {
-        var editor;
         /*
         var myCodeMirror = CodeMirror.fromTextArea(elem, {
             lineNumbers: true,
@@ -180,33 +204,6 @@ var Router = function () {
         //myCodeMirror.setSize(550, 700);
         return myCodeMirror;
     }
-
-    var currentMode;
-    var changeMode = function(mode) {
-        currentMode = mode;
-        $('.ceme-btn-page').removeClass('active');
-        $('.ceme-btn-code').removeClass('active');
-        $('.ceme-btn-both').removeClass('active');
-        //editor.refresh();
-        if (mode === 'view') {
-            $('.ceme-btn-page').addClass('active');
-            $('#ceme-code').hide();
-            $('#ceme-output').fadeIn();
-            $('#ceme-code').hide();
-            $('#ceme-output').fadeIn();
-        } else if (mode === 'edit') {
-            $('.ceme-btn-code').addClass('active');
-            $('#ceme-output').hide();
-            $('#ceme-code').fadeIn();
-        } else if (mode === 'both') {
-            $('.ceme-btn-both').addClass('active');
-            $('#ceme-output').fadeIn();
-            $('#ceme-code').fadeIn();
-        }
-        editor.resize();
-    }
-
-    var editor;
 
     var firstLoad = function() {
         ceme.asyncCompiler('/assets/code/home.ceme', {
@@ -231,6 +228,7 @@ var Router = function () {
             }
         });
     }
+
 
     var route = function (url) {
         url = url.substr(1);
