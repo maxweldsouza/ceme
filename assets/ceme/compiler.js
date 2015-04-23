@@ -3,19 +3,26 @@ var ceme;
 
 (function () {
     "use strict";
+    var lib,
+        infixOps,
+        indent = '    ',
+        macroTable = {},
+        isArray,
+        compile,
+        unique;
 
     ceme = function () {
 
-        var SyntaxError = function (message) {
+        function SyntaxError (message) {
             this.message = message;
-        };
-        var success = function (message) {
+        }
+        function success (message) {
             $('#alert').hide().html(cemeEnv.Alert(message, 'success')).fadeIn(200);
-        };
-        var warning = function (message) {
+        }
+        function warning (message) {
             $('#alert').hide().html(cemeEnv.Alert(message, 'warning')).fadeIn(200);
-        };
-        var error = function (msg, lineno) {
+        }
+        function error (msg, lineno) {
             var message = msg;
             if (lineno !== undefined) {
                 message += ' at line ' + lineno;
@@ -24,7 +31,7 @@ var ceme;
                 $('#alert').hide().html(cemeEnv.Alert(message, 'danger')).fadeIn(200);
             }
             throw message;
-        };
+        }
 
         /* General */
 
@@ -38,7 +45,6 @@ var ceme;
             }
         };
 
-        var lib;
         if (platform() === 'nodejs') {
             lib = require('./lib');
             cemeEnv = lib.cemeEnv;
@@ -46,17 +52,17 @@ var ceme;
 
         /* Helper */
 
-        var Symbol = function (name, lineno) {
+        function Symbol (name, lineno) {
             this.name = name;
             this.lineno = lineno;
-        };
+        }
 
-        var isSymbol = function (a) {
+        function isSymbol (a) {
             if (a === undefined) {
                 return false;
             }
             return a instanceof Symbol;
-        };
+        }
 
         Symbol.prototype.toString = function symbolToString() {
             return '[Symbol: ' + this.name + ']';
@@ -64,7 +70,7 @@ var ceme;
 
         // Generate a unique variable name on each call
         // prefixed with ceme
-        var unique = (function () {
+        unique = (function () {
             var temp = 0;
             return function () {
                 temp += 1;
@@ -72,28 +78,28 @@ var ceme;
             };
         }());
 
-        var toStringLiteral  = function (str) {
+        function toStringLiteral  (str) {
             // TODO not just line break
             // do everything
             str = str.replace(/\n/g, '\\n');
             return str;
-        };
+        }
 
-        var removeQuotes = function (text) {
+        function removeQuotes (text) {
             if (text[0] === '"' || text[0] === "'") {
                 return text.slice(3, text.length - 3);
             }
             return text;
-        };
+        }
 
-        var removeOneQuote  = function (text) {
+        function removeOneQuote (text) {
             if (text[0] === '"' || text[0] === "'") {
                 return text.slice(1, text.length - 1);
             }
             return text;
-        };
+        }
 
-        var escapeSymbol = function (a) {
+        function escapeSymbol (a) {
             if (cemeEnv.hasOwnProperty(a.name)) {
                 return a;
             }
@@ -102,9 +108,9 @@ var ceme;
             result = result.replace(/-/g, '_d');
             result = result.replace(/\?/g, '_q');
             return new Symbol(result, 0);
-        };
+        }
 
-        var infixOps = {
+        infixOps = {
             '+': '+',
             '-': '-',
             '*': '*',
@@ -120,7 +126,7 @@ var ceme;
             'and': '&&'
         };
 
-        var unsymbol = function (a) {
+        function unsymbol (a) {
             if (cemeEnv.hasOwnProperty(a.name)) {
                 return "cemeEnv['" + a.name + "']";
             }
@@ -128,73 +134,71 @@ var ceme;
                 return a.name;
             }
             return a.name;
-        };
+        }
 
         /*********************************************************************************************/
         /* Grammar                                                                               */
         /*********************************************************************************************/
 
-        var Box = function (value, hoist) {
+        function Box (value, hoist) {
             this.value = value;
             this.hoist = hoist;
-        };
+        }
 
-        var _unbox = function (box) {
+        function _unbox (box) {
             return box.hoist + box.value;
-        };
+        }
 
-        var isCurryDot = function (a) {
+        function isCurryDot (a) {
             return a instanceof Box && a.value === '.';
-        };
-
-        var indent = '    ';
+        }
 
         // 'return a'
-        var _return  = function (a) {
+        function _return  (a) {
             return 'return ' + a;
-        };
+        }
 
         // 'some code;'
-        var _statement  = function (a) {
+        function _statement  (a) {
             return a + ';';
-        };
+        }
 
         // 'some code;
         // '
-        var _expression  = function (a) {
+        function _expression  (a) {
             return _statement(a) + '\n';
-        };
+        }
 
         // '{
         //  some code
         //  }'
-        var _block  = function (a) {
+        function _block  (a) {
             return '{\n' + a + '\n}';
-        };
+        }
 
         // 'var name'
-        var _var  = function (name) {
+        function _var  (name) {
             return _expression('var ' + name);
-        };
+        }
 
         // 'name = a'
-        var _assign  = function (name, a) {
+        function _assign  (name, a) {
             return name + ' = ' + a;
-        };
+        }
 
-        var _indent  = function (block) {
+        function _indent  (block) {
             var result = block.replace(/\n/g, '\n' + indent);
             return indent + result;
-        };
+        }
 
         // Non hoisted
 
-        var _parameters  = function (params) {
+        function _parameters  (params) {
+            var temp = [],
+                i;
             if (!params) {
                 return '';
             }
-            var i;
-            var temp = [];
             for (i = 0; i < params.length; i += 1) {
                 temp.push(escapeSymbol(params[i]).name);
             }
@@ -203,21 +207,21 @@ var ceme;
             } else {
                 return ' ' +  temp.join(', ') + ' ';
             }
-        };
+        }
 
         // 'param0, param1, param2'
-        var _args  = function (params) {
-            var i;
-            var vals = [];
+        function _args  (params) {
+            var vals = [],
+                i;
             for (i = 0; i < params.length; i += 1) {
                 vals.push(params[i].value);
             }
             return vals.join(', ');
-        };
+        }
 
         // Hoisted
 
-        var _infix = function (name, a, b) {
+        function _infix (name, a, b) {
             var result = '( ' + a.value
                     + ' '
                     + name
@@ -225,17 +229,17 @@ var ceme;
                     + b.value
                     + ' )';
             return new Box(result, a.hoist + b.hoist);
-        };
+        }
 
-        var wrapdefines  = function (body) {
+        function wrapdefines  (body) {
             var result = '';
             result += '(function () {\n';
                 result += _indent(body.hoist + body.value + '\nreturn;');
                 result += '\n})()';
             return new Box(result, '');
-        };
+        }
 
-        var _functionBody  = function (params, body) {
+        function _functionBody  (params, body) {
             var result = ' (';
             result += _parameters(params);
             result += ') {\n';
@@ -244,73 +248,74 @@ var ceme;
             result += ';\n';
             result += '}';
             return new Box(result, '');
-        };
+        }
 
-        var _lambda  = function (params, body) {
+        function _lambda  (params, body) {
             var result = '';
             result += 'function ';
             result += _functionBody(params, body).value;
             return new Box(result, '');
-        };
+        }
 
-        var _globalfunction  = function (name, params, body) {
+        function _globalfunction  (name, params, body) {
             var result = unsymbol(name) + ' = ';
             result += _lambda(params, body).value;
             return new Box(result, '');
-        };
+        }
 
-        var _function  = function (name, params, body) {
+        function _function  (name, params, body) {
             var result = 'function '+ name;
             result += _functionBody(params, body).value;
             return new Box(result, '');
-        };
+        }
 
-        var _cemeVar  = function (a) {
+        function _cemeVar  (a) {
             if (cemeEnv.hasOwnProperty(a)) {
                 return "cemeEnv['" + a + "']";
             }
             return a;
-        };
+        }
 
-        var _global  = function (name, value) {
-            var val = compile(value);
-            var result = unsymbol(name) + " = " + val.value + ';';
+        function _global  (name, value) {
+            var val = compile(value),
+                result = unsymbol(name) + " = " + val.value + ';';
             return new Box(result, val.hoist);
-        };
+        }
 
-        var _local  = function (name, value) {
-            var val = compile(value);
-            var result = "var " + name + " = " + val.value;
+        function _local  (name, value) {
+            var val = compile(value),
+                result = "var " + name + " = " + val.value;
             return new Box(result, val.hoist);
-        };
+        }
 
-        var _set = function (name, value) {
-            var val = compile(value);
-            var result = unsymbol(name) + " = " + val.value;
+        function _set (name, value) {
+            var val = compile(value),
+                result = unsymbol(name) + " = " + val.value;
             return new Box(result, val.hoist);
-        };
+        }
 
-        var _let  = function (tree) {
-            var hoist = '';
-            var i;
+        function _let  (tree) {
+            var hoist = '',
+                i,
+                nooflets = tree.length,
+                last,
+                result;
 
-            var nooflets = tree.length;
-            var result;
             for (i = 1; i < nooflets - 1; i = i + 2) {
                 result = _local(unsymbol(tree[i]), tree[i+1]);
                 hoist += result.hoist;
                 hoist += _expression(result.value);
             }
-            var last = compile(tree[nooflets - 1]);
+            last = compile(tree[nooflets - 1]);
             hoist += last.hoist;
             return new Box(last.value , hoist);
-        };
+        }
 
-        var _while = function (tree) {
-            var i;
-            var value = '';
-            var hoist = '';
-            var result;
+        function _while (tree) {
+            var i,
+                value = '',
+                hoist = '',
+                result;
             result = 'while (' + compile(tree[0]).value + ') \n';
             for (i = 1; i < tree.length; i += 1) {
                 tree[i] = compile(tree[i]);
@@ -320,12 +325,12 @@ var ceme;
             }
             result = result + _block(value);
             return new Box(result, hoist);
-        };
+        }
 
-        var _group = function (tree) {
-            var i;
-            var value = '';
-            var hoist = '';
+        function _group (tree) {
+            var i,
+                value = '',
+                hoist = '';
             for (i = 0; i < tree.length; i += 1) {
                 tree[i] = compile(tree[i]);
                 if (i === tree.length - 1) {
@@ -337,12 +342,13 @@ var ceme;
                 hoist += tree[i].hoist;
             }
             return new Box(value, hoist);
-        };
+        }
 
-        var _if  = function (name, tree) {
-            var result = '';
-            var hoist = '';
-            var i;
+        function _if  (name, tree) {
+            var result = '',
+                hoist = '',
+                box,
+                i;
             result += _var(name);
             result += 'if ';
             result += '( ';
@@ -359,23 +365,23 @@ var ceme;
                 result += _block(_indent(_statement(tree[i+1].hoist + _assign(name, tree[i+1].value))));
             }
             result += '\n';
-            var box = new Box(name, hoist + result);
+            box = new Box(name, hoist + result);
             return box;
-        };
+        }
 
-        var _call  = function (name, args) {
-            var i;
-            var hoisted = '';
+        function _call  (name, args) {
+            var i,
+                hoisted = '';
             for (i = 0; i < args.length; i += 1) {
                 hoisted += args[i].hoist;
             }
             return new Box(name + ' (' + _args(args) +')', hoisted);
-        };
+        }
 
-        var _array  = function (values) {
-            var i;
-            var vals = [];
-            var hoists = [];
+        function _array  (values) {
+            var i,
+                vals = [],
+                hoists = [];
             for (i = 0; i < values.length; i += 1) {
                 vals.push(compile(values[i]));
                 vals[i] = (vals[i].value);
@@ -383,19 +389,21 @@ var ceme;
             }
             return new Box('[' + vals.join(', ') + ']',
                     hoists.join(''));
-        };
+        }
 
         /*********************************************************************************************/
         /* Errors                                                                                    */
         /*********************************************************************************************/
 
-        var isArray = Array.isArray || function (a) {
-            return Object.prototype.toString.call(a) === '[object Array]';
-        };
+        if (isArray === undefined) {
+            isArray = function (a) {
+                return Object.prototype.toString.call(a) === '[object Array]';
+            };
+        }
 
-        var nestedArrayToString = function (a) {
-            var i;
-            var result = '';
+        function nestedArrayToString (a) {
+            var i,
+                result = '';
             if (isArray(a[0])) {
                 result += nestedArrayToString(a[0]);
             } else {
@@ -409,51 +417,68 @@ var ceme;
                 }
             }
             return '[' + result + ']';
-        };
+        }
 
         /*********************************************************************************************/
         /* Compiler                                                                               */
         /*********************************************************************************************/
 
-        var macroTable = {};
+        function replace (tree, old, nu) {
+            var i;
+            for (i = 0; i < tree.length; i += 1) {
+                if (cemeEnv.IsAtom(tree[i])) {
+                    if (isSymbol(tree[i])) {
+                        if (tree[i].name === old.name) {
+                            tree[i] = nu;
+                        }
+                    }
+                } else {
+                    tree[i] = replace(tree[i], old, nu);
+                }
+            }
+            return tree;
+        }
 
-        var addMacro = function (name, params, body) {
+        function addMacro (name, params, body) {
             var obj = {};
             obj.params = params;
             obj.body = body;
             macroTable[name] = obj;
-        };
+        }
 
-        var processMacros = function (tree) {
-            var params;
-            var x;
+        function processMacros (tree) {
+            var params,
+                name,
+                body,
+                called,
+                i,
+                x;
             if (isSymbol(tree[0])) {
                 x = unsymbol(escapeSymbol(tree[0]));
             }
             if (x === 'macro') {
-                var name = unsymbol(tree[1][0]);
+                name = unsymbol(tree[1][0]);
                 params = tree[1].slice(1);
-                var body = tree[2];
+                body = tree[2];
                 addMacro(name, params, body);
             } else if (macroTable.hasOwnProperty(x)) {
                 params = macroTable[x].params;
-                var body = macroTable[x].body;
-                var called = tree.slice(1);
-                var i;
+                body = macroTable[x].body;
+                called = tree.slice(1);
                 for (i = 0; i < called.length; i += 1) {
                     body = replace(body, params[i], called[i]);
                 }
                 tree = body;
             }
             return tree;
-        };
+        }
 
-        var compileTree = function (tree) {
-            var input = '';
-            var output = '';
-            var tmp;
-            var i;
-            var code;
+        function compileTree (tree) {
+            var input = '',
+                output = '',
+                tmp,
+                i,
+                code;
             for (i = 0; i < tree.length; i += 1) {
                 tree[i] = processMacros(tree[i]);
             }
@@ -472,16 +497,18 @@ var ceme;
                 }
             }
             return output;
-        };
+        }
 
-        var getImports = function (tree) {
-            var i;
-            var imports = [];
+        function getImports (tree) {
+            var i,
+                x,
+                filename,
+                imports = [];
             for (i = 0; i < tree.length; i += 1) {
                 if (isSymbol(tree[i][0])) {
-                    var x = unsymbol(escapeSymbol(tree[i][0]));
+                    x = unsymbol(escapeSymbol(tree[i][0]));
                     if (x === 'import') {
-                        var filename = removeOneQuote(tree[i][1]);
+                        filename = removeOneQuote(tree[i][1]);
                         // If the url begins with http
                         // or // consider it to be external
                         if (/^(http|\/\/)/.test(filename)) {
@@ -493,26 +520,22 @@ var ceme;
                 }
             }
             return imports;
-        };
+        }
 
-        var replace = function (tree, old, nu) {
-            var i;
-            for (i = 0; i < tree.length; i += 1) {
-                if (cemeEnv.IsAtom(tree[i])) {
-                    if (isSymbol(tree[i])) {
-                        if (tree[i].name === old.name) {
-                            tree[i] = nu;
-                        }
-                    }
-                } else {
-                    tree[i] = replace(tree[i], old, nu);
-                }
-            }
-            return tree;
-        };
-
-        var compile = function (tree) {
-            var i;
+        function compile (tree) {
+            var i,
+                x,
+                lineno,
+                pms,
+                bdy,
+                curry,
+                called,
+                params,
+                curryname,
+                fname,
+                body,
+                currybody,
+                temp;
             if (isSymbol(tree)) {
                 return new Box(unsymbol(escapeSymbol(tree)), '');
             }
@@ -522,8 +545,8 @@ var ceme;
             }
 
             if (isSymbol(tree[0])) {
-                var x = unsymbol(escapeSymbol(tree[0]));
-                var lineno = tree[0].lineno;
+                x = unsymbol(escapeSymbol(tree[0]));
+                lineno = tree[0].lineno;
 
                 switch (x) {
                     case 'define':
@@ -554,7 +577,6 @@ var ceme;
                             console.log('lambda usings params at line ' + lineno);
                         }
                         if (tree[1][0].name === 'unnamed' || tree[1][0].name === 'params') {
-                            var pms, bdy;
                             if (tree[1].length > 1) {
                                 pms = tree[1].slice(1,tree[1].length);
                             } else {
@@ -574,15 +596,15 @@ var ceme;
                         return _if(unique(), tree);
                     default:
                         // function call
-                        var curry = false;
-                        var called = tree.slice(1, tree.length);
-                        var params = [];
-                        var curryname = compile(tree[0]).value;
+                        curry = false;
+                        called = tree.slice(1, tree.length);
+                        params = [];
+                        curryname = compile(tree[0]).value;
                         for (i = 0; i < called.length; i += 1) {
                             called[i] = compile(called[i]);
                             if (isCurryDot(called[i])) {
                                 curry = true;
-                                var temp = new Symbol(unique(), 0);
+                                temp = new Symbol(unique(), 0);
                                 params.push(temp);
                                 called[i] = compile(temp);
                             }
@@ -590,9 +612,9 @@ var ceme;
 
                         if (curry) {
                             // curried call
-                            var fname = unique();
-                            var body = _call(curryname, called);
-                            var currybody = _function (fname, params, body).value;
+                            fname = unique();
+                            body = _call(curryname, called);
+                            currybody = _function (fname, params, body).value;
                             return new Box(fname, _expression(currybody));
                         }
 
@@ -600,42 +622,22 @@ var ceme;
                             called[0] = new Box('null', '');
                             return _call(unsymbol(tree[1]) + '.apply', called);
                         }
-                        if (x in infixOps) {
+                        if (infixOps.hasOwnProperty(x)) {
                             // binary operator
                             return _infix(infixOps[x], unsymbol(called[0]), unsymbol(called[1]));
-                        } else {
-                            for (i = 0; i < called.length; i += 1) {
-                                if (called[i] === undefined) {
-                                    throw new SyntaxError ('Syntax error in function call at ' + lineno);
-                                }
-                            }
-                            return _call(x, called);
                         }
+
+                        for (i = 0; i < called.length; i += 1) {
+                            if (called[i] === undefined) {
+                                throw new SyntaxError ('Syntax error in function call at ' + lineno);
+                            }
+                        }
+                        return _call(x, called);
                 }
             }
-        };
+        }
 
-        var parser  = function (tokens) {
-            if (tokens.length === 0) 
-                error('No tokens found');
-
-            var tree = [];
-            var level = 0;
-            while (tokens.length) {
-                if (tokens[1] === '(') {
-                    tree.push(makeList(tokens));
-                } else {
-                    var token = tokens.shift();
-                    tree.push(token);
-                }
-                tokens.shift();
-            }
-            tree = tree[0];
-            tree.shift(); // remove dummy token
-            return tree;
-        };
-
-        var makeList  = function (tokens) {
+        function makeList  (tokens) {
             var list = [];
             list.push(tokens.shift());
             tokens.shift();// Get rid of (
@@ -648,19 +650,33 @@ var ceme;
             }
             tokens.shift();
             return list;
-        };
+        }
 
-        var lexer  = function (input) {
+        function parser  (tokens) {
+            var tree = [],
+                token;
+
+            if (tokens.length === 0) {
+                error('No tokens found');
+            }
+
+            while (tokens.length) {
+                if (tokens[1] === '(') {
+                    tree.push(makeList(tokens));
+                } else {
+                    token = tokens.shift();
+                    tree.push(token);
+                }
+                tokens.shift();
+            }
+            tree = tree[0];
+            tree.shift(); // remove dummy token
+            return tree;
+        }
+
+        function lexer  (input) {
             var lineno = 1;
             var linenos = [];
-
-            var addLines = function (no) {
-                lineno += no;
-                linenos.push(lineno);
-            }
-            var countLines = function (str) {
-                return str.split(/\r\n|\r|\n/).length - 1;
-            }
 
             var i;
             var tokens = [];
@@ -669,6 +685,15 @@ var ceme;
 
             var regs = regexes();
             var length = input.length;
+
+            function addLines (no) {
+                lineno += no;
+                linenos.push(lineno);
+            }
+            function countLines (str) {
+                return str.split(/\r\n|\r|\n/).length - 1;
+            }
+
             while (length > 0) {
                 for (i in regs) {
                     var res = input.match(regs[i]);
@@ -740,17 +765,17 @@ var ceme;
             }
 
             return tokens;
-        };
+        }
 
-        var reShortString  = function () {
-            var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n\r])*"/;
-            var singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n\r])*'/;
-            var result = new RegExp(singleQuoted.source +
+        function reShortString  () {
+            var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n\r])*"/,
+                singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n\r])*'/,
+                result = new RegExp(singleQuoted.source +
                     '|' + doubleQuoted.source);
             return result;
-        };
+        }
 
-        var regexes  = function () {
+        function regexes  () {
             var regs = {
                 'COMMENT': /^[\r\n]* *#[^\r\n]*/,
                 //'DANGEROUS': /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
@@ -764,29 +789,29 @@ var ceme;
                 'STRING': reShortString()
             };
             return regs;
-        };
+        }
 
 
-        var textToParseTree = function (text) {
-            var tokens = lexer(text);
+        function textToParseTree (text) {
+            var tokens = lexer(text),
+                tree;
             tokens.unshift('(');
             tokens.unshift('main'); //dummy token
             tokens.push(')');
-            var tree = parser(tokens);
+            tree = parser(tokens);
             return tree;
-        };
+        }
 
-        var compileText = function (text) {
-            var tree = textToParseTree(text);
-            var result = compileTree(tree);
+        function compileText (text) {
+            var tree = textToParseTree(text),
+                result = compileTree(tree);
             return result;
-        };
+        }
 
-        var FileImports = function (name, checkdone) {
+        function FileImports (name, checkdone) {
             this.name = name;
             this.done = false;
             this.executed = false;
-            this.code;
             this.children = [];
             this.checkdone = checkdone;
             if (this.name.endsWith('.js')) {
@@ -796,7 +821,7 @@ var ceme;
             } else {
                 this.type = 'ceme';
             }
-        };
+        }
 
         FileImports.prototype.toString = function () {
             return 'FileImport: ' + this.name;
@@ -858,7 +883,7 @@ var ceme;
             }
         }
 
-        var importStatic = function (filename, extension) {
+        function importStatic (filename, extension) {
             var escapeSelector = function (id) {
                 var temp = id.replace( /(:|\.|\[|\]|,)/g, "\\$1" );
                 temp = temp.replace(new RegExp('/', 'g'), '\\/');
@@ -886,7 +911,7 @@ var ceme;
                     addJsToDom(fileid, filename);
                 }
             }
-        };
+        }
 
         FileImports.prototype.requestStatic = function () {
             var fileobj = this;
@@ -950,7 +975,7 @@ var ceme;
             }
         }
 
-        var asyncCompiler = function (filename, params) {
+        function asyncCompiler (filename, params) {
             console.log('asyncCompiler: ' + filename);
             // This function has two callbacks
             // first one will run just before compilation
@@ -984,7 +1009,7 @@ var ceme;
                 }
             }
             mainFile.requestAll();
-        };
+        }
 
         return {
             'lexer': lexer,
