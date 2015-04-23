@@ -126,9 +126,8 @@ var ceme;
             if (cemeEnv.hasOwnProperty(a.name)) {
                 if (/^[a-zA-Z0-9]+$/.test(a.name)) {
                     return "cemeEnv." + a.name;
-                } else {
-                    return "cemeEnv['" + a.name + "']";
                 }
+                return "cemeEnv['" + a.name + "']";
             }
             if (infixOps.hasOwnProperty(a.name)) {
                 return a.name;
@@ -227,7 +226,7 @@ var ceme;
         function wrapdefines(body) {
             var result = '';
             result += '(function () {\n';
-            result += _indent(body.hoist + body.value + '');
+            result += _indent(body.hoist + body.value);
             result += '\n})()';
             return new Box(result, '');
         }
