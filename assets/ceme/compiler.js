@@ -124,7 +124,11 @@ var ceme;
 
         function unsymbol(a) {
             if (cemeEnv.hasOwnProperty(a.name)) {
-                return "cemeEnv['" + a.name + "']";
+                if (/^[a-zA-Z0-9]+$/.test(a.name)) {
+                    return "cemeEnv." + a.name;
+                } else {
+                    return "cemeEnv['" + a.name + "']";
+                }
             }
             if (infixOps.hasOwnProperty(a.name)) {
                 return a.name;
@@ -243,7 +247,7 @@ var ceme;
 
         function _lambda(params, body) {
             var result = '';
-            result += 'function ';
+            result += 'function';
             result += _functionBody(params, body).value;
             return new Box(result, '');
         }
@@ -468,6 +472,7 @@ var ceme;
             for (i = 0; i < tree.length; i += 1) {
                 try {
                     code = _expression(_unbox(compile(tree[i])));
+                    console.log(code);
                     tmp = eval(code);
                     if (isArray(tmp)) {
                         output += nestedArrayToString(tmp);
