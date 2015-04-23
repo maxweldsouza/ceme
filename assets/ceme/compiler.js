@@ -44,6 +44,347 @@ var ceme;
             cemeEnv = lib.cemeEnv;
         }
 
+        /* Helper */
+
+        var Symbol = function (name, lineno) {
+            this.name = name;
+            this.lineno = lineno;
+        };
+
+        var isSymbol = function (a) {
+            if (a === undefined) {
+                return false;
+            }
+            return a instanceof Symbol;
+        };
+
+        Symbol.prototype.toString = function symbolToString() {
+            return '[Symbol: ' + this.name + ']';
+        };
+
+        // Generate a unique variable name on each call
+        // prefixed with ceme
+        var unique = (function () {
+            var temp = 0;
+            return function () {
+                temp += 1;
+                return '_ceme' + temp;
+            };
+        }());
+
+        var toStringLiteral  = function (str) {
+            // TODO not just line break
+            // do everything
+            str = str.replace(/\n/g, '\\n');
+            return str;
+        };
+
+        var removeQuotes = function (text) {
+            if (text[0] === '"' || text[0] === "'") {
+                return text.slice(3, text.length - 3);
+            }
+            return text;
+        };
+
+        var removeOneQuote  = function (text) {
+            if (text[0] === '"' || text[0] === "'") {
+                return text.slice(1, text.length - 1);
+            }
+            return text;
+        };
+
+        var escapeSymbol = function (a) {
+            if (cemeEnv.hasOwnProperty(a.name)) {
+                return a;
+            }
+            var result = a.name;
+            result = result.replace(/_/g, '__');
+            result = result.replace(/-/g, '_d');
+            result = result.replace(/\?/g, '_q');
+            return new Symbol(result, 0);
+        };
+
+        var infixOps = {
+            '+': '+',
+            '-': '-',
+            '*': '*',
+            '/': '/',
+            '%': '%',
+            '>=': '>=',
+            '<=': '<=',
+            '>': '>',
+            '<': '<',
+            'equal?': '===',
+            '!==': '!==',
+            'or': '||',
+            'and': '&&'
+        };
+
+        var unsymbol = function (a) {
+            if (cemeEnv.hasOwnProperty(a.name)) {
+                return "cemeEnv['" + a.name + "']";
+            }
+            if (infixOps.hasOwnProperty(a.name)) {
+                return a.name;
+            }
+            return a.name;
+        };
+
+        /*********************************************************************************************/
+        /* Grammar                                                                               */
+        /*********************************************************************************************/
+
+        var Box = function (value, hoist) {
+            this.value = value;
+            this.hoist = hoist;
+        };
+
+        var _unbox = function (box) {
+            return box.hoist + box.value;
+        };
+
+        var isCurryDot = function (a) {
+            return a instanceof Box && a.value === '.';
+        };
+
+        var indent = '    ';
+
+        // 'return a'
+        var _return  = function (a) {
+            return 'return ' + a;
+        };
+
+        // 'some code;'
+        var _statement  = function (a) {
+            return a + ';';
+        };
+
+        // 'some code;
+        // '
+        var _expression  = function (a) {
+            return _statement(a) + '\n';
+        };
+
+        // '{
+        //  some code
+        //  }'
+        var _block  = function (a) {
+            return '{\n' + a + '\n}';
+        };
+
+        // 'var name'
+        var _var  = function (name) {
+            return _expression('var ' + name);
+        };
+
+        // 'name = a'
+        var _assign  = function (name, a) {
+            return name + ' = ' + a;
+        };
+
+        var _indent  = function (block) {
+            var result = block.replace(/\n/g, '\n' + indent);
+            return indent + result;
+        };
+
+        // Non hoisted
+
+        var _parameters  = function (params) {
+            if (!params) {
+                return '';
+            }
+            var i;
+            var temp = [];
+            for (i = 0; i < params.length; i += 1) {
+                temp.push(escapeSymbol(params[i]).name);
+            }
+            if (temp[0] === '*args') {
+                // TODO variable arguments
+            } else {
+                return ' ' +  temp.join(', ') + ' ';
+            }
+        };
+
+        // 'param0, param1, param2'
+        var _args  = function (params) {
+            var i;
+            var vals = [];
+            for (i = 0; i < params.length; i += 1) {
+                vals.push(params[i].value);
+            }
+            return vals.join(', ');
+        };
+
+        // Hoisted
+
+        var _infix = function (name, a, b) {
+            var result = '( ' + a.value
+                    + ' '
+                    + name
+                    + ' '
+                    + b.value
+                    + ' )';
+            return new Box(result, a.hoist + b.hoist);
+        };
+
+        var wrapdefines  = function (body) {
+            var result = '';
+            result += '(function () {\n';
+                result += _indent(body.hoist + body.value + '\nreturn;');
+                result += '\n})()';
+            return new Box(result, '');
+        };
+
+        var _functionBody  = function (params, body) {
+            var result = ' (';
+            result += _parameters(params);
+            result += ') {\n';
+            result += _indent(body.hoist);
+            result += _return(body.value);
+            result += ';\n';
+            result += '}';
+            return new Box(result, '');
+        };
+
+        var _lambda  = function (params, body) {
+            var result = '';
+            result += 'function ';
+            result += _functionBody(params, body).value;
+            return new Box(result, '');
+        };
+
+        var _globalfunction  = function (name, params, body) {
+            var result = unsymbol(name) + ' = ';
+            result += _lambda(params, body).value;
+            return new Box(result, '');
+        };
+
+        var _function  = function (name, params, body) {
+            var result = 'function '+ name;
+            result += _functionBody(params, body).value;
+            return new Box(result, '');
+        };
+
+        var _cemeVar  = function (a) {
+            if (cemeEnv.hasOwnProperty(a)) {
+                return "cemeEnv['" + a + "']";
+            }
+            return a;
+        };
+
+        var _global  = function (name, value) {
+            var val = compile(value);
+            var result = unsymbol(name) + " = " + val.value + ';';
+            return new Box(result, val.hoist);
+        };
+
+        var _local  = function (name, value) {
+            var val = compile(value);
+            var result = "var " + name + " = " + val.value;
+            return new Box(result, val.hoist);
+        };
+
+        var _set = function (name, value) {
+            var val = compile(value);
+            var result = unsymbol(name) + " = " + val.value;
+            return new Box(result, val.hoist);
+        };
+
+        var _let  = function (tree) {
+            var hoist = '';
+            var i;
+
+            var nooflets = tree.length;
+            var result;
+            for (i = 1; i < nooflets - 1; i = i + 2) {
+                result = _local(unsymbol(tree[i]), tree[i+1]);
+                hoist += result.hoist;
+                hoist += _expression(result.value);
+            }
+            var last = compile(tree[nooflets - 1]);
+            hoist += last.hoist;
+            return new Box(last.value , hoist);
+        };
+
+        var _while = function (tree) {
+            var i;
+            var value = '';
+            var hoist = '';
+            var result;
+            result = 'while (' + compile(tree[0]).value + ') \n';
+            for (i = 1; i < tree.length; i += 1) {
+                tree[i] = compile(tree[i]);
+                value += _statement(tree[i].value);
+                value += '\n';
+                hoist += tree[i].hoist;
+            }
+            result = result + _block(value);
+            return new Box(result, hoist);
+        };
+
+        var _group = function (tree) {
+            var i;
+            var value = '';
+            var hoist = '';
+            for (i = 0; i < tree.length; i += 1) {
+                tree[i] = compile(tree[i]);
+                if (i === tree.length - 1) {
+                    value += tree[i].value;
+                } else {
+                    hoist += _statement(tree[i].value);
+                    hoist += '\n';
+                }
+                hoist += tree[i].hoist;
+            }
+            return new Box(value, hoist);
+        };
+
+        var _if  = function (name, tree) {
+            var result = '';
+            var hoist = '';
+            var i;
+            result += _var(name);
+            result += 'if ';
+            result += '( ';
+            result += tree[1].value;
+            hoist += tree[1].hoist;
+            result += ' ) ';
+            result += _block(_indent(_statement(tree[2].hoist + _assign(name, tree[2].value))));
+            for (i = 3; i < tree.length; i=i+2) {
+                result += ' else if ';
+                result += '( ';
+                result += tree[i].value;
+                hoist += tree[i].hoist;
+                result += ' ) ';
+                result += _block(_indent(_statement(tree[i+1].hoist + _assign(name, tree[i+1].value))));
+            }
+            result += '\n';
+            var box = new Box(name, hoist + result);
+            return box;
+        };
+
+        var _call  = function (name, args) {
+            var i;
+            var hoisted = '';
+            for (i = 0; i < args.length; i += 1) {
+                hoisted += args[i].hoist;
+            }
+            return new Box(name + ' (' + _args(args) +')', hoisted);
+        };
+
+        var _array  = function (values) {
+            var i;
+            var vals = [];
+            var hoists = [];
+            for (i = 0; i < values.length; i += 1) {
+                vals.push(compile(values[i]));
+                vals[i] = (vals[i].value);
+                hoists.push(values[i].hoist);
+            }
+            return new Box('[' + vals.join(', ') + ']',
+                    hoists.join(''));
+        };
+
         /*********************************************************************************************/
         /* Errors                                                                                    */
         /*********************************************************************************************/
@@ -74,23 +415,55 @@ var ceme;
         /* Compiler                                                                               */
         /*********************************************************************************************/
 
+        var macroTable = {};
+
+        var addMacro = function (name, params, body) {
+            var obj = {};
+            obj.params = params;
+            obj.body = body;
+            macroTable[name] = obj;
+        };
+
+        var processMacros = function (tree) {
+            var params;
+            if (isSymbol(tree[0])) {
+                var x = unsymbol(escapeSymbol(tree[0]));
+            }
+            if (x === 'macro') {
+                var name = unsymbol(tree[1][0]);
+                params = tree[1].slice(1);
+                var body = tree[2];
+                addMacro(name, params, body);
+            } else if (x in macroTable) {
+                params = macroTable[x].params;
+                var body = macroTable[x].body;
+                var called = tree.slice(1);
+                var i;
+                for (i = 0; i < called.length; i += 1) {
+                    body = replace(body, params[i], called[i]);
+                }
+                tree = body;
+            }
+            return tree;
+        };
+
         var compileTree = function (tree) {
             var input = '';
             var output = '';
             var tmp;
             var i;
+            var code;
             for (i = 0; i < tree.length; i += 1) {
                 tree[i] = processMacros(tree[i]);
             }
             for (i = 0; i < tree.length; i += 1) {
                 try {
-                    var code = _expression(_unbox(compile(tree[i])));
+                    code = _expression(_unbox(compile(tree[i])));
                     input += code;
                     tmp = eval(code);
-                    if (tmp === undefined) {
-                    } else if (isArray(tmp)) {
+                    if (isArray(tmp)) {
                         output += nestedArrayToString(tmp);
-                    } else {
+                    } else if (tmp !== undefined) {
                         output += tmp;
                     }
                 } catch (err) {
@@ -121,8 +494,6 @@ var ceme;
             return imports;
         };
 
-        var macroTable = {};
-
         var replace = function (tree, old, nu) {
             var i;
             for (i = 0; i < tree.length; i += 1) {
@@ -139,40 +510,12 @@ var ceme;
             return tree;
         };
 
-        var addMacro = function (name, params, body) {
-            var obj = {};
-            obj.params = params;
-            obj.body = body;
-            macroTable[name] = obj;
-        };
-
-        var processMacros = function (tree) {
-            if (isSymbol(tree[0])) {
-                var x = unsymbol(escapeSymbol(tree[0]));
-            }
-            if (x === 'macro') {
-                var name = unsymbol(tree[1][0]);
-                var params = tree[1].slice(1);
-                var body = tree[2];
-                addMacro(name, params, body);
-            } else if (x in macroTable) {
-                var params = macroTable[x].params;
-                var body = macroTable[x].body;
-                var called = tree.slice(1);
-                var i;
-                for (i = 0; i < called.length; i += 1) {
-                    body = replace(body, params[i], called[i]);
-                }
-                tree = body;
-            }
-            return tree;
-        };
-
         var compile = function (tree) {
             var i;
             if (isSymbol(tree)) {
                 return new Box(unsymbol(escapeSymbol(tree)), '');
-            } else if (cemeEnv.IsAtom(tree)) {
+            }
+            if (cemeEnv.IsAtom(tree)) {
                 // constant literal
                 return new Box(tree, '');
             }
@@ -185,9 +528,8 @@ var ceme;
                     if (cemeEnv.IsAtom(tree[1])) { // single variable
                         cemeEnv[unsymbol(tree[1])] = "";
                         return wrapdefines(_global(tree[1], tree[2]));
-                    } else {
-                        throw new SyntaxError ('Syntax error in define at line ' + lineno);
                     }
+                    throw new SyntaxError ('Syntax error in define at line ' + lineno);
                 } else if (x === 'group') {
                     return _group(tree.slice(1, tree.length));
                 } else if (x === '=') {
@@ -422,278 +764,6 @@ var ceme;
             return regs;
         };
 
-        /*********************************************************************************************/
-        /* Grammar                                                                               */
-        /*********************************************************************************************/
-
-        var Box = function (value, hoist) {
-            this.value = value;
-            this.hoist = hoist;
-        };
-
-        var _unbox = function (box) {
-            return box.hoist + box.value;
-        };
-
-        var isCurryDot = function (a) {
-            return a instanceof Box && a.value === '.';
-        };
-
-        var indent = '    '
-
-            // Hoisted
-
-            var infixOps = {
-                '+': '+',
-                '-': '-',
-                '*': '*',
-                '/': '/',
-                '%': '%',
-                '>=': '>=',
-                '<=': '<=',
-                '>': '>',
-                '<': '<',
-                'equal?': '===',
-                '!==': '!==',
-                'or': '||',
-                'and': '&&'
-            };
-
-        var _infix = function (name, a, b) {
-            var result = '( ' + a.value
-                    + ' '
-                    + name
-                    + ' '
-                    + b.value
-                    + ' )';
-            return new Box(result, a.hoist + b.hoist);
-        };
-
-        var wrapdefines  = function (body) {
-            var result = '';
-            result += '(function () {\n';
-                result += _indent(body.hoist + body.value + '\nreturn;');
-                result += '\n})()';
-            return new Box(result, '');
-        };
-
-        var _globalfunction  = function (name, params, body) {
-            var result = unsymbol(name) + ' = ';
-            result += _lambda(params, body).value;
-            return new Box(result, '');
-        };
-
-        var _function  = function (name, params, body) {
-            var result = 'function '+ name;
-            result += _functionBody(params, body).value;
-            return new Box(result, '');
-        };
-
-        var _lambda  = function (params, body) {
-            var result = '';
-            result += 'function ';
-            result += _functionBody(params, body).value;
-            return new Box(result, '');
-        };
-
-        var _functionBody  = function (params, body) {
-            var result = '';
-            result += ' \(';
-            result += _parameters(params);
-            result += '\) \{\n';
-            result += _indent(body.hoist);
-            result += _return(body.value);
-            result += ';\n';
-            result += '\}';
-            return new Box(result, '');
-        };
-
-        var _cemeVar  = function (a) {
-            if (a in cemeEnv) {
-                return "cemeEnv['" + a + "']";
-            } else {
-                return a;
-            }
-        };
-
-        var _global  = function (name, value) {
-            var val = compile(value);
-            var result = unsymbol(name) + " = " + val.value + ';';
-            return new Box(result, val.hoist);
-        };
-
-        var _local  = function (name, value) {
-            var val = compile(value);
-            var result = "var " + name + " = " + val.value;
-            return new Box(result, val.hoist);
-        };
-
-        var _set = function (name, value) {
-            var val = compile(value);
-            var result = unsymbol(name) + " = " + val.value;
-            return new Box(result, val.hoist);
-        };
-
-        var _let  = function (tree) {
-            var value = '';
-            var hoist = '';
-            var i;
-
-            var nooflets = tree.length;
-            for (i = 1; i < nooflets - 1; i = i + 2) {
-                var result = _local(unsymbol(tree[i]), tree[i+1]);
-                hoist += result.hoist;
-                hoist += _expression(result.value);
-            }
-            var last = compile(tree[nooflets - 1]);
-            hoist += last.hoist;
-            return new Box(last.value , hoist);
-        };
-
-        var _while = function (tree) {
-            var i;
-            var value = '';
-            var hoist = '';
-            var result;
-            result = 'while (' + compile(tree[0]).value + ') \n';
-            for (i = 1; i < tree.length; i += 1) {
-                tree[i] = compile(tree[i]);
-                value += _statement(tree[i].value);
-                value += '\n';
-                hoist += tree[i].hoist;
-            }
-            result = result + _block(value);
-            return new Box(result, hoist);
-        };
-
-        var _group = function (tree) {
-            var i;
-            var value = '';
-            var hoist = '';
-            for (i = 0; i < tree.length; i += 1) {
-                tree[i] = compile(tree[i]);
-                if (i === tree.length - 1) {
-                    value += tree[i].value;
-                } else {
-                    hoist += _statement(tree[i].value);
-                    hoist += '\n';
-                }
-                hoist += tree[i].hoist;
-            }
-            return new Box(value, hoist);
-        };
-
-        var _if  = function (name, tree) {
-            var result = '';
-            var hoist = '';
-            var i;
-            result += _var(name);
-            result += 'if ';
-            result += '\( ';
-            result += tree[1].value;
-            hoist += tree[1].hoist;
-            result += ' \) ';
-            result += _block(_indent(_statement(tree[2].hoist + _assign(name, tree[2].value))));
-            for (i = 3; i < tree.length; i=i+2) {
-                result += ' else if ';
-                result += '\( ';
-                result += tree[i].value;
-                hoist += tree[i].hoist;
-                result += ' \) ';
-                result += _block(_indent(_statement(tree[i+1].hoist + _assign(name, tree[i+1].value))));
-            }
-            result += '\n';
-            var box = new Box(name, hoist + result);
-            return box;
-        };
-
-        var _call  = function (name, args) {
-            var i;
-            var hoisted = '';
-            for (i = 0; i < args.length; i += 1) {
-                hoisted += args[i].hoist;
-            }
-            return new Box(name + ' \(' + _args(args) +'\)', hoisted);
-        };
-
-        var _array  = function (values) {
-            var i;
-            var vals = [];
-            var hoists = [];
-            for (i = 0; i < values.length; i += 1) {
-                vals.push(compile(values[i]));
-                vals[i] = (vals[i].value);
-                hoists.push(values[i].hoist);
-            }
-            return new Box('[' + vals.join(', ') + ']',
-                    hoists.join(''));
-        };
-
-        // Non hoisted
-
-        var _parameters  = function (params) {
-            if (!params) {
-                return '';
-            }
-            var i;
-            var temp = [];
-            for (i = 0; i < params.length; i += 1) {
-                temp.push(escapeSymbol(params[i]).name);
-            }
-            if (temp[0] === '*args') {
-                // TODO variable arguments
-            } else {
-                return ' ' +  temp.join(', ') + ' ';
-            }
-        };
-
-        // 'param0, param1, param2'
-        var _args  = function (params) {
-            var i;
-            var vals = [];
-            for (i = 0; i < params.length; i += 1) {
-                vals.push(params[i].value);
-            }
-            return vals.join(', ');
-        };
-
-        // 'return a'
-        var _return  = function (a) {
-            return 'return ' + a;
-        };
-
-        // 'some code;'
-        var _statement  = function (a) {
-            return a + ';';
-        };
-
-        // 'some code;
-        // '
-        var _expression  = function (a) {
-            return _statement(a) + '\n';
-        };
-
-        // '{
-        //  some code
-        //  }'
-        var _block  = function (a) {
-            return '{\n' + a + '\n}';
-        };
-
-        // 'var name'
-        var _var  = function (name) {
-            return _expression('var ' + name);
-        };
-
-        // 'name = a'
-        var _assign  = function (name, a) {
-            return name + ' = ' + a;
-        };
-
-        var _indent  = function (block) {
-            var result = block.replace(/\n/g, '\n' + indent);
-            return indent + result;
-        };
 
         var textToParseTree = function (text) {
             var tokens = lexer(text);
@@ -708,78 +778,6 @@ var ceme;
             var tree = textToParseTree(text);
             var result = compileTree(tree);
             return result;
-        };
-
-        /*********************************************************************************************/
-        /* Helper
-        /*********************************************************************************************/
-
-        var Symbol = function (name, lineno) {
-            this.name = name;
-            this.lineno = lineno;
-        };
-
-        var isSymbol = function (a) {
-            if (a === undefined)
-                return false;
-            return a instanceof Symbol;
-        };
-
-        Symbol.prototype.toString = function symbolToString() {
-            return '[Symbol: ' + this.name + ']';
-        };
-
-        // Generate a unique variable name on each call
-        // prefixed with ceme
-        var unique = (function () {
-            var temp = 0;
-            return function () {
-                temp += 1;
-                return '_ceme' + temp;
-            }
-        }());
-
-        var toStringLiteral  = function (str) {
-            // TODO not just line break
-            // do everything
-            str = str.replace(/\n/g, '\\n');
-            return str;
-        };
-
-        var removeQuotes = function (text) {
-            if (text[0] === '"' || text[0] === "'") {
-                return text.slice(3, text.length - 3);
-            }
-            return text;
-        };
-
-        var removeOneQuote  = function (text) {
-            if (text[0] === '"' || text[0] === "'") {
-                return text.slice(1, text.length - 1);
-            }
-            return text;
-        };
-
-        var escapeSymbol = function (a) {
-            if (a.name in cemeEnv) {
-                return a;
-            } else {
-                var result = a.name;
-                result = result.replace(/_/g, '__');
-                result = result.replace(/-/g, '_d');
-                result = result.replace(/\?/g, '_q');
-                return new Symbol(result, 0);
-            }
-        };
-
-        var unsymbol = function (a) {
-            if (a.name in cemeEnv) {
-                return "cemeEnv['" + a.name + "']";
-            } else if (a.name in infixOps) {
-                return a.name;
-            } else {
-                return a.name;
-            }
         };
 
         var FileImports = function (name, checkdone) {
@@ -997,15 +995,15 @@ var ceme;
             'error': error
         };
     }();
-
-    (function(exports) {
-
-        exports.lexer = ceme.lexer;
-        exports.Symbol = ceme.Symbol;
-        exports.isSymbol = ceme.isSymbol;
-        exports.compileText = ceme.compileText;
-        exports.asyncCompiler = ceme.asyncCompiler;
-        exports.cemeEnv = cemeEnv;
-
-    })(exports === undefined ? {} : exports);
 }());
+
+(function(exports) {
+
+    exports.lexer = ceme.lexer;
+    exports.Symbol = ceme.Symbol;
+    exports.isSymbol = ceme.isSymbol;
+    exports.compileText = ceme.compileText;
+    exports.asyncCompiler = ceme.asyncCompiler;
+    exports.cemeEnv = cemeEnv;
+
+})(exports === undefined ? {} : exports);
