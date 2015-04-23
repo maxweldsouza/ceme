@@ -35,25 +35,25 @@ var Router = function () {
     var currentMode,
         editor;
 
-    function queryStringToJSON (queryString) {
+    function queryStringToJSON(queryString) {
         var result = {},
             pairs;
-        if(queryString.indexOf('?') > -1){
+        if (queryString.indexOf('?') > -1) {
             queryString = queryString.split('?')[1];
         }
         pairs = queryString.split('&');
-        pairs.forEach(function(pair) {
+        pairs.forEach(function (pair) {
             pair = pair.split('=');
             result[pair[0]] = decodeURIComponent(pair[1] || '');
         });
         return result;
     }
 
-    function xsrfToken () {
+    function xsrfToken() {
         return '&_xsrf=' + cemeEnv.GetCookie('_xsrf');
     }
 
-    function changeMode (mode) {
+    function changeMode(mode) {
         currentMode = mode;
         $('.ceme-btn-page').removeClass('active');
         $('.ceme-btn-code').removeClass('active');
@@ -77,7 +77,7 @@ var Router = function () {
         editor.resize();
     }
 
-    function makeEditor (elem) {
+    function makeEditor(elem) {
         /*
         var myCodeMirror = CodeMirror.fromTextArea(elem, {
             lineNumbers: true,
@@ -97,7 +97,7 @@ var Router = function () {
         return myCodeMirror;
     }
 
-    function runCode () {
+    function runCode() {
         var text,
             textareas,
             i,
@@ -154,26 +154,26 @@ var Router = function () {
                     });
                 } else {
                     var input = $("<input>")
-                              .attr("type", "hidden")
-                              .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
+                        .attr("type", "hidden")
+                        .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
                     $(this).append(input);
                 }
             }
         });
 
-        $(document).on('click', '#logout', function() {
+        $(document).on('click', '#logout', function () {
             $('#logout-form').submit();
         });
 
-        $(document).on('click', '.ceme-btn-page', function() {
+        $(document).on('click', '.ceme-btn-page', function () {
             changeMode('view');
         });
 
-        $(document).on('click', '.ceme-btn-code', function() {
+        $(document).on('click', '.ceme-btn-code', function () {
             changeMode('edit');
         });
 
-        $(document).on('click', '.ceme-btn-both', function() {
+        $(document).on('click', '.ceme-btn-both', function () {
             changeMode('both');
         });
 
@@ -197,7 +197,7 @@ var Router = function () {
         });
     }
 
-    function firstLoad () {
+    function firstLoad() {
         ceme.asyncCompiler('/assets/code/home.ceme', {
             callback: function (code, output) {
                 $('body').show();
@@ -222,7 +222,7 @@ var Router = function () {
     }
 
 
-    function route (url) {
+    function route(url) {
         var loc,
             pagename;
         url = url.substr(1);
@@ -244,7 +244,7 @@ var Router = function () {
                 hljs.configure({
                     languages: ['ceme']
                 });
-                $('pre code').each(function(i, block) {
+                $('pre code').each(function (i, block) {
                     hljs.highlightBlock(block);
                 });
 
@@ -285,4 +285,4 @@ if (clientSide) {
 (function (exports) {
     exports.route = Router.route;
 
-})(typeof exports === 'undefined'? {} : exports);
+})(typeof exports === 'undefined' ? {} : exports);
