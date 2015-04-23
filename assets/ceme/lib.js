@@ -39,7 +39,6 @@ var cemeEnv,
             return list[0];
         }
 
-        // TODO rename
         function Rest(list) {
             if (IsEmptyArray(list)) {
                 throw new Error('Cant Rest an empty array: ' + list);
@@ -395,8 +394,7 @@ var cemeEnv,
                     if (x === '}}') {
                         return '}';
                     }
-                    // TODO parseInt?
-                    i = parseInt(x[1], 10) + 1;
+                    i = Number(x[1]) + 1;
                     if (i >= args.length) {
                         throw new Error('Too few arguments for format string');
                     }
