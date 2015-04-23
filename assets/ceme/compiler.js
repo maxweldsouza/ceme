@@ -3,7 +3,7 @@
 var cemeEnv = {};
 var ceme = function () {
 
-    var CustomException = function (message) {
+    var SyntaxError = function (message) {
         this.message = message;
     }
     var success = function (message) {
@@ -201,7 +201,7 @@ var ceme = function () {
                     cemeEnv[unsymbol(tree[1])] = "";
                     return wrapdefines(_global(tree[1], tree[2]));
                 } else {
-                    throw new CustomException ('Syntax error in define at line ' + lineno);
+                    throw new SyntaxError ('Syntax error in define at line ' + lineno);
                 }
             } else if (x === 'group') {
                 return _group(tree.slice(1, tree.length));
@@ -219,7 +219,7 @@ var ceme = function () {
                 return _array(tree.slice(1, tree.length));
             } else if (x === 'function') {
                 if (!isSymbol(tree[1][0])) {
-                    throw new CustomException ('Syntax error in function definition at line ' + lineno);
+                    throw new SyntaxError ('Syntax error in function definition at line ' + lineno);
                 }
                 if (tree[1][0].name === 'params') {
                     console.log('lambda usings params at line ' + lineno);
@@ -277,7 +277,7 @@ var ceme = function () {
                 } else {
                     for (i = 0; i < called.length; i++) {
                         if (typeof called[i] === 'undefined') {
-                            throw new CustomException ('Syntax error in function call at ' + lineno);
+                            throw new SyntaxError ('Syntax error in function call at ' + lineno);
                         }
                     }
                     return _call(x, called);
