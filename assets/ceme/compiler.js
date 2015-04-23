@@ -136,9 +136,7 @@ var ceme;
             return a.name;
         }
 
-        /*********************************************************************************************/
-        /* Grammar                                                                               */
-        /*********************************************************************************************/
+        /* Grammar */
 
         function Box(value, hoist) {
             this.value = value;
@@ -229,7 +227,7 @@ var ceme;
         function wrapdefines(body) {
             var result = '';
             result += '(function () {\n';
-            result += _indent(body.hoist + body.value + '\nreturn;');
+            result += _indent(body.hoist + body.value + '');
             result += '\n})()';
             return new Box(result, '');
         }
@@ -239,7 +237,7 @@ var ceme;
             result += _parameters(params);
             result += ') {\n';
             result += _indent(body.hoist);
-            result += _return(body.value);
+            result += _return(_indent(body.value).trim());
             result += ';\n';
             result += '}';
             return new Box(result, '');
