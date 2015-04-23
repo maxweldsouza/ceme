@@ -1010,6 +1010,7 @@ var ceme;
         };
     }());
 
+        /*
     (function (exports) {
 
         exports.lexer = ceme.lexer;
@@ -1020,4 +1021,5 @@ var ceme;
         exports.cemeEnv = cemeEnv;
 
     }(exports === undefined ? {} : exports));
+    */
 }());
