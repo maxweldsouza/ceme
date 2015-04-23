@@ -225,20 +225,20 @@ var ceme;
 
         function wrapdefines(body) {
             var result = '';
-            result += '(function () {\n';
-            result += _indent(body.hoist + body.value);
-            result += '\n})()';
+            result += '(function () ';
+            result += _block(_indent(body.hoist + body.value));
+            result += '())';
             return new Box(result, '');
         }
 
         function _functionBody(params, body) {
-            var result = ' (';
+            var result = ' (',
+                fbody;
             result += _parameters(params);
-            result += ') {\n';
-            result += _indent(body.hoist);
-            result += _return(_indent(body.value).trim());
-            result += ';\n';
-            result += '}';
+            result += ') ';
+            fbody = _indent(body.hoist);
+            fbody += _return(_indent(body.value).trim()) + ';';
+            result += _block(fbody);
             return new Box(result, '');
         }
 
