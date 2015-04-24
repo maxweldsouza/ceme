@@ -1,5 +1,4 @@
-var cemeEnv,
-    IsArray;
+var IsArray;
 (function () {
     "use strict";
 
@@ -23,7 +22,7 @@ var cemeEnv,
         };
     }
 
-    cemeEnv = (function () {
+    ceme = (function () {
         function IsEmptyArray(tree) {
             return IsArray(tree) && tree.length === 0;
         }
@@ -33,7 +32,7 @@ var cemeEnv,
             if (IsEmptyArray(list)) {
                 throw new Error('Cant get first of empty array ' + list);
             }
-            if (cemeEnv.IsAtom(list)) {
+            if (ceme.IsAtom(list)) {
                 throw new Error('Cant get first of atom ' + list);
             }
             return list[0];
@@ -43,7 +42,7 @@ var cemeEnv,
             if (IsEmptyArray(list)) {
                 throw new Error('Cant Rest an empty array: ' + list);
             }
-            if (cemeEnv.IsAtom(list)) {
+            if (ceme.IsAtom(list)) {
                 throw new Error('Cant Rest an atom: ' + list);
             }
             return list.slice(1, list.length);
@@ -223,7 +222,7 @@ var cemeEnv,
                 return Math.sin(2 * Math.PI * x);
             },
             'Cos': function (x) {
-                return cemeEnv.Sine(x + 0.25);
+                return ceme.Sine(x + 0.25);
             },
 
             //////// Arrays
@@ -293,7 +292,7 @@ var cemeEnv,
                 return result;
             },
             'ReduceRight': function (f, lst) {
-                return cemeEnv.Reduce(f, cemeEnv.Reverse(lst));
+                return ceme.Reduce(f, ceme.Reverse(lst));
             },
 
             'Filter': function (f, arg) {
@@ -313,7 +312,7 @@ var cemeEnv,
                 var result = [],
                     i;
                 for (i = 0; i < x.length; i += 1) {
-                    if (!cemeEnv.IsMember(x[i], result)) {
+                    if (!ceme.IsMember(x[i], result)) {
                         result.push(x[i]);
                     }
                 }
@@ -323,7 +322,7 @@ var cemeEnv,
                 var result = [],
                     i;
                 for (i = 0; i < x.length; i += 1) {
-                    if (cemeEnv.IsMember(x[i], y)) {
+                    if (ceme.IsMember(x[i], y)) {
                         result.push(x[i]);
                     }
                 }
@@ -404,11 +403,11 @@ var cemeEnv,
             },
 
             'MaxList': function (a) {
-                var temp = cemeEnv.Reduce(cemeEnv.Max, a);
+                var temp = ceme.Reduce(ceme.Max, a);
                 return temp;
             },
             'MinList': function (a) {
-                var temp = cemeEnv.Reduce(cemeEnv.Min, a);
+                var temp = ceme.Reduce(ceme.Min, a);
                 return temp;
             },
             'Print': function (a) {
@@ -457,7 +456,7 @@ var cemeEnv,
             },
 
             'EvalString': function (str) {
-                return ceme.compileText(str);
+                return cemeCompiler.compileText(str);
             },
             'UTCToLocalTime': function (utc) {
                 var date = new Date(utc);
@@ -633,7 +632,7 @@ var cemeEnv,
                 return '<' + a + atr + '/>';
             };
         }
-        cemeEnv.attrib = function () {
+        ceme.attrib = function () {
             var result = '',
                 i;
             for (i = 0; i < arguments.length; i += 1) {
@@ -649,25 +648,25 @@ var cemeEnv,
         }
 
         // Attributes
-        cemeEnv.type = attribute('type');
+        ceme.type = attribute('type');
 
         attributes = ('src,class,value,id,style,' +
             'href,title,target').split(',');
 
         // Self closing tags
-        cemeEnv.hr = sctag('hr');
-        cemeEnv.br = sctag('br');
-        cemeEnv.img = sctagWithAttrib('img');
+        ceme.hr = sctag('hr');
+        ceme.br = sctag('br');
+        ceme.img = sctagWithAttrib('img');
 
-        tags = cemeEnv.CemeLanguage.HtmlTags.split(',');
+        tags = ceme.CemeLanguage.HtmlTags.split(',');
 
         (function () {
             var i;
             for (i = 0; i < attributes.length; i += 1) {
-                cemeEnv[attributes[i]] = attribute(attributes[i]);
+                ceme[attributes[i]] = attribute(attributes[i]);
             }
             for (i = 0; i < tags.length; i += 1) {
-                cemeEnv[tags[i]] = tag(tags[i]);
+                ceme[tags[i]] = tag(tags[i]);
             }
         }());
 
@@ -676,7 +675,7 @@ var cemeEnv,
     /*
     (function(exports) {
 
-        exports.cemeEnv = cemeEnv;
+        exports.ceme = ceme;
 
     })(typeof exports === 'undefined'? this['lib']={}: exports);
     */

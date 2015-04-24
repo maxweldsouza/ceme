@@ -7,7 +7,7 @@ var clientSide = function () {
 if (!clientSide) {
     var ceme = require('./ceme/compiler');
     var lib = require('./ceme/lib');
-    var cemeEnv = lib.cemeEnv;
+    var ceme = lib.ceme;
 }
 
 if (clientSide) {
@@ -20,7 +20,7 @@ if (clientSide) {
     };
 }
 
-cemeEnv.GetPageName = function () {
+ceme.GetPageName = function () {
     var path = window.location.pathname;
     path = path.substr(1);
     if (path === '') {
@@ -50,7 +50,7 @@ var Router = function () {
     }
 
     function xsrfToken() {
-        return '&_xsrf=' + cemeEnv.GetCookie('_xsrf');
+        return '&_xsrf=' + ceme.GetCookie('_xsrf');
     }
 
     function changeMode(mode) {
@@ -107,7 +107,7 @@ var Router = function () {
         outputelem = $('#ceme-output');
         outputelem.empty();
 
-        ceme.asyncCompiler('', {
+        cemeCompiler.asyncCompiler('', {
             callback: function (code, output) {
                 outputelem.html(output).fadeIn(300);
                 if (currentMode === 'edit') {
@@ -138,24 +138,24 @@ var Router = function () {
                         data: $(this).serialize() + xsrfToken(),
                         error: function (jqXHR) {
                             if (jqXHR.status === 0) {
-                                ceme.error('No internet connection');
+                                cemeCompiler.error('No internet connection');
                             } else if (jqXHR.status === 500) {
-                                ceme.error('Internal server error');
+                                cemeCompiler.error('Internal server error');
                             } else if (jqXHR.status === 404) {
-                                ceme.error(jqXHR.responseText);
+                                cemeCompiler.error(jqXHR.responseText);
                             } else if (jqXHR.status === 400) {
-                                ceme.error(jqXHR.responseText);
+                                cemeCompiler.error(jqXHR.responseText);
                             } else {
-                                ceme.error('Unexpected error status:' + jqXHR.status);
+                                cemeCompiler.error('Unexpected error status:' + jqXHR.status);
                             }
                         }
                     }).done(function (response) {
-                        $('#alert').hide().html(cemeEnv.Alert(response, 'success')).fadeIn(200);
+                        $('#alert').hide().html(ceme.Alert(response, 'success')).fadeIn(200);
                     });
                 } else {
                     var input = $("<input>")
                         .attr("type", "hidden")
-                        .attr("name", "_xsrf").val(cemeEnv.GetCookie('_xsrf'));
+                        .attr("name", "_xsrf").val(ceme.GetCookie('_xsrf'));
                     $(this).append(input);
                 }
             }
@@ -180,7 +180,7 @@ var Router = function () {
         $(document).on('click', '#ceme-run', runCode);
 
         $(document).on('click', '#ceme-history', function (e) {
-            window.location = '/history?name=' + cemeEnv.GetPageName();
+            window.location = '/history?name=' + ceme.GetPageName();
             e.preventDefault();
         });
 
@@ -198,7 +198,7 @@ var Router = function () {
     }
 
     function firstLoad() {
-        ceme.asyncCompiler('/assets/code/home.ceme', {
+        cemeCompiler.asyncCompiler('/assets/code/home.ceme', {
             callback: function (code, output) {
                 $('body').show();
                 $('#page-container').hide().html(output).fadeIn(300);
@@ -236,7 +236,7 @@ var Router = function () {
         }
 
         $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
-        ceme.asyncCompiler('/code/' + pagename, {
+        cemeCompiler.asyncCompiler('/code/' + pagename, {
             callback: function (code, output) {
 
                 runCode();

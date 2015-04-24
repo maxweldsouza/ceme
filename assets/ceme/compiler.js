@@ -1,4 +1,5 @@
-var ceme;
+var cemeCompiler,
+    ceme;
 
 (function () {
     "use strict";
@@ -9,7 +10,7 @@ var ceme;
         compile,
         unique;
 
-    ceme = (function () {
+    cemeCompiler = (function () {
         var infixOps;
 
         function SyntaxError(message) {
@@ -17,11 +18,11 @@ var ceme;
         }
 
         function success(message) {
-            $('#alert').hide().html(cemeEnv.Alert(message, 'success')).fadeIn(200);
+            $('#alert').hide().html(ceme.Alert(message, 'success')).fadeIn(200);
         }
 
         function warning(message) {
-            $('#alert').hide().html(cemeEnv.Alert(message, 'warning')).fadeIn(200);
+            $('#alert').hide().html(ceme.Alert(message, 'warning')).fadeIn(200);
         }
 
         function error(msg, lineno) {
@@ -29,8 +30,8 @@ var ceme;
             if (lineno !== undefined) {
                 message += ' at line ' + lineno;
             }
-            if (cemeEnv.Alert) {
-                $('#alert').hide().html(cemeEnv.Alert(message, 'danger')).fadeIn(200);
+            if (ceme.Alert) {
+                $('#alert').hide().html(ceme.Alert(message, 'danger')).fadeIn(200);
             }
             throw message;
         }
@@ -49,7 +50,7 @@ var ceme;
 
         if (platform() === 'nodejs') {
             lib = require('./lib');
-            cemeEnv = lib.cemeEnv;
+            ceme = lib.ceme;
         }
 
         /* Helper */
@@ -95,7 +96,7 @@ var ceme;
         }
 
         function escapeSymbol(a) {
-            if (cemeEnv.hasOwnProperty(a.name)) {
+            if (ceme.hasOwnProperty(a.name)) {
                 return a;
             }
             var result = a.name;
@@ -122,11 +123,11 @@ var ceme;
         };
 
         function unsymbol(a) {
-            if (cemeEnv.hasOwnProperty(a.name)) {
+            if (ceme.hasOwnProperty(a.name)) {
                 if (/^[a-zA-Z0-9]+$/.test(a.name)) {
-                    return "cemeEnv." + a.name;
+                    return "ceme." + a.name;
                 }
-                return "cemeEnv['" + a.name + "']";
+                return "ceme['" + a.name + "']";
             }
             if (infixOps.hasOwnProperty(a.name)) {
                 return a.name;
@@ -406,7 +407,7 @@ var ceme;
         function replace(tree, old, nu) {
             var i;
             for (i = 0; i < tree.length; i += 1) {
-                if (cemeEnv.IsAtom(tree[i])) {
+                if (ceme.IsAtom(tree[i])) {
                     if (isSymbol(tree[i])) {
                         if (tree[i].name === old.name) {
                             tree[i] = nu;
@@ -518,7 +519,7 @@ var ceme;
             if (isSymbol(tree)) {
                 return new Box(unsymbol(escapeSymbol(tree)), '');
             }
-            if (cemeEnv.IsAtom(tree)) {
+            if (ceme.IsAtom(tree)) {
                 // constant literal
                 return new Box(tree, '');
             }
@@ -529,8 +530,8 @@ var ceme;
 
                 switch (x) {
                 case 'define':
-                    if (cemeEnv.IsAtom(tree[1])) { // single variable
-                        cemeEnv[unsymbol(tree[1])] = "";
+                    if (ceme.IsAtom(tree[1])) { // single variable
+                        ceme[unsymbol(tree[1])] = "";
                         return wrapdefines(_global(tree[1], tree[2]));
                     }
                     throw new SyntaxError('Syntax error in define at line ' + lineno);
@@ -564,7 +565,7 @@ var ceme;
                         bdy = compile(tree[2]);
                         return _lambda(pms, bdy);
                     }
-                    cemeEnv[unsymbol(tree[1][0])] = "";
+                    ceme[unsymbol(tree[1][0])] = "";
                     return wrapdefines(_globalfunction(tree[1][0],
                         tree[1].slice(1, tree[1].length),
                         compile(tree[2])));
@@ -1011,7 +1012,7 @@ var ceme;
         exports.isSymbol = ceme.isSymbol;
         exports.compileText = ceme.compileText;
         exports.asyncCompiler = ceme.asyncCompiler;
-        exports.cemeEnv = cemeEnv;
+        exports.ceme = ceme;
 
     }(exports === undefined ? {} : exports));
     */
