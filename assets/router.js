@@ -248,7 +248,7 @@ var Router = function () {
                     hljs.highlightBlock(block);
                 });
 
-                if (document.cookie.indexOf('sodfksoihasg') > 0) {
+                if (document.cookie.indexOf('ofhbjpodsfasiohs') > 0) {
                     $('.login-logout').html('<li><a href="#" id="logout" >Log Out</a></li>');
                 } else {
                     $('.login-logout').html('<li><a href="/login">Login</a></li><li><a href="/sign-up">Sign Up</a></li>');

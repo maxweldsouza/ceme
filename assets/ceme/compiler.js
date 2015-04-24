@@ -36,8 +36,6 @@ var cemeCompiler,
             throw message;
         }
 
-        /* General */
-
         // TODO move
         var platform = function () {
             if (XMLHttpRequest !== undefined) {
@@ -137,6 +135,12 @@ var cemeCompiler,
 
         /* Grammar */
 
+        // Box is a container of code
+        // value holds the code itself and
+        // hoist contains code that needs to
+        // run before it
+        // eg. value: x = square(x);
+        //     hoist: var x;
         function Box(value, hoist) {
             this.value = value;
             this.hoist = hoist;
@@ -249,7 +253,28 @@ var cemeCompiler,
             return new Box(result, '');
         }
 
-        function _globalfunction(name, params, body) {
+        function _functionDefinition(tree) {
+            var pms,
+                bdy;
+            if (!isSymbol(tree[1][0])) {
+                throw new SyntaxError('Syntax error in function definition at line ' + lineno);
+            }
+            if (tree[1][0].name === 'unnamed') {
+                if (tree[1].length > 1) {
+                    pms = tree[1].slice(1, tree[1].length);
+                } else {
+                    pms = false;
+                }
+                bdy = compile(tree[2]);
+                return _lambda(pms, bdy);
+            }
+            ceme[unsymbol(tree[1][0])] = "";
+            return wrapdefines(_functionExpression(tree[1][0],
+                tree[1].slice(1, tree[1].length),
+                compile(tree[2])));
+        }
+
+        function _functionExpression(name, params, body) {
             var result = unsymbol(name) + ' = ';
             result += _lambda(params, body).value + ';';
             return new Box(result, '');
@@ -334,6 +359,9 @@ var cemeCompiler,
                 hoist = '',
                 box,
                 i;
+            for (i = 1; i < tree.length; i += 1) {
+                tree[i] = compile(tree[i]);
+            }
             result += _var(name);
             result += 'if ';
             result += '( ';
@@ -384,8 +412,6 @@ var cemeCompiler,
                 hoists.join(''));
         }
 
-        /* Errors */
-
         if (isArray === undefined) {
             isArray = function (a) {
                 return Object.prototype.toString.call(a) === '[object Array]';
@@ -409,8 +435,6 @@ var cemeCompiler,
             }
             return '[' + result + ']';
         }
-
-        /* Compiler */
 
         function replace(tree, old, nu) {
             var i;
@@ -514,8 +538,6 @@ var cemeCompiler,
             var i,
                 x,
                 lineno,
-                pms,
-                bdy,
                 curry,
                 called,
                 params,
@@ -558,26 +580,8 @@ var cemeCompiler,
                 case 'list':
                     return _array(tree.slice(1, tree.length));
                 case 'function':
-                    if (!isSymbol(tree[1][0])) {
-                        throw new SyntaxError('Syntax error in function definition at line ' + lineno);
-                    }
-                    if (tree[1][0].name === 'unnamed') {
-                        if (tree[1].length > 1) {
-                            pms = tree[1].slice(1, tree[1].length);
-                        } else {
-                            pms = false;
-                        }
-                        bdy = compile(tree[2]);
-                        return _lambda(pms, bdy);
-                    }
-                    ceme[unsymbol(tree[1][0])] = "";
-                    return wrapdefines(_globalfunction(tree[1][0],
-                        tree[1].slice(1, tree[1].length),
-                        compile(tree[2])));
+                    return _functionDefinition(tree);
                 case 'if':
-                    for (i = 1; i < tree.length; i += 1) {
-                        tree[i] = compile(tree[i]);
-                    }
                     return _if(unique(), tree);
                 default:
                     // function call
