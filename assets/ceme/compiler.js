@@ -342,11 +342,19 @@ var cemeCompiler,
             result += ' ) ';
             result += _block(_indent(_statement(tree[2].hoist + _assign(name, tree[2].value))));
             for (i = 3; i < tree.length; i = i + 2) {
-                result += ' else if ';
-                result += '( ';
-                result += tree[i].value;
+                // Comparison with true is intentional
+                // This generates an else
+                // instead of an else if (true)
+                if (tree[i].value === true) {
+                    result += ' else ';
+                } else {
+                    result += ' else if ';
+                    result += '( ';
+                    result += tree[i].value;
+                    result += ' ) ';
+                }
+
                 hoist += tree[i].hoist;
-                result += ' ) ';
                 result += _block(_indent(_statement(tree[i + 1].hoist + _assign(name, tree[i + 1].value))));
             }
             result += '\n';
