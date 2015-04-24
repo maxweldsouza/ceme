@@ -544,35 +544,6 @@ var IsArray;
                 return a.sort();
             },
 
-            /***************************
-             * Scantuary
-             **************************/
-            'ItemsAt': function (x, ids) {
-                var result = [],
-                    i;
-                for (i = 0; i < ids.length; i += 1) {
-                    result.push(x[ids[i]]);
-                }
-                return result;
-            },
-            'ItemWithIds': function (x, ids, target) {
-                var result = [],
-                    ind,
-                    i;
-                for (i = 0; i < target.length; i += 1) {
-                    ind = IndexOf(target[i], ids);
-                    if (ind !== -1) {
-                        result.push(x[ind]);
-                    }
-                }
-                return result;
-            },
-
-            'SplitIntoArraysOfSize': SplitIntoArraysOfSize,
-            'SplitInto': function (lst, no) {
-                var elemsperlist = Math.ceil(lst.length / no);
-                return SplitIntoArraysOfSize(lst, elemsperlist);
-            }
         };
     }());
 
