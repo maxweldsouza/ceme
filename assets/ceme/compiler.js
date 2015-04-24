@@ -1,4 +1,3 @@
-var cemeEnv = {};
 var ceme;
 
 (function () {
@@ -251,7 +250,7 @@ var ceme;
 
         function _globalfunction(name, params, body) {
             var result = unsymbol(name) + ' = ';
-            result += _lambda(params, body).value;
+            result += _lambda(params, body).value + ';';
             return new Box(result, '');
         }
 
