@@ -4,7 +4,6 @@ var ceme;
 (function () {
     "use strict";
     var lib,
-        infixOps,
         indent = '    ',
         macroTable = {},
         isArray,
@@ -12,6 +11,7 @@ var ceme;
         unique;
 
     ceme = (function () {
+        var infixOps;
 
         function SyntaxError(message) {
             this.message = message;
@@ -376,9 +376,7 @@ var ceme;
                 hoists.join(''));
         }
 
-        /*********************************************************************************************/
-        /* Errors                                                                                    */
-        /*********************************************************************************************/
+        /* Errors */
 
         if (isArray === undefined) {
             isArray = function (a) {
@@ -404,9 +402,7 @@ var ceme;
             return '[' + result + ']';
         }
 
-        /*********************************************************************************************/
-        /* Compiler                                                                               */
-        /*********************************************************************************************/
+        /* Compiler */
 
         function replace(tree, old, nu) {
             var i;
@@ -654,13 +650,13 @@ var ceme;
             return tree;
         }
 
-        function reShortString() {
+        var reShortString = function () {
             var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n\r])*"/,
                 singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n\r])*'/,
                 result = new RegExp(singleQuoted.source +
                     '|' + doubleQuoted.source);
             return result;
-        }
+        }();
 
         function regexes() {
             var regs = {
@@ -673,7 +669,7 @@ var ceme;
                 'INDENT': /^\(/,
                 'DEDENT': /^\)/,
                 'LONGSTRING': /^"""([^"]|\\")*"""|^'''([^']|\\')*'''/,
-                'STRING': reShortString()
+                'STRING': reShortString
             };
             return regs;
         }
