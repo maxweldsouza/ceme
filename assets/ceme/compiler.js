@@ -55,7 +55,7 @@ var cemeCompiler,
 
         /* Helper */
 
-        function Symbol(name, lineno) {
+        function CemeSymbol(name, lineno) {
             this.name = name;
             this.lineno = lineno;
         }
@@ -64,10 +64,10 @@ var cemeCompiler,
             if (a === undefined) {
                 return false;
             }
-            return a instanceof Symbol;
+            return a instanceof CemeSymbol;
         }
 
-        Symbol.prototype.toString = function symbolToString() {
+        CemeSymbol.prototype.toString = function symbolToString() {
             return '[Symbol: ' + this.name + ']';
         };
 
@@ -103,7 +103,7 @@ var cemeCompiler,
             result = result.replace(/_/g, '__');
             result = result.replace(/-/g, '_d');
             result = result.replace(/\?/g, '_q');
-            return new Symbol(result, 0);
+            return new CemeSymbol(result, 0);
         }
 
         infixOps = {
@@ -584,7 +584,7 @@ var cemeCompiler,
                         called[i] = compile(called[i]);
                         if (isCurryDot(called[i])) {
                             curry = true;
-                            temp = new Symbol(unique(), 0);
+                            temp = new CemeSymbol(unique(), 0);
                             params.push(temp);
                             called[i] = compile(temp);
                         }
@@ -731,7 +731,7 @@ var cemeCompiler,
                             } else if (res === 'empty-list') {
                                 tokens.push('[]');
                             } else if (i === 'SYMBOL') {
-                                symbol = new Symbol(res, lineno);
+                                symbol = new CemeSymbol(res, lineno);
                                 tokens.push(symbol);
                             } else if (i === 'STRING') {
                                 tokens.push(res);
@@ -994,7 +994,7 @@ var cemeCompiler,
 
         return {
             'lexer': lexer,
-            'Symbol': Symbol,
+            'CemeSymbol': CemeSymbol,
             'isSymbol': isSymbol,
             'compileText': compileText,
             'asyncCompiler': asyncCompiler,
@@ -1008,7 +1008,7 @@ var cemeCompiler,
     (function (exports) {
 
         exports.lexer = ceme.lexer;
-        exports.Symbol = ceme.Symbol;
+        exports.CemeSymbol = ceme.CemeSymbol;
         exports.isSymbol = ceme.isSymbol;
         exports.compileText = ceme.compileText;
         exports.asyncCompiler = ceme.asyncCompiler;
