@@ -561,10 +561,7 @@ var cemeCompiler,
                     if (!isSymbol(tree[1][0])) {
                         throw new SyntaxError('Syntax error in function definition at line ' + lineno);
                     }
-                    if (tree[1][0].name === 'params') {
-                        console.log('lambda usings params at line ' + lineno);
-                    }
-                    if (tree[1][0].name === 'unnamed' || tree[1][0].name === 'params') {
+                    if (tree[1][0].name === 'unnamed') {
                         if (tree[1].length > 1) {
                             pms = tree[1].slice(1, tree[1].length);
                         } else {
