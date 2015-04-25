@@ -97,6 +97,20 @@ def validate_username(username):
     if not reg.match(username):
         raise InvalidInput('Username has invalid characters')
 
+def validate_limit(limit):
+    limit = int(limit)
+    if limit < 1 or limit > 20:
+        raise InvalidInput('Limit can be between 1 and 20')
+
+def validate_offset(offset):
+    try:
+        offset = int(offset)
+        if offset < 0:
+            raise InvalidInput('Offset value can only be any positive integer')
+    except Exception, e:
+        raise InvalidInput('Offset value can only be any positive integer')
+
+
 def validate_email(email):
     reg = re.compile('[^@]+@[^@]+\.[^@]+')
     if not reg.match(email):
@@ -225,10 +239,13 @@ def get_diff(name, first, second):
     else:
         raise InvalidInput('Page with the given id or name does not exist')
 
-def get_user_profile(username):
-    limit = 10
+def get_user_profile(username, limit, offset):
+    validate_username(username)
+    validate_limit(limit)
+    validate_offset(offset)
     entries = db.get_all('SELECT page_id, page_name, page_timestamp FROM pages'
-            ' WHERE page_username = %s ORDER BY page_timestamp DESC LIMIT %s', (username, int(limit)))
+            ' WHERE page_username = %s ORDER BY page_timestamp DESC LIMIT %s OFFSET %s',
+            (username, int(limit), int(offset)))
     arr = []
     if not entries:
         raise EntryNotFound('No more entries to show')

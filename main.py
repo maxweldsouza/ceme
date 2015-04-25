@@ -156,7 +156,9 @@ class ApiHandler(tornado.web.RequestHandler):
                 self.write(database.search(query))
             elif action == 'user':
                 username = self.get_argument('username')
-                self.write(database.get_user_profile(username))
+                limit = self.get_argument('limit', 10)
+                offset = self.get_argument('offset', 0)
+                self.write(database.get_user_profile(username, limit, offset))
             else:
                 raise InvalidInput('Invalid action')
         except InvalidInput, e:
