@@ -141,9 +141,10 @@ class ApiHandler(tornado.web.RequestHandler):
         try:
             if action == 'history':
                 name = self.get_argument('name', '')
-                limit = self.get_argument('limit', '20')
+                limit = self.get_argument('limit', '10')
+                offset = self.get_argument('offset', 0)
                 self.set_header('Content-Type', 'application/json')
-                self.write(database.get_history(name, limit))
+                self.write(database.get_history(name, limit, offset))
             elif action == 'diff':
                 name = self.get_argument('name')
                 first = self.get_argument('first')

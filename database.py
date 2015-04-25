@@ -107,9 +107,10 @@ def validate_offset(offset):
         offset = int(offset)
         if offset < 0:
             raise InvalidInput('Offset value can only be any positive integer')
+        elif offset > 1000:
+            raise InvalidInput('Offset cannot be greater than 1000')
     except Exception, e:
         raise InvalidInput('Offset value can only be any positive integer')
-
 
 def validate_email(email):
     reg = re.compile('[^@]+@[^@]+\.[^@]+')
@@ -215,10 +216,12 @@ def read_page(name):
         raise EntryNotFound('this entry was not found')
     return page
 
-def get_history(name, limit):
+def get_history(name, limit, offset):
     validate_name(name)
+    validate_limit(limit)
+    validate_offset(offset)
     entries = db.get_all('SELECT page_id, page_username, page_timestamp FROM pages'
-            ' WHERE page_name = %s LIMIT %s', (name, int(limit)))
+            ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT %s OFFSET %s', (name, int(limit), int(offset)))
     arr = []
     if not entries:
         raise EntryNotFound('No more pages to show')
