@@ -225,6 +225,18 @@ def get_diff(name, first, second):
     else:
         raise InvalidInput('Page with the given id or name does not exist')
 
+def get_user_profile(username):
+    limit = 10
+    entries = db.get_all('SELECT page_id, page_name, page_timestamp FROM pages'
+            ' WHERE page_username = %s ORDER BY page_timestamp DESC LIMIT %s', (username, int(limit)))
+    arr = []
+    if not entries:
+        raise EntryNotFound('No more entries to show')
+    for entry in entries:
+        tmpobj = { "id": entry[0], "page": entry[1], "timestamp": entry[2], }
+        arr.append(tmpobj)
+    return json_output(arr)
+
 def search(query):
     entries = db.get_all('SELECT DISTINCT page_name FROM pages'
             ' WHERE page_content LIKE %s LIMIT 10', (query, ))

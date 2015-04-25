@@ -185,8 +185,11 @@ var Router = function () {
         });
 
         $(document).on('click', 'a', function (e) {
+            function external (url) {
+                return /^http/.test(url);
+            }
             var url = $(this).attr("href");
-            if (url && url[0] === '/') {
+            if (url && !external(url)) {
                 history.pushState(null, null, url);
 
                 e.preventDefault();
@@ -225,7 +228,9 @@ var Router = function () {
     function route(url) {
         var loc,
             pagename;
-        url = url.substr(1);
+        if (url[0] === '/') {
+            url = url.substr(1);
+        }
         loc = url.split('?');
         if (loc[1]) {
             queryObj = queryStringToJSON(loc[1]);
