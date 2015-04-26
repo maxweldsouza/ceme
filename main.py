@@ -222,11 +222,11 @@ application = tornado.web.Application([
     ], **settings)
 
 if __name__ == '__main__':
-    server = HTTPServer(application, ssl_options = {
-        'certfile': os.path.join('certs/localhost.crt'),
-        'keyfile': os.path.join('certs/localhost.key'),
-        })
     if config.ssl:
+        server = HTTPServer(application, ssl_options = {
+            'certfile': os.path.join('certs/localhost.crt'),
+            'keyfile': os.path.join('certs/localhost.key'),
+            })
         server.listen(config.port)
     else:
         application.listen(config.port)
