@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import tornado.ioloop
 import tornado.web
@@ -217,7 +218,7 @@ application = tornado.web.Application([
     (r'/sign-up', SignupHandler),
     (r'/api', ApiHandler),
     (r'/code/(.*)', CodeHandler),
-    (r'/assets/(.*)', CemeStaticHandler, {'path': 'assets'},),
+    (r'/assets/(.*)', CemeStaticHandler, {'path': './assets'},),
     (r'/(.*)', MainHandler),
     ], **settings)
 
