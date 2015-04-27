@@ -395,7 +395,7 @@ function
         <a class="navbar-brand" style="font-size:2em;" href="#mobile-menu"><i style="line-height:inherit;" class="fa fa-bars"></i></a>
     </div>
     <div class="navbar-header">
-        <a class="navbar-brand" href="/">Ceme.io</a>
+        <a class="navbar-brand" href="/">Ceme</a>
     </div>
 
     <!-- Collect the nav links, forms, and other

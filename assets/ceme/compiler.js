@@ -497,7 +497,6 @@ var cemeCompiler,
             for (i = 0; i < tree.length; i += 1) {
                 try {
                     code = _expression(_unbox(compile(tree[i])));
-                    console.log(code);
                     tmp = eval(code);
                     if (isArray(tmp)) {
                         output += nestedArrayToString(tmp);

@@ -263,12 +263,12 @@ var Router = function () {
                 // runs before compilation
                 //editor.setValue(code);
                 editor.getSession().setMode("ace/mode/ceme");
-                editor.setOption('maxLines', 40);
+                editor.setOption('maxLines', Infinity);
                 editor.setOption('minLines', 3);
                 editor.setFontSize(18);
                 editor.setTheme("ace/theme/github");
-                editor.setValue(code);
                 editor.$blockScrolling = Infinity;
+                editor.setValue(code);
                 changeMode('view');
             }
         });
