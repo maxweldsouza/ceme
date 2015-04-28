@@ -204,7 +204,7 @@ settings = {
     'default_handler_class': ErrorHandler,
     'default_handler_args': dict(status_code=404),
     'compress_response': True,
-    'debug' : True,
+    'debug' : config.debug,
     'cookie_secret' : config.cookie_secret,
     'xsrf_cookies': True
 }
