@@ -94,6 +94,11 @@ class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
         self.write('An error occurred')
 
+class FaviconHandler (tornado.web.StaticFileHandler):
+    def set_extra_headers(self, path):
+        year = 60 * 60 * 24 * 365
+        self.set_header('Cache-Control', 'max-age:{0}'.format(year))
+
 """ Ceme code """
 class CodeHandler(tornado.web.RequestHandler):
     def get(self, path):
@@ -203,15 +208,27 @@ settings = {
     'xsrf_cookies': True
 }
 
+
 class CemeStaticHandler(tornado.web.StaticFileHandler):
+    def set_extra_headers(self, path):
+        day = 60 * 60 * 24
+        self.set_header('Cache-Control', 'max-age:{0}'.format(day))
+        if self.isCemeFile():
+            self.set_header('X-Robots-Tag', 'noindex')
+
     def get_content_type(self):
         name, extension = os.path.splitext(self.absolute_path)
-        if extension and extension.lower() == '.ceme':
-            return 'text/ceme'
+        if self.isCemeFile():
+            return 'text/ceme; charset=UTF-8'
         return super(CemeStaticHandler, self).get_content_type()
+
+    def isCemeFile(self):
+        name, extension = os.path.splitext(self.absolute_path)
+        return extension and (extension.lower() == '.ceme')
 
 # Urls starting with api are for ajax requests.
 application = tornado.web.Application([
+    (r'/(favicon.ico)', FaviconHandler, {'path': './assets'},),
     (r'/login', LoginHandler),
     (r'/logout', LogoutHandler),
     (r'/create', CreateHandler),
