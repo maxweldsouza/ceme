@@ -212,10 +212,9 @@ settings = {
 
 class CemeStaticHandler(tornado.web.StaticFileHandler):
     def set_extra_headers(self, path):
-        day = 60 * 60 * 24
-        self.set_header('Cache-Control', 'max-age:{0}'.format(day))
-        expires = datetime.datetime.utcnow() + datetime.timedelta(days=1)
-        self.set_header('Cache-Control', 'max-age:{0}'.format(day))
+        period = 60 * 60 * 24 * 8
+        self.set_header('Cache-Control', 'max-age:{0}'.format(period))
+        expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=period)
         self.set_header('Expires', expires)
         if self.isCemeFile():
             self.set_header('X-Robots-Tag', 'noindex')
