@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import datetime
 import os
 import tornado.ioloop
 import tornado.web
@@ -213,6 +214,9 @@ class CemeStaticHandler(tornado.web.StaticFileHandler):
     def set_extra_headers(self, path):
         day = 60 * 60 * 24
         self.set_header('Cache-Control', 'max-age:{0}'.format(day))
+        expires = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        self.set_header('Cache-Control', 'max-age:{0}'.format(day))
+        self.set_header('Expires', expires)
         if self.isCemeFile():
             self.set_header('X-Robots-Tag', 'noindex')
 
