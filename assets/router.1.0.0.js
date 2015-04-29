@@ -201,7 +201,7 @@ var Router = function () {
     }
 
     function firstLoad() {
-        cemeCompiler.asyncCompiler('/assets/code/home.ceme', {
+        cemeCompiler.asyncCompiler('/assets/code/home.1.0.0.ceme', {
             callback: function (code, output) {
                 $('body').show();
                 $('#page-container').hide().html(output).fadeIn(300);

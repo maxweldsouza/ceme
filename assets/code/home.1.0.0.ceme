@@ -30,7 +30,8 @@ function
             'Example'
         pre
             code
-                x
+                EscapeHtml
+                    x
 function
     Link
         url
