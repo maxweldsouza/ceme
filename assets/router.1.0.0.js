@@ -186,7 +186,7 @@ var Router = function () {
 
         $(document).on('click', 'a', function (e) {
             function external (url) {
-                return /^http/.test(url);
+                return /^(http|#)/.test(url);
             }
             var url = $(this).attr("href");
             if (url && !external(url)) {
@@ -213,6 +213,11 @@ var Router = function () {
                 editor = ace.edit("ceme-ace-editor");
 
                 $("#mobile-menu").mmenu({
+                    "extensions": [
+                    "border-none",
+                    "effect-slide",
+                    "padeshadow"
+                    ],
                     onClick: {
                         close: true
                     }
