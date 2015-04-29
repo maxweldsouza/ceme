@@ -194,8 +194,6 @@ def save_page(name, content, ip, username):
     else:
         user_group = 0
 
-    if content == old_content:
-        raise InvalidInput("No changes to save")
     if user_group < page_group:
         if user_group is 0:
             raise NoRights('This page can only be edited by authenticated users of level %d and above.' % (page_group,))
@@ -204,6 +202,8 @@ def save_page(name, content, ip, username):
     # check user level before validating content
     # to save one query
     content = validate_content(content)
+    if content == old_content:
+        raise InvalidInput("No changes to save")
     db.put('INSERT INTO pages (page_name, page_content, page_group, page_username, page_ip)'
             ' VALUES (%s, %s, %s, %s, %s) '
             , (name, content, config.default_level, username, ip))
