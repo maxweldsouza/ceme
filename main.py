@@ -35,7 +35,7 @@ class LoginHandler(tornado.web.RequestHandler):
     have common ajax code for all forms."""
     def get(self):
         self.xsrf_token
-        self.render('index.html')
+        self.render(config.template)
 
     def post(self):
         try:
@@ -53,7 +53,7 @@ class LoginHandler(tornado.web.RequestHandler):
 class LogoutHandler(tornado.web.RequestHandler):
     def get(self):
         self.xsrf_token
-        self.render('index.html')
+        self.render(config.template)
 
     def post(self):
         self.clear_cookie(config.xsrf_cookie)
@@ -62,7 +62,7 @@ class LogoutHandler(tornado.web.RequestHandler):
 class SignupHandler(tornado.web.RequestHandler):
     def get(self):
         self.xsrf_token
-        self.render('index.html')
+        self.render(config.template)
 
     def post(self):
         try:
@@ -89,7 +89,7 @@ class UserHandler(tornado.web.RequestHandler):
 class MainHandler(tornado.web.RequestHandler):
     def get(self, path):
         self.xsrf_token
-        self.render('index.html')
+        self.render(config.template)
 
 class ErrorHandler(tornado.web.ErrorHandler):
     def get(self):
@@ -122,7 +122,7 @@ class CodeHandler(tornado.web.RequestHandler):
 class CreateHandler(tornado.web.RequestHandler):
     def get(self):
         self.xsrf_token
-        self.render('index.html')
+        self.render(config.template)
 
     def post(self):
         """ redirects after post """

@@ -11,3 +11,4 @@ db_password = "password"
 # this is the default level of created pages
 default_level = 1
 debug = True
+template = 'base.html'

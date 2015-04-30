@@ -245,6 +245,10 @@ var Router = function () {
             pagename = 'home';
         }
 
+        if (typeof ga !== 'undefined') {
+            ga('send', 'pageview');
+        }
+
         $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
         cemeCompiler.asyncCompiler('/code/' + pagename, {
             callback: function (code, output) {
