@@ -233,6 +233,7 @@ class CemeStaticHandler(tornado.web.StaticFileHandler):
 # Urls starting with api are for ajax requests.
 application = tornado.web.Application([
     (r'/(favicon.ico)', FaviconHandler, {'path': './assets'},),
+    (r'/(robots.txt)', CemeStaticHandler, {'path': './'},),
     (r'/login', LoginHandler),
     (r'/logout', LogoutHandler),
     (r'/create', CreateHandler),
