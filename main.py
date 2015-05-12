@@ -5,7 +5,6 @@ import tornado.ioloop
 import tornado.web
 from tornado.httpserver import HTTPServer
 import json
-import prerender
 
 import database
 import config
