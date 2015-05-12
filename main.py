@@ -5,6 +5,7 @@ import tornado.ioloop
 import tornado.web
 from tornado.httpserver import HTTPServer
 import json
+import prerender
 
 import database
 import config
@@ -35,6 +36,7 @@ class LoginHandler(tornado.web.RequestHandler):
     have common ajax code for all forms."""
     def get(self):
         self.xsrf_token
+        #TODO compile and cache template
         self.render(config.template)
 
     def post(self):
@@ -208,7 +210,6 @@ settings = {
     'cookie_secret' : config.cookie_secret,
     'xsrf_cookies': True
 }
-
 
 class CemeStaticHandler(tornado.web.StaticFileHandler):
     def set_extra_headers(self, path):
