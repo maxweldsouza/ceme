@@ -1,68 +1,15 @@
-import MySQLdb
-import json
 import hashlib, uuid
 import re
 
 import config
+import dbhelper
 from custom_exceptions import *
 
-class DatabaseConnection:
-    def connect(self):
-        try:
-            self.connection = MySQLdb.connect(host=config.db_host,
+db = dbhelper.DatabaseConnection(host=config.db_host,
                     user=config.db_user,
                     passwd=config.db_password,
                     db=config.db_name)
-
-            self.cur = self.connection.cursor()
-            return self.cur
-        except Exception, e:
-            raise
-
-    def disconnect(self):
-        self.connection.close()
-        self.cur.close()
-
-    def get_one(self, qry, tpl):
-        try:
-            cur = self.connect()
-            cur.execute(qry, tpl)
-            result = cur.fetchone()
-            self.disconnect()
-            # unpack tuple if it has only
-            # one element
-            if type(result) is tuple and len(result) == 1:
-                result = result[0]
-            return result
-        except Exception, e:
-            raise
-
-    def get_all(self, qry, tpl):
-        try:
-            cur = self.connect()
-            cur.execute(qry, tpl)
-            result = cur.fetchall()
-            self.disconnect()
-            return result
-        except Exception, e:
-            raise
-
-    def put(self, qry, tpl):
-        try:
-            cur = self.connect()
-            cur.execute(qry, tpl)
-            self.connection.commit()
-            self.disconnect()
-        except Exception, e:
-            raise
-
-db = DatabaseConnection()
-
-def json_output(obj):
-    return json.dumps(obj, default=date_handler)
-
-def date_handler(obj):
-        return obj.isoformat() if hasattr(obj, 'isoformat') else obj
+json_output = dbhelper.json_output
 
 def generate_salt():
     return uuid.uuid4().hex
