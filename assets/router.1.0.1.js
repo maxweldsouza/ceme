@@ -1,25 +1,5 @@
 'use strict';
 
-var clientSide = function () {
-    return typeof exports === 'undefined';
-}();
-
-if (!clientSide) {
-    var ceme = require('./ceme/compiler');
-    var lib = require('./ceme/lib');
-    var ceme = lib.ceme;
-}
-
-if (clientSide) {
-    var cemeFileName = function () {
-        var file = window.location.pathname.substr(1);
-        if (file === '') {
-            return 'home';
-        }
-        return file;
-    };
-}
-
 ceme.GetPageName = function () {
     var path = window.location.pathname;
     path = path.substr(1);
@@ -123,82 +103,80 @@ var Router = function () {
         }
     }
 
-    if (clientSide) {
-        $(document).on('submit', 'form', function (e) {
-            $("#ceme-input").val(editor.getSession().getValue());
+    $(document).on('submit', 'form', function (e) {
+        $("#ceme-input").val(editor.getSession().getValue());
 
-            // TODO not for GET forms
-            var url = $(this).attr('action');
-            if ($(this).attr('method') === 'post') {
-                if (url.indexOf('/api') === 0) {
-                    e.preventDefault();
-                    $.ajax({
-                        url: url,
-                        type: 'POST',
-                        data: $(this).serialize() + xsrfToken(),
-                        error: function (jqXHR) {
-                            if (jqXHR.status === 0) {
-                                cemeCompiler.error('No internet connection');
-                            } else if (jqXHR.status === 500) {
-                                cemeCompiler.error('Internal server error');
-                            } else if (jqXHR.status === 404) {
-                                cemeCompiler.error(jqXHR.responseText);
-                            } else if (jqXHR.status === 400) {
-                                cemeCompiler.error(jqXHR.responseText);
-                            } else {
-                                cemeCompiler.error('Unexpected error status:' + jqXHR.status);
-                            }
-                        }
-                    }).done(function (response) {
-                        $('#alert').hide().html(ceme.Alert(response, 'success')).fadeIn(200);
-                    });
-                } else {
-                    var input = $("<input>")
-                        .attr("type", "hidden")
-                        .attr("name", "_xsrf").val(ceme.GetCookie('_xsrf'));
-                    $(this).append(input);
-                }
-            }
-        });
-
-        $(document).on('click', '#logout', function () {
-            $('#logout-form').submit();
-        });
-
-        $(document).on('click', '.ceme-btn-page', function () {
-            changeMode('view');
-        });
-
-        $(document).on('click', '.ceme-btn-code', function () {
-            changeMode('edit');
-        });
-
-        $(document).on('click', '.ceme-btn-both', function () {
-            changeMode('both');
-        });
-
-        $(document).on('click', '#ceme-run', runCode);
-
-        $(document).on('click', '#ceme-history', function (e) {
-            window.location = '/history?name=' + ceme.GetPageName();
-            e.preventDefault();
-        });
-
-        $(document).on('click', 'a', function (e) {
-            function external (url) {
-                return /^(http|#)/.test(url);
-            }
-            var url = $(this).attr("href");
-            if (url && !external(url)) {
-                history.pushState(null, null, url);
-
+        // TODO not for GET forms
+        var url = $(this).attr('action');
+        if ($(this).attr('method') === 'post') {
+            if (url.indexOf('/api') === 0) {
                 e.preventDefault();
-                setTimeout(function () {
-                    Router.route(url);
-                }, 0);
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: $(this).serialize() + xsrfToken(),
+                    error: function (jqXHR) {
+                        if (jqXHR.status === 0) {
+                            cemeCompiler.error('No internet connection');
+                        } else if (jqXHR.status === 500) {
+                            cemeCompiler.error('Internal server error');
+                        } else if (jqXHR.status === 404) {
+                            cemeCompiler.error(jqXHR.responseText);
+                        } else if (jqXHR.status === 400) {
+                            cemeCompiler.error(jqXHR.responseText);
+                        } else {
+                            cemeCompiler.error('Unexpected error status:' + jqXHR.status);
+                        }
+                    }
+                }).done(function (response) {
+                    $('#alert').hide().html(ceme.Alert(response, 'success')).fadeIn(200);
+                });
+            } else {
+                var input = $("<input>")
+                    .attr("type", "hidden")
+                    .attr("name", "_xsrf").val(ceme.GetCookie('_xsrf'));
+                $(this).append(input);
             }
-        });
-    }
+        }
+    });
+
+    $(document).on('click', '#logout', function () {
+        $('#logout-form').submit();
+    });
+
+    $(document).on('click', '.ceme-btn-page', function () {
+        changeMode('view');
+    });
+
+    $(document).on('click', '.ceme-btn-code', function () {
+        changeMode('edit');
+    });
+
+    $(document).on('click', '.ceme-btn-both', function () {
+        changeMode('both');
+    });
+
+    $(document).on('click', '#ceme-run', runCode);
+
+    $(document).on('click', '#ceme-history', function (e) {
+        window.location = '/history?name=' + ceme.GetPageName();
+        e.preventDefault();
+    });
+
+    $(document).on('click', 'a', function (e) {
+        function external (url) {
+            return /^(http|#)/.test(url);
+        }
+        var url = $(this).attr("href");
+        if (url && !external(url)) {
+            history.pushState(null, null, url);
+
+            e.preventDefault();
+            setTimeout(function () {
+                Router.route(url);
+            }, 0);
+        }
+    });
 
     function firstLoad() {
         cemeCompiler.asyncCompiler('/assets/code/home.1.0.0.ceme', {
@@ -290,13 +268,6 @@ var Router = function () {
     };
 }();
 
-if (clientSide) {
-    window.onpopstate = function () {
-        Router.route(window.location.pathname + window.location.search);
-    };
-}
-
-(function (exports) {
-    exports.route = Router.route;
-
-})(typeof exports === 'undefined' ? {} : exports);
+window.onpopstate = function () {
+    Router.route(window.location.pathname + window.location.search);
+};
