@@ -244,7 +244,7 @@ application = tornado.web.Application([
     ], **settings)
 
 if __name__ == '__main__':
-    print 'Ceme Server running on port %s' %s config.port
+    print 'Ceme Server running on port %s' % config.port
     if config.ssl:
         server = HTTPServer(application, ssl_options = {
             'certfile': os.path.join('certs/localhost.crt'),

@@ -116,7 +116,7 @@ def create_page(name, content, ip, username):
         username = ''
 
     exists = db.get_one('SELECT page_timestamp FROM pages'
-            ' WHERE page_name = %s limit 1', (name,))
+            ' WHERE page_name = %s', (name,))
     if (exists):
         raise AlreadyExists('This page already exists')
     else:
@@ -133,7 +133,7 @@ def save_page(name, content, ip, username):
     user_group = db.get_one('SELECT user_group FROM users'
             ' WHERE user_name = %s', (username,))
     page_group, old_content = db.get_one('SELECT page_group, page_content FROM pages'
-            ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
+            ' WHERE page_name = %s ORDER BY page_timestamp DESC', (name,))
     if page_group:
         page_group = int(page_group)
     if user_group:
@@ -158,7 +158,7 @@ def save_page(name, content, ip, username):
 def read_page(name):
     validate_name(name)
     page = db.get_one('SELECT page_content FROM pages'
-            ' WHERE page_name = %s ORDER BY page_timestamp DESC LIMIT 1', (name,))
+            ' WHERE page_name = %s ORDER BY page_timestamp DESC', (name,))
     if not page:
         raise EntryNotFound('this entry was not found')
     return page
