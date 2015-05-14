@@ -9,6 +9,8 @@ var cemeCompiler,
         compile,
         unique;
 
+    // cemeCompiler is an object that has functions
+    // to compile and run ceme code
     cemeCompiler = (function () {
         var infixOps;
 
@@ -938,13 +940,21 @@ var cemeCompiler,
             }
         };
 
+        // The compiler compiles ceme code to javascript, it then
+        // runs the javascript code with generates html
+        // The generated html is passed as an argument to the
+        // callback
+        //
         // The asynchronous compiler takes an object with three
         // properties
         //     filepath: Path to the file to be compiled
         //          or
         //     code: Source code that needs to be compiled
         //     callback: optional callback
-        //
+        //     The callback is a function of two arguments
+        //         code: ceme source code
+        //         output: generated html
+
         function asyncCompiler(params) {
             var tree,
                 imports,
