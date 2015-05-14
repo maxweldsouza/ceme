@@ -65,8 +65,6 @@ var cemeCompiler,
         }());
 
         function toStringLiteral(str) {
-            // TODO not just line break
-            // do everything
             str = str.replace(/\n/g, '\\n');
             return str;
         }
@@ -753,7 +751,6 @@ var cemeCompiler,
                 }
             }
             // add dedents at the end
-            //TODO: Remove duplication
             spaces = 1;
             while (indentLevel > spaces) {
                 indentLevel = indentLevel - indentStack.pop();
