@@ -239,7 +239,7 @@ var cemeCompiler,
             var pms,
                 bdy;
             if (!isSymbol(tree[1][0])) {
-                throw new SyntaxError('Syntax error in function definition at line ' + lineno);
+                throw new SyntaxError('Syntax error in function definition');
             }
             if (tree[1][0].name === 'unnamed') {
                 if (tree[1].length > 1) {
@@ -515,7 +515,7 @@ var cemeCompiler,
             return imports;
         }
 
-        function compile(tree) {
+        var compile = function (tree) {
             var i,
                 x,
                 lineno,
@@ -640,13 +640,13 @@ var cemeCompiler,
             return tree;
         }
 
-        var reShortString = function () {
+        var reShortString = (function () {
             var doubleQuoted = /^"(\\["'\\\/bfnrt]|[^\\"\n\r])*"/,
                 singleQuoted = /^'(\\["'\\\/bfnrt]|[^\\'\n\r])*'/,
                 result = new RegExp(singleQuoted.source +
                     '|' + doubleQuoted.source);
             return result;
-        }();
+        }());
 
         function regexes() {
             var regs = {
