@@ -972,9 +972,6 @@ var cemeCompiler,
             mainFile = new FileImports(filename, function () {
                 var output;
                 if (mainFile.checkAllDone() && !mainFile.executed) {
-                    if (params.callbackbeforecompile) {
-                        params.callbackbeforecompile(mainFile.code);
-                    }
                     if (mainFile.type === 'ceme') {
                         mainFile.importChildren();
                         output = compileTree(mainFile.tree);

@@ -227,9 +227,19 @@ var Router = function () {
             ga('send', 'pageview');
         }
 
+        editor.getSession().setMode("ace/mode/ceme");
+        editor.setOption('maxLines', Infinity);
+        editor.setOption('minLines', 3);
+        editor.setFontSize(18);
+        editor.setTheme("ace/theme/github");
+        editor.$blockScrolling = Infinity;
+
         $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
         cemeCompiler.asyncCompiler('/code/' + pagename, {
             callback: function (code, output) {
+
+                editor.setValue(code);
+                changeMode('view');
 
                 runCode();
 
@@ -245,18 +255,11 @@ var Router = function () {
                 } else {
                     $('.login-logout').html('<li><a href="/login">Login</a></li><li><a href="/sign-up">Sign Up</a></li>');
                 }
+
             },
             callbackbeforecompile: function (code) {
                 // runs before compilation
                 //editor.setValue(code);
-                editor.getSession().setMode("ace/mode/ceme");
-                editor.setOption('maxLines', Infinity);
-                editor.setOption('minLines', 3);
-                editor.setFontSize(18);
-                editor.setTheme("ace/theme/github");
-                editor.$blockScrolling = Infinity;
-                editor.setValue(code);
-                changeMode('view');
             }
         });
 
