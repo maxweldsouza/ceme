@@ -180,6 +180,12 @@ var Router = function () {
     });
 
     function firstLoad() {
+        cemeCompiler.setErrorCallback(function error(message) {
+            if (ceme.Alert) {
+                $('#alert').hide().html(ceme.Alert(message, 'danger')).fadeIn(200);
+            }
+        });
+
         cemeCompiler.asyncCompiler({
             filepath: '/assets/code/home.1.0.0.ceme',
             callback: function (code, output) {

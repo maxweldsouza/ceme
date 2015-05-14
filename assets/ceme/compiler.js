@@ -12,28 +12,11 @@ var cemeCompiler,
     // cemeCompiler is an object that has functions
     // to compile and run ceme code
     cemeCompiler = (function () {
-        var infixOps;
+        var infixOps,
+            error;
 
         function SyntaxError(message) {
             this.message = message;
-        }
-
-        function success(message) {
-            $('#alert').hide().html(ceme.Alert(message, 'success')).fadeIn(200);
-        }
-
-        function warning(message) {
-            $('#alert').hide().html(ceme.Alert(message, 'warning')).fadeIn(200);
-        }
-
-        function error(msg, lineno) {
-            var message = msg;
-            if (lineno !== undefined) {
-                message += ' at line ' + lineno;
-            }
-            if (ceme.Alert) {
-                $('#alert').hide().html(ceme.Alert(message, 'danger')).fadeIn(200);
-            }
         }
 
         /* Helper */
@@ -730,7 +713,7 @@ var cemeCompiler,
                                 temp = toStringLiteral(removeOneQuote(removeOneQuote(temp)));
                                 tokens.push(temp);
                                 //} else if (i === 'DANGEROUS') {
-                                //    error('Dangerous character');
+                                //    throw new SyntaxError('Dangerous character');
                             } else {
                                 tokens.push(res);
                             }
@@ -779,6 +762,8 @@ var cemeCompiler,
         }
 
         function FileImports(name, checkdone) {
+            var filetypes = ['css', 'js', 'ceme'],
+                i;
             this.name = name;
             this.done = false;
             this.executed = false;
@@ -847,7 +832,7 @@ var cemeCompiler,
                     },
                     error: function (request) {
                         if (request.status === 0) {
-                            ceme.error('No internet connection');
+                            error('No internet connection');
                         } else {
                             error(request.responseText);
                         }
@@ -993,15 +978,17 @@ var cemeCompiler,
             mainFile.requestAll();
         }
 
+        function setErrorCallback(fn) {
+            error = fn;
+        }
+
         return {
             'lexer': lexer,
             'CemeSymbol': CemeSymbol,
             'isSymbol': isSymbol,
             'compileText': compileText,
             'asyncCompiler': asyncCompiler,
-            'success': success,
-            'warning': warning,
-            'error': error
+            'setErrorCallback': setErrorCallback
         };
     }());
 
