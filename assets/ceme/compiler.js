@@ -605,7 +605,7 @@ var cemeCompiler,
                     return _call(x, called);
                 }
             }
-        }
+        };
 
         function makeList(tokens) {
             var list = [];
@@ -648,21 +648,18 @@ var cemeCompiler,
             return result;
         }());
 
-        function regexes() {
-            var regs = {
-                'COMMENT': /^[\r\n]* *#[^\r\n]*/,
-                //'DANGEROUS': /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-                'NUMBER': /^\-?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][+\-]?[0-9]*)?/,
-                'SYMBOL': /^[^_ '"\r\n#:()][^ '"\r\n#:()]*/,
-                'INDSPACE': /^(\r\n|\n|\r) */,
-                'SPACE': /(^ +)|(^\r\n+)|(^\n+)|(^\r+)/,
-                'INDENT': /^\(/,
-                'DEDENT': /^\)/,
-                'LONGSTRING': /^"""([^"]|\\")*"""|^'''([^']|\\')*'''/,
-                'STRING': reShortString
-            };
-            return regs;
-        }
+        var regs = {
+            'COMMENT': /^[\r\n]* *#[^\r\n]*/,
+            //'DANGEROUS': /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
+            'NUMBER': /^\-?(0|[1-9][0-9]*)(\.[0-9]*)?([eE][+\-]?[0-9]*)?/,
+            'SYMBOL': /^[^_ '"\r\n#:()][^ '"\r\n#:()]*/,
+            'INDSPACE': /^(\r\n|\n|\r) */,
+            'SPACE': /(^ +)|(^\r\n+)|(^\n+)|(^\r+)/,
+            'INDENT': /^\(/,
+            'DEDENT': /^\)/,
+            'LONGSTRING': /^"""([^"]|\\")*"""|^'''([^']|\\')*'''/,
+            'STRING': reShortString
+        };
 
         function lexer(input) {
             var lineno = 1,
@@ -671,7 +668,6 @@ var cemeCompiler,
                 tokens = [],
                 indentStack = [],
                 indentLevel = 1,
-                regs = regexes(),
                 length = input.length,
                 res,
                 spaces,
