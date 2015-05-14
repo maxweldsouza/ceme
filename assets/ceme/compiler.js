@@ -1,19 +1,48 @@
 var cemeCompiler,
     ceme;
 
+    // Polyfills
+        // Strings
+    if (!String.prototype.endsWith) {
+        String.prototype.endsWith = function (searchString, position) {
+            var subjectString = this.toString(),
+                lastIndex;
+            if (position === undefined || position > subjectString.length) {
+                position = subjectString.length;
+            }
+            position -= searchString.length;
+            lastIndex = subjectString.indexOf(searchString, position);
+            return lastIndex !== -1 && lastIndex === position;
+        };
+    }
+    if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function (searchString, position) {
+            position = position || 0;
+            return this.lastIndexOf(searchString, position) === position;
+        };
+    }
+        //Arrays
+    if (!Array.isArray) {
+        Array.isArray = function(arg) {
+            return Object.prototype.toString.call(arg) === '[object Array]';
+        };
+    }
+
 (function () {
     "use strict";
-    var indent = '    ',
-        macroTable = {},
-        isArray,
-        compile,
-        unique;
 
     // cemeCompiler is an object that has functions
     // to compile and run ceme code
     cemeCompiler = (function () {
-        var infixOps,
+        var indent = '    ',
+            macroTable = {},
+            isArray,
+            compile,
+            unique,
+            infixOps,
             error;
+
+        isArray = Array.isArray;
 
         function SyntaxError(message) {
             this.message = message;

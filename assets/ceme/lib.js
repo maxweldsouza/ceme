@@ -1,28 +1,10 @@
-var IsArray;
 (function () {
     "use strict";
 
-    // Polyfills
-    if (!String.prototype.endsWith) {
-        String.prototype.endsWith = function (searchString, position) {
-            var subjectString = this.toString(),
-                lastIndex;
-            if (position === undefined || position > subjectString.length) {
-                position = subjectString.length;
-            }
-            position -= searchString.length;
-            lastIndex = subjectString.indexOf(searchString, position);
-            return lastIndex !== -1 && lastIndex === position;
-        };
-    }
-    if (!String.prototype.startsWith) {
-        String.prototype.startsWith = function (searchString, position) {
-            position = position || 0;
-            return this.lastIndexOf(searchString, position) === position;
-        };
-    }
-
     ceme = (function () {
+        //TODO duplicate
+        var IsArray = Array.isArray;
+
         function IsEmptyArray(tree) {
             return IsArray(tree) && tree.length === 0;
         }
@@ -46,13 +28,6 @@ var IsArray;
                 throw new Error('Cant Rest an atom: ' + list);
             }
             return list.slice(1, list.length);
-        }
-
-        //TODO duplicate
-        if (IsArray === undefined) {
-            IsArray = function (a) {
-                return Object.prototype.toString.call(a) === '[object Array]';
-            };
         }
 
         function IsLat(a) {
