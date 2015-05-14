@@ -34,7 +34,6 @@ var cemeCompiler,
             if (ceme.Alert) {
                 $('#alert').hide().html(ceme.Alert(message, 'danger')).fadeIn(200);
             }
-            throw message;
         }
 
         /* Helper */
@@ -489,6 +488,7 @@ var cemeCompiler,
                     }
                 } catch (err) {
                     error(err.message);
+                    throw err;
                 }
             }
             return output;
@@ -742,7 +742,7 @@ var cemeCompiler,
 
                 // check whether stuck in infinite loop
                 if (input.length === length) {
-                    error('Check your quotes. Lexer is stuck', lineno);
+                    throw new SyntaxError('Check your quotes. Lexer is stuck', lineno);
                 } else {
                     length = input.length;
                 }
@@ -758,12 +758,17 @@ var cemeCompiler,
         }
 
         function textToParseTree(text) {
-            var tokens = lexer(text),
-                tree;
-            tokens.unshift('(');
-            tokens.unshift('main'); //dummy token
-            tokens.push(')');
-            tree = parser(tokens);
+            try {
+                var tokens = lexer(text),
+                    tree;
+                tokens.unshift('(');
+                tokens.unshift('main'); //dummy token
+                tokens.push(')');
+                tree = parser(tokens);
+            } catch (err) {
+                error(err.message);
+                throw err;
+            }
             return tree;
         }
 
