@@ -3,8 +3,7 @@ var cemeCompiler,
 
 (function () {
     "use strict";
-    var lib,
-        indent = '    ',
+    var indent = '    ',
         macroTable = {},
         isArray,
         compile,
