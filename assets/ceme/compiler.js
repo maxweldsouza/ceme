@@ -961,15 +961,19 @@ var cemeCompiler,
             }
         };
 
-        function asyncCompiler(filename, params) {
+        // The asynchronous compiler takes an object with three
+        // properties
+        //     filepath: Path to the file to be compiled
+        //          or
+        //     code: Source code that needs to be compiled
+        //     callback: optional callback
+        //
+        function asyncCompiler(params) {
             var tree,
                 imports,
                 i,
                 mainFile;
-            // This function has two callbacks
-            // first one will run just before compilation
-            // second one will run just after compilation
-            mainFile = new FileImports(filename, function () {
+            mainFile = new FileImports(params.filepath, function () {
                 var output;
                 if (mainFile.checkAllDone() && !mainFile.executed) {
                     if (mainFile.type === 'ceme') {

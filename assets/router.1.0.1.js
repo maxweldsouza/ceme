@@ -87,7 +87,8 @@ var Router = function () {
         outputelem = $('#ceme-output');
         outputelem.empty();
 
-        cemeCompiler.asyncCompiler('', {
+        cemeCompiler.asyncCompiler({
+            filepath: '',
             callback: function (code, output) {
                 outputelem.html(output).fadeIn(300);
                 if (currentMode === 'edit') {
@@ -179,7 +180,8 @@ var Router = function () {
     });
 
     function firstLoad() {
-        cemeCompiler.asyncCompiler('/assets/code/home.1.0.0.ceme', {
+        cemeCompiler.asyncCompiler({
+            filepath: '/assets/code/home.1.0.0.ceme',
             callback: function (code, output) {
                 $('body').show();
                 $('#page-container').hide().html(output).fadeIn(300);
@@ -202,7 +204,6 @@ var Router = function () {
                 });
 
                 Router.route(window.location.pathname + window.location.search);
-
             }
         });
     }
@@ -235,7 +236,9 @@ var Router = function () {
         editor.$blockScrolling = Infinity;
 
         $('#ceme-page-name').replaceWith('<input type="hidden" name="name" id="ceme-page-name" value="' + pagename + '">');
-        cemeCompiler.asyncCompiler('/code/' + pagename, {
+
+        cemeCompiler.asyncCompiler({
+            filepath: '/code/' + pagename,
             callback: function (code, output) {
 
                 editor.setValue(code);
@@ -256,10 +259,6 @@ var Router = function () {
                     $('.login-logout').html('<li><a href="/login">Login</a></li><li><a href="/sign-up">Sign Up</a></li>');
                 }
 
-            },
-            callbackbeforecompile: function (code) {
-                // runs before compilation
-                //editor.setValue(code);
             }
         });
 
