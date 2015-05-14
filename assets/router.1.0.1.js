@@ -107,7 +107,6 @@ var Router = function () {
     $(document).on('submit', 'form', function (e) {
         $("#ceme-input").val(editor.getSession().getValue());
 
-        // TODO not for GET forms
         var url = $(this).attr('action');
         if ($(this).attr('method') === 'post') {
             if (url.indexOf('/api') === 0) {
@@ -118,6 +117,7 @@ var Router = function () {
                     data: $(this).serialize() + xsrfToken(),
                     error: function (jqXHR) {
                         if (jqXHR.status === 0) {
+                            //TODO dont use cemeCompiler.
                             cemeCompiler.error('No internet connection');
                         } else if (jqXHR.status === 500) {
                             cemeCompiler.error('Internal server error');
