@@ -36,21 +36,6 @@ var cemeCompiler,
             throw message;
         }
 
-        // TODO move
-        var platform = function () {
-            if (XMLHttpRequest !== undefined) {
-                return 'browser';
-            }
-            if (exports !== undefined) {
-                return 'nodejs';
-            }
-        };
-
-        if (platform() === 'nodejs') {
-            lib = require('./lib');
-            ceme = lib.ceme;
-        }
-
         /* Helper */
 
         function CemeSymbol(name, lineno) {
@@ -1013,16 +998,4 @@ var cemeCompiler,
         };
     }());
 
-        /*
-    (function (exports) {
-
-        exports.lexer = ceme.lexer;
-        exports.CemeSymbol = ceme.CemeSymbol;
-        exports.isSymbol = ceme.isSymbol;
-        exports.compileText = ceme.compileText;
-        exports.asyncCompiler = ceme.asyncCompiler;
-        exports.ceme = ceme;
-
-    }(exports === undefined ? {} : exports));
-    */
 }());

@@ -643,12 +643,4 @@ var IsArray;
 
     }());
 
-    /*
-    (function(exports) {
-
-        exports.ceme = ceme;
-
-    })(typeof exports === 'undefined'? this['lib']={}: exports);
-    */
-
 }());
