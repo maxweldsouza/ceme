@@ -2,7 +2,6 @@
     "use strict";
 
     ceme = (function () {
-        //TODO duplicate
         var IsArray = Array.isArray;
 
         function IsEmptyArray(tree) {
@@ -517,7 +516,7 @@
             },
             'SortStrings': function (a) {
                 return a.sort();
-            },
+            }
 
         };
     }());
